@@ -99,6 +99,7 @@ class JsbSimEnv(gym.Env):
                 'fcs/elevator-cmd-norm': action[1],
                 'fcs/rudder-cmd-norm': action[2]
         }
+        self._log(data)
 
         return np.array(state), reward, done, info
 
@@ -192,6 +193,15 @@ class JsbSimEnv(gym.Env):
         """
         gym.logger.warn("Could not seed environment %s", self)
         return
+
+    """Add data to log"""
+    def _log(self, data):
+        """Initialize"""
+        if len(self._render_log) == 0:
+            self._render_log = {k: deque(maxlen=self._max_log_length) for k in data}
+        """Append to log"""
+        for k in data:
+            self._render_log[k].append(data[k])
 
     def _make_json_compatible(self, obj):
         """Converts deques to list, returning a recursive copy of the input obkject"""

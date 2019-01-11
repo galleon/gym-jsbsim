@@ -57,7 +57,7 @@ class JsbSimEnv(gym.Env):
         self.done = False
 
         self._max_log_length = 200
-        self._log_path = "./log.json"
+        self._log_path = "/home/jsbsim/logs/log.json"
         self._render_log = {}
 
     def step(self, action: np.ndarray) -> Tuple[np.ndarray, float, bool, Dict]:

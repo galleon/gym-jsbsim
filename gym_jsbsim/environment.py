@@ -54,9 +54,9 @@ class JsbSimEnv(gym.Env):
         self.flightgear_visualiser: FlightGearVisualiser = None
         self.step_delay = None
 
-        self.done = False
+        self.log_when_done = False
 
-        self._max_log_length = 200
+        self._max_log_length = 1000
         self._log_path = "/home/jsbsim/logs/log.json"
         self._render_log = {}
 
@@ -102,7 +102,8 @@ class JsbSimEnv(gym.Env):
                 'fcs/rudder-cmd-norm': action[2]
         }
         self._log(data)
-        self.done = done
+        if done and self.log_when_done:
+            self.render()
 
         return np.array(state), reward, done, info
 
@@ -124,7 +125,6 @@ class JsbSimEnv(gym.Env):
             self.flightgear_visualiser.configure_simulation_output(self.sim)
 
         self._render_log = {}
-        self.done = False
 
         return np.array(state)
 
@@ -156,9 +156,8 @@ class JsbSimEnv(gym.Env):
             returning if True, else returns immediately
         """
         if mode == 'human':
-            if self.done: # only output json file if the episode is finished
-                with open (self._log_path, 'w') as file:
-                    json.dump(self._make_json_compatible(self._render_log), file)
+            with open (self._log_path, 'w') as file:
+                json.dump(self._make_json_compatible(self._render_log), file)
                 
         elif mode == 'flightgear':
             if not self.flightgear_visualiser:

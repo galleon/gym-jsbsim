@@ -1,5 +1,7 @@
 import gym
 import numpy as np
+import json
+from collections import deque
 from gym_jsbsim.tasks import Shaping, HeadingControlTask
 from gym_jsbsim.simulation import Simulation
 from gym_jsbsim.visualiser import FigureVisualiser, FlightGearVisualiser
@@ -52,6 +54,12 @@ class JsbSimEnv(gym.Env):
         self.flightgear_visualiser: FlightGearVisualiser = None
         self.step_delay = None
 
+        self.log_when_done = False
+
+        self._max_log_length = 1000
+        self._log_path = "/home/jsbsim/logs/log.json"
+        self._render_log = {}
+
     def step(self, action: np.ndarray) -> Tuple[np.ndarray, float, bool, Dict]:
         """
         Run one timestep of the environment's dynamics. When end of
@@ -66,10 +74,37 @@ class JsbSimEnv(gym.Env):
             done: whether the episode has ended, in which case further step() calls are undefined
             info: auxiliary information, e.g. full reward shaping data
         """
+
         if not (action.shape == self.action_space.shape):
             raise ValueError('mismatch between action and action space size')
 
         state, reward, done, info = self.task.task_step(self.sim, action, self.sim_steps_per_agent_step)
+
+        data = {'position/h-sl-ft': state[0],
+                'attitude/pitch-rad': state[1],
+                'attitude/roll-rad': state[2],
+                'velocities/u-fps': state[3],
+                'velocities/v-fps': state[4],
+                'velocities/w-fps': state[5],
+                'velocities/p-rad_sec': state[6],
+                'velocities/q-rad_sec': state[7],
+                'velocities/r-rad_sec': state[8],
+                'fcs/left-aileron-pos-norm': state[9],
+                'fcs/right-aileron-pos-norm': state[10],
+                'fcs/elevator-pos-norm': state[11],
+                'fcs/rudder-pos-norm': state[12],
+                'error/altitude-error-ft': state[13],
+                'aero/beta-deg': state[14],
+                'error/track-error-deg': state[15],
+                'info/steps_left': state[16],
+                'fcs/aileron-cmd-norm': action[0],
+                'fcs/elevator-cmd-norm': action[1],
+                'fcs/rudder-cmd-norm': action[2]
+        }
+        self._log(data)
+        if done and self.log_when_done:
+            self.render()
+
         return np.array(state), reward, done, info
 
     def reset(self):
@@ -88,6 +123,8 @@ class JsbSimEnv(gym.Env):
 
         if self.flightgear_visualiser:
             self.flightgear_visualiser.configure_simulation_output(self.sim)
+
+        self._render_log = {}
 
         return np.array(state)
 
@@ -119,10 +156,9 @@ class JsbSimEnv(gym.Env):
             returning if True, else returns immediately
         """
         if mode == 'human':
-            if not self.figure_visualiser:
-                self.figure_visualiser = FigureVisualiser(self.sim,
-                                                          self.task.get_props_to_output())
-            self.figure_visualiser.plot(self.sim)
+            with open (self._log_path, 'w') as file:
+                json.dump(self._make_json_compatible(self._render_log), file)
+                
         elif mode == 'flightgear':
             if not self.flightgear_visualiser:
                 self.flightgear_visualiser = FlightGearVisualiser(self.sim,
@@ -161,6 +197,25 @@ class JsbSimEnv(gym.Env):
         """
         gym.logger.warn("Could not seed environment %s", self)
         return
+
+    """Add data to log"""
+    def _log(self, data):
+        """Initialize"""
+        if len(self._render_log) == 0:
+            self._render_log = {k: deque(maxlen=self._max_log_length) for k in data}
+        """Append to log"""
+        for k in data:
+            self._render_log[k].append(data[k])
+
+    def _make_json_compatible(self, obj):
+        """Converts deques to list, returning a recursive copy of the input obkject"""
+        if type(obj) is dict:
+            return {k: self._make_json_compatible(obj[k]) for k in obj}
+        if type(obj) is deque:
+            return list(obj)
+        else:
+            return(obj)
+
 
 
 class NoFGJsbSimEnv(JsbSimEnv):

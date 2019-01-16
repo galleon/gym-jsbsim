@@ -5,7 +5,7 @@ from holoviews.operation import gridmatrix
 hv.renderer('bokeh')
 
 def generate_figures(log):
-    log = pd.DataFrame(log)
+    log = pd.DataFrame(log).astype(float) # convert to float in case of string inputs
 
     # add a few more columns
     log['time'] = log.index

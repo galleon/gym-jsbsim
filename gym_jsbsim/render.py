@@ -7,7 +7,15 @@ import panel as pn
 
 from gym_jsbsim.plots import generate_figures
 
-FILE_PATH = sys.argv[1]
+import argparse
+
+parser = argparse.ArgumentParser(description='Start rendering server for log file in JSON format.')
+parser.add_argument("--log_path", dest="log_path", type=str, default="~/logs/log.json", help="the path to the log JSON file")
+parser.add_argument("-p", "--port", dest="port", type=int, default=56000, help="the port for serving the rendered plots")
+
+args = parser.parse_args()
+FILE_PATH = args.log_path
+PORT = args.port
 
 
 def update_panel():
@@ -19,7 +27,7 @@ def update_panel():
                 log = json.load(file)
         except FileNotFoundError:
             import warnings
-            warnings.warn("Wrong file.")
+            warnings.warn(f"No JSON file at {FILE_PATH}.")
             continue
         except json.decoder.JSONDecodeError:
             continue
@@ -61,4 +69,4 @@ thread = threading.Thread(target=update_panel)
 thread.daemon = True
 thread.start()
 
-render_panel.show(port=56000)
+render_panel.show(port=PORT)

@@ -2,7 +2,7 @@ import pandas as pd
 
 import holoviews as hv
 from holoviews.operation import gridmatrix
-hv.extension('bokeh')
+hv.renderer('bokeh')
 
 def generate_figures(log):
     log = pd.DataFrame(log)

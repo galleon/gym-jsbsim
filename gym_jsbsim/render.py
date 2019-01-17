@@ -10,7 +10,7 @@ from gym_jsbsim.plots import generate_figures
 import argparse
 
 parser = argparse.ArgumentParser(description='Start rendering server for log file in JSON format.')
-parser.add_argument("--log_path", dest="log_path", type=str, default="~/logs/log.json", help="the path to the log JSON file")
+parser.add_argument("--log_path", dest="log_path", type=str, default="/home/jsbsim/logs/log.json", help="the path to the log JSON file")
 parser.add_argument("-p", "--port", dest="port", type=int, default=56000, help="the port for serving the rendered plots")
 
 args = parser.parse_args()

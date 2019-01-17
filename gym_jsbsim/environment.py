@@ -58,7 +58,8 @@ class JsbSimEnv(gym.Env):
 
         self._max_log_length = 1000
         self._log_path = "/home/jsbsim/logs/log.json"
-        self._render_log = {}
+        self._last_data = None
+        self._render_log = deque(maxlen=self._max_log_length)
 
     def step(self, action: np.ndarray) -> Tuple[np.ndarray, float, bool, Dict]:
         """
@@ -101,9 +102,7 @@ class JsbSimEnv(gym.Env):
                 'fcs/elevator-cmd-norm': action[1],
                 'fcs/rudder-cmd-norm': action[2]
         }
-        self._log(data)
-        if done and self.log_when_done:
-            self.render()
+        self._last_data = data
 
         return np.array(state), reward, done, info
 
@@ -124,7 +123,11 @@ class JsbSimEnv(gym.Env):
         if self.flightgear_visualiser:
             self.flightgear_visualiser.configure_simulation_output(self.sim)
 
-        self._render_log = {}
+        # If there is "rendered" data in the deque, write to file
+        self._write_out_render_json()
+        # reset the "rendering queue"
+        self._render_log.clear()
+        self._last_data = None
 
         return np.array(state)
 
@@ -156,8 +159,7 @@ class JsbSimEnv(gym.Env):
             returning if True, else returns immediately
         """
         if mode == 'human':
-            with open (self._log_path, 'w') as file:
-                json.dump(self._make_json_compatible(self._render_log), file)
+            self._append_last_state()
                 
         elif mode == 'flightgear':
             if not self.flightgear_visualiser:
@@ -198,14 +200,21 @@ class JsbSimEnv(gym.Env):
         gym.logger.warn("Could not seed environment %s", self)
         return
 
-    """Add data to log"""
-    def _log(self, data):
-        """Initialize"""
-        if len(self._render_log) == 0:
-            self._render_log = {k: deque(maxlen=self._max_log_length) for k in data}
-        """Append to log"""
-        for k in data:
-            self._render_log[k].append(data[k])
+    def _append_last_state(self):
+        '''
+        Add items to the deque.
+        The deque will be written out when the environment gets reset.
+        '''
+        if self._last_data is not None:
+            self._render_log.append(self._last_data)
+
+    def _write_out_render_json(self):
+        '''
+        Write the rendering deque to disk
+        '''
+        if self._render_log: # not empty
+            with open (self._log_path, 'w') as file:
+                json.dump(self._make_json_compatible(self._render_log), file)
 
     def _make_json_compatible(self, obj):
         """Converts deques to list, returning a recursive copy of the input obkject"""

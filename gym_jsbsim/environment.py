@@ -1,8 +1,6 @@
 import gym
 import numpy as np
-import json
-from collections import deque
-from gym_jsbsim.tasks import Shaping, HeadingControlTask
+from gym_jsbsim.base_flight_task import BaseFlightTask
 from gym_jsbsim.simulation import Simulation
 from gym_jsbsim.visualiser import FigureVisualiser, FlightGearVisualiser
 from gym_jsbsim.aircraft import Aircraft, cessna172P
@@ -25,8 +23,8 @@ class JsbSimEnv(gym.Env):
     JSBSIM_DT_HZ: int = 60  # JSBSim integration frequency
     metadata = {'render.modes': ['human', 'flightgear']}
 
-    def __init__(self, task_type: Type[HeadingControlTask], aircraft: Aircraft = cessna172P,
-                 agent_interaction_freq: int = 5, shaping: Shaping=Shaping.STANDARD):
+    def __init__(self, task_type: Type[BaseFlightTask], aircraft: Aircraft = cessna172P,
+                 agent_interaction_freq: int = 5):
         """
         Constructor. Inits some internal state, but JsbSimEnv.reset() must be
         called first before interacting with environment.
@@ -35,8 +33,6 @@ class JsbSimEnv(gym.Env):
         :param aircraft: the JSBSim aircraft to be used
         :param agent_interaction_freq: int, how many times per second the agent
             should interact with environment.
-        :param shaping: a HeadingControlTask.Shaping enum, what type of agent_reward
-            shaping to use (see HeadingControlTask for options)
         """
         if agent_interaction_freq > self.JSBSIM_DT_HZ:
             raise ValueError('agent interaction frequency must be less than '
@@ -45,7 +41,7 @@ class JsbSimEnv(gym.Env):
         self.sim: Simulation = None
         self.sim_steps_per_agent_step: int = self.JSBSIM_DT_HZ // agent_interaction_freq
         self.aircraft = aircraft
-        self.task = task_type(shaping, agent_interaction_freq, aircraft)
+        self.task = task_type(agent_interaction_freq, aircraft)
         # set Space objects
         self.observation_space: gym.spaces.Box = self.task.get_state_space()
         self.action_space: gym.spaces.Box = self.task.get_action_space()
@@ -53,13 +49,6 @@ class JsbSimEnv(gym.Env):
         self.figure_visualiser: FigureVisualiser = None
         self.flightgear_visualiser: FlightGearVisualiser = None
         self.step_delay = None
-
-        self.log_when_done = False
-
-        self._max_log_length = 1000
-        self._log_path = "/home/jsbsim/logs/log.json"
-        self._last_data = None
-        self._render_log = deque(maxlen=self._max_log_length)
 
     def step(self, action: np.ndarray) -> Tuple[np.ndarray, float, bool, Dict]:
         """
@@ -73,37 +62,12 @@ class JsbSimEnv(gym.Env):
             state: agent's observation of the current environment
             reward: amount of reward returned after previous action
             done: whether the episode has ended, in which case further step() calls are undefined
-            info: auxiliary information, e.g. full reward shaping data
+            info: auxiliary information
         """
-
         if not (action.shape == self.action_space.shape):
             raise ValueError('mismatch between action and action space size')
 
         state, reward, done, info = self.task.task_step(self.sim, action, self.sim_steps_per_agent_step)
-
-        data = {'position/h-sl-ft': state[0],
-                'attitude/pitch-rad': state[1],
-                'attitude/roll-rad': state[2],
-                'velocities/u-fps': state[3],
-                'velocities/v-fps': state[4],
-                'velocities/w-fps': state[5],
-                'velocities/p-rad_sec': state[6],
-                'velocities/q-rad_sec': state[7],
-                'velocities/r-rad_sec': state[8],
-                'fcs/left-aileron-pos-norm': state[9],
-                'fcs/right-aileron-pos-norm': state[10],
-                'fcs/elevator-pos-norm': state[11],
-                'fcs/rudder-pos-norm': state[12],
-                'error/altitude-error-ft': state[13],
-                'aero/beta-deg': state[14],
-                'error/track-error-deg': state[15],
-                'info/steps_left': state[16],
-                'fcs/aileron-cmd-norm': action[0],
-                'fcs/elevator-cmd-norm': action[1],
-                'fcs/rudder-cmd-norm': action[2]
-        }
-        self._last_data = data
-
         return np.array(state), reward, done, info
 
     def reset(self):
@@ -122,12 +86,6 @@ class JsbSimEnv(gym.Env):
 
         if self.flightgear_visualiser:
             self.flightgear_visualiser.configure_simulation_output(self.sim)
-
-        # If there is "rendered" data in the deque, write to file
-        self._write_out_render_json()
-        # reset the "rendering queue"
-        self._render_log.clear()
-        self._last_data = None
 
         return np.array(state)
 
@@ -159,12 +117,14 @@ class JsbSimEnv(gym.Env):
             returning if True, else returns immediately
         """
         if mode == 'human':
-            self._append_last_state()
-                
+            if not self.figure_visualiser:
+                self.figure_visualiser = FigureVisualiser(self.sim,
+                                                          self.task.get_props_to_output(self.sim))
+            self.figure_visualiser.plot(self.sim)
         elif mode == 'flightgear':
             if not self.flightgear_visualiser:
                 self.flightgear_visualiser = FlightGearVisualiser(self.sim,
-                                                                  self.task.get_props_to_output(),
+                                                                  self.task.get_props_to_output(self.sim),
                                                                   flightgear_blocking)
             self.flightgear_visualiser.plot(self.sim)
         else:
@@ -199,32 +159,6 @@ class JsbSimEnv(gym.Env):
         """
         gym.logger.warn("Could not seed environment %s", self)
         return
-
-    def _append_last_state(self):
-        '''
-        Add items to the deque.
-        The deque will be written out when the environment gets reset.
-        '''
-        if self._last_data is not None:
-            self._render_log.append(self._last_data)
-
-    def _write_out_render_json(self):
-        '''
-        Write the rendering deque to disk
-        '''
-        if self._render_log: # not empty
-            with open (self._log_path, 'w') as file:
-                json.dump(self._make_json_compatible(self._render_log), file)
-
-    def _make_json_compatible(self, obj):
-        """Converts deques to list, returning a recursive copy of the input obkject"""
-        if type(obj) is dict:
-            return {k: self._make_json_compatible(obj[k]) for k in obj}
-        if type(obj) is deque:
-            return list(obj)
-        else:
-            return(obj)
-
 
 
 class NoFGJsbSimEnv(JsbSimEnv):

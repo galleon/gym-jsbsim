@@ -48,7 +48,7 @@ pip install git+https://github.com/Gor-Ren/gym-jsbsim
 Gym-JSBSim implements two tasks for controlling the altitude and heading of aircraft:
 
 * **HeadingControl**: aircraft must fly in a straight line, maintaining its initial altitude and direction of travel (heading)
-* **TurnHeadingControl**: aircraft must turn to face a random target heading while maintaining their initial altitude
+* **TurnHeadingChangeLevelControlTask**: aircraft must make a turn and change its altitude
 
 The environment can be configured to use one of three aircraft:
 
@@ -93,15 +93,22 @@ Then, the first call to `env.render(mode='flightgear')` will launch FlightGear a
 
 ## State and Action Space
 
-Gym-JSBSim's environments have a continuous state and action space. The state is a 17-tuple:
+Gym-JSBSim's environments have a continuous state and action space. The state depends on the task and is composed of properties declared in gym-jsbsim/properties.py.
 
 ```
 (name='position/h-sl-ft', description='altitude above mean sea level [ft]', min=-1400, max=85000)
 (name='attitude/pitch-rad', description='pitch [rad]', min=-1.5707963267948966, max=1.5707963267948966)
 (name='attitude/roll-rad', description='roll [rad]', min=-3.141592653589793, max=3.141592653589793)
+(name='attitude/psi-deg', description='heading [deg]', 0, 360)
+(name='aero/beta-deg', description='sideslip [deg]', -180, +180)
+(name='position/lat-geod-deg', description='geocentric latitude [deg]', -90, 90)
+(name='position/long-gc-deg', description='geodesic longitude [deg]', -180, 180)
 (name='velocities/u-fps', description='body frame x-axis velocity [ft/s]', min=-2200, max=2200)
 (name='velocities/v-fps', description='body frame y-axis velocity [ft/s]', min=-2200, max=2200)
 (name='velocities/w-fps', description='body frame z-axis velocity [ft/s]', min=-2200, max=2200)
+(name='velocities/v-north-fps', description='velocity true north [ft/s]', float('-inf'), float('+inf'))
+(name='velocities/v-east-fps', description='velocity east [ft/s]', float('-inf'), float('+inf'))
+(name='velocities/v-down-fps', description='velocity downwards [ft/s]', float('-inf'), float('+inf'))
 (name='velocities/p-rad_sec', description='roll rate [rad/s]', min=-6.283185307179586, max=6.283185307179586)
 (name='velocities/q-rad_sec', description='pitch rate [rad/s]', min=-6.283185307179586, max=6.283185307179586)
 (name='velocities/r-rad_sec', description='yaw rate [rad/s]', min=-6.283185307179586, max=6.283185307179586)
@@ -109,14 +116,17 @@ Gym-JSBSim's environments have a continuous state and action space. The state is
 (name='fcs/right-aileron-pos-norm', description='right aileron position, normalised', min=-1, max=1)
 (name='fcs/elevator-pos-norm', description='elevator position, normalised', min=-1, max=1)
 (name='fcs/rudder-pos-norm', description='rudder position, normalised', min=-1, max=1)
-(name='error/altitude-error-ft', description='error to desired altitude [ft]', min=-1400, max=85000)
-(name='aero/beta-deg', description='sideslip [deg]', min=-180, max=180)
-(name='error/track-error-deg', description='error to desired track [deg]', min=-180, max=180)
-(name='info/steps_left', description='steps remaining in episode', min=0, max=300)
+(name='fcs/throttle-pos-norm', description='throttle position, normalised', 0, 1)
+(name='gear/gear-pos-norm', description='landing gear position, normalised', 0, 1)
  ```
- Actions are 3-tuples of floats in the range [-1,+1] describing commands to move the aircraft's control surfaces (ailerons, elevator, rudder):
+ Actions tuples of floats in the range [-1,+1] describing commands to move the aircraft's control surfaces (ailerons, elevator, rudder) and to control the engines and the gears:
  ```
- (name='fcs/aileron-cmd-norm', description='aileron commanded position, normalised', min=-1.0, max=1.0)
- (name='fcs/elevator-cmd-norm', description='elevator commanded position, normalised', min=-1.0, max=1.0)
- (name='fcs/rudder-cmd-norm', description='rudder commanded position, normalised', min=-1.0, max=1.0)
+(name='fcs/aileron-cmd-norm', description='aileron commanded position, normalised', min=-1.0, max=1.0)
+(name='fcs/elevator-cmd-norm', description='elevator commanded position, normalised', min=-1.0, max=1.0)
+(name='fcs/rudder-cmd-norm', description='rudder commanded position, normalised', min=-1.0, max=1.0)
+(name='fcs/throttle-cmd-norm', description='throttle commanded position, normalised', 0., 1.)
+(name='fcs/mixture-cmd-norm', description='engine mixture setting, normalised', 0., 1.)
+(name='fcs/throttle-cmd-norm[1]', description='throttle 1 commanded position, normalised', 0., 1.)
+(name='fcs/mixture-cmd-norm[1]', description='engine mixture 1 setting, normalised', 0., 1.)
+(name='gear/gear-cmd-norm', description='all landing gear commanded position, normalised', 0, 1)
  ```

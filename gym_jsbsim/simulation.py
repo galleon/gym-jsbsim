@@ -11,8 +11,10 @@ class Simulation(object):
     """
     A class which wraps an instance of JSBSim and manages communication with it.
     """
+    if 'JSBSIM_ROOT_DIR' not in os.environ or os.environ['JSBSIM_ROOT_DIR'] == '':
+        raise RuntimeError('JSBSIM_ROOT_DIR environment variable not set')
+    ROOT_DIR = os.path.abspath(os.environ['JSBSIM_ROOT_DIR'])
     encoding = 'utf-8'  # encoding of bytes returned by JSBSim Cython funcs
-    ROOT_DIR = os.path.abspath('/home/jsbsim/jsbsim-JSBSim-trusty-v2018a')
     OUTPUT_FILE = 'flightgear.xml'
     LONGITUDINAL = 'longitudinal'
     FULL = 'full'

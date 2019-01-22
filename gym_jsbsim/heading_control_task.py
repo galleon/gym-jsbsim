@@ -35,7 +35,7 @@ class HeadingControlTask(BaseFlightTask):
         self.steps_left = BoundedProperty('info/steps_left', 'steps remaining in episode', 0,
                                           episode_steps)
         self.aircraft = aircraft
-        self.state_variables = (prp.v_north_fps, prp.v_east_fps, prp.altitude_sl_ft, # minimal state variables for the task
+        self.state_variables = (prp.pitch_rad, prp.roll_rad, prp.heading_deg, prp.sideslip_deg, prp.altitude_sl_ft, # minimal state variables for the task
                                 prp.v_down_fps, prp.p_radps, prp.q_radps, prp.r_radps) # additional state variables used for reward shaping
         self.action_variables = (prp.aileron_cmd, prp.elevator_cmd, prp.rudder_cmd)
         super().__init__(debug)
@@ -66,8 +66,7 @@ class HeadingControlTask(BaseFlightTask):
     
     def _get_reward(self, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
         # Get negative reward proportional to normalised heading and altitude errors
-        track_deg = prp.Vector2(last_state.velocities_v_east_fps, last_state.velocities_v_north_fps).heading_deg()
-        normalised_error_track_deg = math.fabs(utils.reduce_reflex_angle_deg(track_deg - self.INITIAL_HEADING_DEG)) / 180.0
+        normalised_error_track_deg = math.fabs(utils.reduce_reflex_angle_deg(last_state.attitude_psi_deg - self.INITIAL_HEADING_DEG)) / 180.0
         normalised_altitude_error = min(math.fabs(last_state.position_h_sl_ft - self.INITIAL_ALTITUDE_FT) / self.INITIAL_ALTITUDE_FT, 1.0)
         target_reward = - normalised_error_track_deg - normalised_altitude_error
 
@@ -102,8 +101,7 @@ class TurnHeadingChangeLevelControlTask(HeadingControlTask):
 
     def _get_reward(self, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
         # Get negative reward proportional to normalised heading and altitude errors
-        track_deg = prp.Vector2(last_state.velocities_v_east_fps, last_state.velocities_v_north_fps).heading_deg()
-        normalised_error_track_deg = math.fabs(utils.reduce_reflex_angle_deg(track_deg - self.TARGET_HEADING_DEG)) / 180.0
+        normalised_error_track_deg = math.fabs(utils.reduce_reflex_angle_deg(last_state.attitude_psi_deg - self.TARGET_HEADING_DEG)) / 180.0
         normalised_altitude_error = min(math.fabs(last_state.position_h_sl_ft - self.TARGET_ALTITUDE_FT) / self.INITIAL_ALTITUDE_FT, 1.0)
         target_reward = - normalised_error_track_deg - normalised_altitude_error
 

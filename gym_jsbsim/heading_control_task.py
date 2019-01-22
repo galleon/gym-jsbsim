@@ -87,8 +87,7 @@ class HeadingControlTask(BaseFlightTask):
         sim[self.steps_left] = self.steps_left.max
 
     def get_props_to_output(self, sim: Simulation) -> Tuple:
-        aircraft_position = NamedTuple(*[sim[prp.lat_geod_deg], sim[prp.lng_geoc_deg]])
-        return (self.last_state, aircraft_position, self.steps_left)
+        return (*self.state_variables, prp.lat_geod_deg, prp.lng_geoc_deg, self.steps_left)
 
 
 class TurnHeadingChangeLevelControlTask(HeadingControlTask):

@@ -39,6 +39,7 @@ class BaseFlightTask(ABC):
         self.last_state = None
         self._make_state_class()
         self._make_action_class()
+        self.all_props = self._get_all_props()
         self.debug = debug
 
     def task_step(self, sim: Simulation, action: Sequence[float], sim_steps: int) \
@@ -139,7 +140,19 @@ class BaseFlightTask(ABC):
     def _update_custom_properties(self, sim: Simulation) -> None:
         """ Calculates any custom properties which change every timestep. """
         pass
-    
+
+    def _get_all_props(self) -> Tuple:
+        """
+        Returns all the properties.
+
+        :return: list of properties
+        """
+        props = []
+        for name, item in prp.__dict__.items():
+            if isinstance(item, (Property, BoundedProperty)):
+                props.append(item)
+        return props
+
     @abstractmethod
     def get_initial_conditions(self) -> Optional[Dict[Property, float]]:
         """

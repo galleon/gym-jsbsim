@@ -95,7 +95,7 @@ class HeadingControlTask(BaseFlightTask):
         terminal_step = sim[self.steps_left] <= 0
         return terminal_step or self._altitude_out_of_bounds(sim, state)
     
-    def _get_reward(self, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
+    def _get_reward(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
         ### Get negative reward proportional to normalised heading and altitude errors
         #track_deg = prp.Vector2(last_state.velocities_v_east_fps, last_state.velocities_v_north_fps).heading_deg()
         #normalised_error_track_deg = math.fabs(utils.reduce_reflex_angle_deg(track_deg - self.INITIAL_HEADING_DEG)) / 180.0

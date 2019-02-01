@@ -7,6 +7,7 @@ from gym_jsbsim.simulation import Simulation
 from gym_jsbsim.visualiser import FigureVisualiser, FlightGearVisualiser
 from gym_jsbsim.aircraft import Aircraft, cessna172P
 from typing import Type, Tuple, Dict
+import boto3
 
 
 class JsbSimEnv(gym.Env):
@@ -54,6 +55,14 @@ class JsbSimEnv(gym.Env):
 
         self._max_log_length = 1000
         self._log_path = "/home/jsbsim/logs/log.json"
+        try:
+            with open('/home/jsbsim/sqs_url.conf', 'r') as file:
+                self._sqs_url = file.readline()
+            sqs = boto3.resource('sqs')
+            self._l2f_queue = sqs.Queue(self._sqs_url)
+        except Exception:
+            self._sqs_url = None
+            self._l2f_queue = None
         self._render_log = deque(maxlen=self._max_log_length)
 
     def step(self, action: np.ndarray) -> Tuple[np.ndarray, float, bool, Dict]:
@@ -95,6 +104,7 @@ class JsbSimEnv(gym.Env):
 
         # If there is "rendered" data in the deque, write to file
         self._write_out_render_json()
+        self._write_out_render_sqs()
         # reset the "rendering queue"
         self._render_log.clear()
 
@@ -183,6 +193,17 @@ class JsbSimEnv(gym.Env):
         if self._render_log: # not empty
             with open (self._log_path, 'w') as file:
                 json.dump(self._make_json_compatible(self._render_log), file)
+
+    def _write_out_render_sqs(self):
+        '''
+        Send the rendering deque to SQS
+        '''
+        if self._l2f_queue and self._render_log: # not empty
+            self._l2f_queue.send_message(
+                MessageBody=json.dumps(
+                    self._make_json_compatible(self._render_log)),
+                MessageGroupId='state_action_history'
+            )
 
     def _make_json_compatible(self, obj):
         """Converts deques to list, returning a recursive copy of the input obkject"""

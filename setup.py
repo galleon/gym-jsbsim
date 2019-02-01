@@ -12,6 +12,7 @@ setup(name='gym_jsbsim',
           'numpy',
           'gym',
           'matplotlib',
+          'boto3'
       ],
       packages=find_packages(),
       classifiers=[

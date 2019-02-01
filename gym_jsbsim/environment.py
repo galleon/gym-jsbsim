@@ -1,5 +1,7 @@
 import gym
 import numpy as np
+import json
+from collections import deque
 from gym_jsbsim.base_flight_task import BaseFlightTask
 from gym_jsbsim.simulation import Simulation
 from gym_jsbsim.visualiser import FigureVisualiser, FlightGearVisualiser
@@ -50,6 +52,10 @@ class JsbSimEnv(gym.Env):
         self.flightgear_visualiser: FlightGearVisualiser = None
         self.step_delay = None
 
+        self._max_log_length = 1000
+        self._log_path = "/home/jsbsim/logs/log.json"
+        self._render_log = deque(maxlen=self._max_log_length)
+
     def step(self, action: np.ndarray) -> Tuple[np.ndarray, float, bool, Dict]:
         """
         Run one timestep of the environment's dynamics. When end of
@@ -87,6 +93,11 @@ class JsbSimEnv(gym.Env):
         if self.flightgear_visualiser:
             self.flightgear_visualiser.configure_simulation_output(self.sim)
 
+        # If there is "rendered" data in the deque, write to file
+        self._write_out_render_json()
+        # reset the "rendering queue"
+        self._render_log.clear()
+
         return np.array(state)
 
     def _init_new_sim(self, dt, aircraft, initial_conditions):
@@ -117,10 +128,7 @@ class JsbSimEnv(gym.Env):
             returning if True, else returns immediately
         """
         if mode == 'human':
-            if not self.figure_visualiser:
-                self.figure_visualiser = FigureVisualiser(self.sim,
-                                                          self.task.get_props_to_output(self.sim))
-            self.figure_visualiser.plot(self.sim)
+            self._append_last_state()
         elif mode == 'flightgear':
             if not self.flightgear_visualiser:
                 self.flightgear_visualiser = FlightGearVisualiser(self.sim,
@@ -159,6 +167,31 @@ class JsbSimEnv(gym.Env):
         """
         gym.logger.warn("Could not seed environment %s", self)
         return
+
+    def _append_last_state(self):
+        '''
+        Add items to the deque.
+        The deque will be written out when the environment gets reset.
+        '''
+        state = {prop.name: self.sim[prop] for prop in self.task.all_props}
+        self._render_log.append(state)
+
+    def _write_out_render_json(self):
+        '''
+        Write the rendering deque to disk
+        '''
+        if self._render_log: # not empty
+            with open (self._log_path, 'w') as file:
+                json.dump(self._make_json_compatible(self._render_log), file)
+
+    def _make_json_compatible(self, obj):
+        """Converts deques to list, returning a recursive copy of the input obkject"""
+        if type(obj) is dict:
+            return {k: self._make_json_compatible(obj[k]) for k in obj}
+        if type(obj) is deque:
+            return list(obj)
+        else:
+            return(obj)
 
 
 class NoFGJsbSimEnv(JsbSimEnv):

@@ -56,6 +56,7 @@ class HeadingControlTask(BaseFlightTask):
         episode_steps = math.ceil(self.max_time_s * step_frequency_hz)
         self.steps_left = BoundedProperty('info/steps_left', 'steps remaining in episode', 0,
                                           episode_steps)
+        self.nb_episodes = Property('info/nb_episodes', 'number of episodes since the beginning')
         self.aircraft = aircraft
 
 
@@ -79,6 +80,7 @@ class HeadingControlTask(BaseFlightTask):
                               prp.initial_r_radps: 0,
                               prp.initial_roc_fpm: 0,
                               prp.initial_heading_deg: self.INITIAL_HEADING_DEG,
+                              self.nb_episodes: 0
                              }
         return initial_conditions
 
@@ -112,6 +114,20 @@ class HeadingControlTask(BaseFlightTask):
         #print(heading_r + alt_r, -(heading_r + alt_r), -(heading_r + alt_r)/2.)
         return -(heading_r + alt_r)/2.
         #return target_reward + (0.5 * stabilisation_reward)
+    
+   def _get_reward_real(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
+        # Get negative reward proportional to normalised heading and altitude errors
+        track_deg = prp.Vector2(last_state.velocities_v_east_fps, last_state.velocities_v_north_fps).heading_deg()
+        normalised_error_track_deg = math.fabs(utils.reduce_reflex_angle_deg(track_deg - self.INITIAL_HEADING_DEG)) / 180.0
+        normalised_altitude_error = min(math.fabs(last_state.position_h_sl_ft - self.INITIAL_ALTITUDE_FT) / self.INITIAL_ALTITUDE_FT, 1.0)
+        target_reward = - normalised_error_track_deg - normalised_altitude_error
+
+        # Get negative reward proportional to normalised speed angles and vertical speed
+        normalised_angle_speed = min((math.fabs(last_state.velocities_p_rad_sec) + math.fabs(last_state.velocities_q_rad_sec) + math.fabs(last_state.velocities_r_rad_sec)) / (3*2*math.pi), 1.0)
+        normalised_vertical_speed = min(math.fabs(last_state.velocities_v_down_fps) / self.INITIAL_ALTITUDE_FT, 1.0)
+        stabilisation_reward = - math.exp(- sim[self.nb_episodes] / 100) * (normalised_angle_speed + normalised_vertical_speed)
+
+        return target_reward + stabilisation_reward
 
     def _altitude_out_of_bounds(self, sim: Simulation, state: NamedTuple) -> bool:
         altitude_error_ft = math.fabs(state.position_h_sl_ft - self.INITIAL_ALTITUDE_FT)
@@ -121,6 +137,7 @@ class HeadingControlTask(BaseFlightTask):
         super()._new_episode_init(sim)
         sim.set_throttle_mixture_controls(self.THROTTLE_CMD, self.MIXTURE_CMD)
         sim[self.steps_left] = self.steps_left.max
+        sim[self.nb_episodes] += 1
 
     def get_props_to_output(self, sim: Simulation) -> Tuple:
         return (*self.state_variables, prp.lat_geod_deg, prp.lng_geoc_deg, self.steps_left)
@@ -134,7 +151,7 @@ class TurnHeadingChangeLevelControlTask(HeadingControlTask):
     TARGET_HEADING_DEG = 360
     TARGET_ALTITUDE_FT = 3000
 
-    def _get_reward(self, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
+    def _get_reward(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
         # Get negative reward proportional to normalised heading and altitude errors
         track_deg = prp.Vector2(last_state.velocities_v_east_fps, last_state.velocities_v_north_fps).heading_deg()
         normalised_error_track_deg = math.fabs(utils.reduce_reflex_angle_deg(track_deg - self.INITIAL_HEADING_DEG)) / 180.0
@@ -144,4 +161,6 @@ class TurnHeadingChangeLevelControlTask(HeadingControlTask):
         # Get negative reward proportional to normalised speed angles and vertical speed
         normalised_angle_speed = min((math.fabs(last_state.velocities_p_rad_sec) + math.fabs(last_state.velocities_q_rad_sec) + math.fabs(last_state.velocities_r_rad_sec)) / (3*2*math.pi), 1.0)
         normalised_vertical_speed = min(math.fabs(last_state.velocities_v_down_fps) / self.INITIAL_ALTITUDE_FT, 1.0)
-        stabilisation_reward = - normalised_angle_speed - normalised_vertical_speed
+        stabilisation_reward = - math.exp(- sim[self.nb_episodes] / 100) * (normalised_angle_speed + normalised_vertical_speed)
+        
+        return target_reward + stabilisation_reward

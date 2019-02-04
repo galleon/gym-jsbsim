@@ -1,3 +1,5 @@
+import time
+from multiprocessing.pool import ThreadPool
 import gym
 import numpy as np
 import json
@@ -53,17 +55,17 @@ class JsbSimEnv(gym.Env):
         self.flightgear_visualiser: FlightGearVisualiser = None
         self.step_delay = None
 
-        self._max_log_length = 1000
-        self._log_path = "/home/jsbsim/logs/log.json"
         try:
             with open('/home/jsbsim/sqs_url.conf', 'r') as file:
                 self._sqs_url = file.readline()
             sqs = boto3.resource('sqs')
             self._l2f_queue = sqs.Queue(self._sqs_url)
+            self._NUM_THREADS = 100
+            self._pool = ThreadPool(self._NUM_THREADS)
         except Exception:
             self._sqs_url = None
             self._l2f_queue = None
-        self._render_log = deque(maxlen=self._max_log_length)
+            self._pool = None
 
     def step(self, action: np.ndarray) -> Tuple[np.ndarray, float, bool, Dict]:
         """
@@ -102,11 +104,10 @@ class JsbSimEnv(gym.Env):
         if self.flightgear_visualiser:
             self.flightgear_visualiser.configure_simulation_output(self.sim)
 
-        # If there is "rendered" data in the deque, write to file
-        self._write_out_render_json()
-        self._write_out_render_sqs()
-        # reset the "rendering queue"
-        self._render_log.clear()
+        if self._pool:
+            self._pool.join()
+            self._pool.terminate()
+            self._pool = ThreadPool(self._NUM_THREADS)
 
         return np.array(state)
 
@@ -120,14 +121,7 @@ class JsbSimEnv(gym.Env):
         The set of supported modes varies per environment. (And some
         environments do not support rendering at all.) By convention,
         if mode is:
-        - human: render to the current display or terminal and
-          return nothing. Usually for human consumption.
-        - rgb_array: Return an numpy.ndarray with shape (x, y, 3),
-          representing RGB values for an x-by-y pixel image, suitable
-          for turning into a video.
-        - ansi: Return a string (str) or StringIO.StringIO containing a
-          terminal-style text representation. The text can include newlines
-          and ANSI escape sequences (e.g. for colors).
+        - human: Send the state to AWS SQS.
         Note:
             Make sure that your class's metadata 'render.modes' key includes
               the list of supported modes. It's recommended to call super()
@@ -138,7 +132,7 @@ class JsbSimEnv(gym.Env):
             returning if True, else returns immediately
         """
         if mode == 'human':
-            self._append_last_state()
+            self._send_state_to_sqs()
         elif mode == 'flightgear':
             if not self.flightgear_visualiser:
                 self.flightgear_visualiser = FlightGearVisualiser(self.sim,
@@ -178,42 +172,27 @@ class JsbSimEnv(gym.Env):
         gym.logger.warn("Could not seed environment %s", self)
         return
 
-    def _append_last_state(self):
-        '''
-        Add items to the deque.
-        The deque will be written out when the environment gets reset.
-        '''
+    def _get_full_state(self):
         state = {prop.name: self.sim[prop] for prop in self.task.all_props}
-        self._render_log.append(state)
+        state['epochtime'] = time.time() # required to sort queue
+        return state
 
-    def _write_out_render_json(self):
-        '''
-        Write the rendering deque to disk
-        '''
-        if self._render_log: # not empty
-            with open (self._log_path, 'w') as file:
-                json.dump(self._make_json_compatible(self._render_log), file)
-
-    def _write_out_render_sqs(self):
+    def _send_state_to_sqs(self):
         '''
         Send the rendering deque to SQS
         '''
-        if self._l2f_queue and self._render_log: # not empty
-            self._l2f_queue.send_message(
-                MessageBody=json.dumps(
-                    self._make_json_compatible(self._render_log)),
-                MessageGroupId='state_action_history'
+        if self._l2f_queue:
+            message_body = json.dumps(self._get_full_state)
+            self._pool.apply_async(
+                self._l2f_queue.send_message,
+                kwds=dict(
+                    MessageBody=message_body,
+                    MessageGroupId='state_action_history'
+                )
             )
-
-    def _make_json_compatible(self, obj):
-        """Converts deques to list, returning a recursive copy of the input obkject"""
-        if type(obj) is dict:
-            return {k: self._make_json_compatible(obj[k]) for k in obj}
-        if type(obj) is deque:
-            return list(obj)
         else:
-            return(obj)
-
+            import warnings
+            warnings.warn('No SQS queue available.')
 
 class NoFGJsbSimEnv(JsbSimEnv):
     """

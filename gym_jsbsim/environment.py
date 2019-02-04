@@ -108,6 +108,9 @@ class JsbSimEnv(gym.Env):
             self._pool.join()
             self._pool.terminate()
             self._pool = ThreadPool(self._NUM_THREADS)
+            
+        if self._l2f_queue:
+            self._l2f_queue.purge()
 
         return np.array(state)
 

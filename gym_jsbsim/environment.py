@@ -1,3 +1,4 @@
+import os
 import time
 from multiprocessing.pool import ThreadPool
 import gym
@@ -56,7 +57,7 @@ class JsbSimEnv(gym.Env):
         self.step_delay = None
 
         try:
-            with open('/home/jsbsim/sqs_url.conf', 'r') as file:
+            with open(os.path.join(os.path.expanduser("~"), 'sqs_url.conf'), 'r') as file:
                 self._sqs_url = file.readline()
             sqs = boto3.resource('sqs')
             self._l2f_queue = sqs.Queue(self._sqs_url)

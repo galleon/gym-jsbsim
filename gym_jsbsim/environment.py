@@ -105,6 +105,7 @@ class JsbSimEnv(gym.Env):
             self.flightgear_visualiser.configure_simulation_output(self.sim)
 
         if self._pool:
+            self._pool.close()
             self._pool.join()
             self._pool.terminate()
             self._pool = ThreadPool(self._NUM_THREADS)

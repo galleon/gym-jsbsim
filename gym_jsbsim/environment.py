@@ -61,6 +61,8 @@ class JsbSimEnv(gym.Env):
                 self._sqs_url = file.readline()
             sqs = boto3.resource('sqs')
             self._l2f_queue = sqs.Queue(self._sqs_url)
+            self._l2f_queue.purge()
+            self._l2f_queue_is_dirty = False # Signal if queue might not be empty
             self._NUM_THREADS = 100
             self._pool = ThreadPool(self._NUM_THREADS)
         except Exception:
@@ -111,8 +113,9 @@ class JsbSimEnv(gym.Env):
             self._pool.terminate()
             self._pool = ThreadPool(self._NUM_THREADS)
             
-        if self._l2f_queue:
+        if self._l2f_queue and self._l2f_queue_is_dirty:
             self._l2f_queue.purge()
+            self._l2f_queue_is_dirty = False
 
         return np.array(state)
 
@@ -187,6 +190,7 @@ class JsbSimEnv(gym.Env):
         Send the rendering deque to SQS
         '''
         if self._l2f_queue:
+            self._l2f_queue_is_dirty = True
             message_body = json.dumps(self._get_full_state)
             self._pool.apply_async(
                 self._l2f_queue.send_message,

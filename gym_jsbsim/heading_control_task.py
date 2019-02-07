@@ -77,6 +77,8 @@ class HeadingControlTask(BaseFlightTask):
                               prp.initial_v_fps: 0,
                               prp.initial_w_fps: 0,
                               prp.initial_p_radps: 0,
+                              prp.initial_latitude_geod_deg: 43.6047
+                              prp.initial_longitude_geoc_deg: 1.4442
                               prp.initial_q_radps: 0,
                               prp.initial_r_radps: 0,
                               prp.initial_roc_fpm: 0,
@@ -117,7 +119,7 @@ class HeadingControlTask(BaseFlightTask):
         #return target_reward + (0.5 * stabilisation_reward)
     
     def _get_reward(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
-        # Get negative reward proportional to normalised heading and altitude errors
+        # Get   
         track_deg = prp.Vector2(last_state.velocities_v_east_fps, last_state.velocities_v_north_fps).heading_deg()
         normalised_error_track_deg = math.fabs(utils.reduce_reflex_angle_deg(track_deg - self.INITIAL_HEADING_DEG)) / 180.0
         normalised_altitude_error = min(math.fabs(last_state.position_h_sl_ft - self.INITIAL_ALTITUDE_FT) / self.INITIAL_ALTITUDE_FT, 1.0)

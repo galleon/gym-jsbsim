@@ -13,7 +13,8 @@ import configparser
 
 ### Collect Config Value
 config = configparser.ConfigParser()
-config.read('config-state-action.ini')
+print(config.read('/home/ubuntu/gym-jsbsim/gym_jsbsim/config-state-action.ini'))
+print(config.sections())
 
 ### collect state var from config file
 state_list = config.get('SA_DEFAULT', 'states').split('\n')

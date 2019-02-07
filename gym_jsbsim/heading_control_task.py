@@ -76,8 +76,8 @@ class HeadingControlTask(BaseFlightTask):
                               prp.initial_v_fps: 0,
                               prp.initial_w_fps: 0,
                               prp.initial_p_radps: 0,
-                              prp.initial_latitude_geod_deg: 43.6047
-                              prp.initial_longitude_geoc_deg: 1.4442
+                              prp.initial_latitude_geod_deg: 43.6047,
+                              prp.initial_longitude_geoc_deg: 1.4442,
                               prp.initial_q_radps: 0,
                               prp.initial_r_radps: 0,
                               prp.initial_roc_fpm: 0,

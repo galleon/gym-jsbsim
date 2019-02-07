@@ -56,19 +56,21 @@ class JsbSimEnv(gym.Env):
         self.flightgear_visualiser: FlightGearVisualiser = None
         self.step_delay = None
 
-        try:
-            with open(os.path.join(os.path.expanduser("~"), 'sqs_url.conf'), 'r') as file:
-                self._sqs_url = file.readline()
+        #try:
+        if (True):
+            #with open('/home/ubuntu/sqs_url.conf', 'r') as file:
+            #    self._sqs_url = file.readline()
+            self._sqs_url = "https://sqs.eu-west-1.amazonaws.com/190334810943/L2F.fifo"
             sqs = boto3.resource('sqs')
             self._l2f_queue = sqs.Queue(self._sqs_url)
-            self._l2f_queue.purge()
+            #self._l2f_queue.purge()
             self._l2f_queue_is_dirty = False # Signal if queue might not be empty
             self._NUM_THREADS = 100
             self._pool = ThreadPool(self._NUM_THREADS)
-        except Exception:
-            self._sqs_url = None
-            self._l2f_queue = None
-            self._pool = None
+        #except Exception:
+        #    self._sqs_url = None
+        #    self._l2f_queue = None
+        #    self._pool = None
 
     def step(self, action: np.ndarray) -> Tuple[np.ndarray, float, bool, Dict]:
         """
@@ -107,17 +109,20 @@ class JsbSimEnv(gym.Env):
         if self.flightgear_visualiser:
             self.flightgear_visualiser.configure_simulation_output(self.sim)
 
+
         if self._pool:
             self._pool.close()
             self._pool.join()
             self._pool.terminate()
             self._pool = ThreadPool(self._NUM_THREADS)
             
+        return np.array(state)
+   
+    def reset_queue(self):
         if self._l2f_queue and self._l2f_queue_is_dirty:
             self._l2f_queue.purge()
             self._l2f_queue_is_dirty = False
-
-        return np.array(state)
+ 
 
     def _init_new_sim(self, dt, aircraft, initial_conditions):
         return Simulation(sim_frequency_hz=dt,
@@ -191,7 +196,9 @@ class JsbSimEnv(gym.Env):
         '''
         if self._l2f_queue:
             self._l2f_queue_is_dirty = True
-            message_body = json.dumps(self._get_full_state)
+            full_state = self._get_full_state()
+            print("FULL STATE TO JSON", full_state)
+            message_body = json.dumps(full_state)
             self._pool.apply_async(
                 self._l2f_queue.send_message,
                 kwds=dict(

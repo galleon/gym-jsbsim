@@ -112,10 +112,12 @@ class HeadingControlTask(BaseFlightTask):
 
         #print(self.INITIAL_HEADING_DEG, self.INITIAL_HEADING_DEG/360., new_state.attitude_psi_deg, new_state.attitude_psi_deg/360., 2*(self.INITIAL_HEADING_DEG/360. - new_state.attitude_psi_deg/360.))
         #print(self.INITIAL_ALTITUDE_FT, self.INITIAL_ALTITUDE_FT/360., new_state.position_h_sl_ft, new_state.position_h_sl_ft/360., 2*(self.INITIAL_ALTITUDE_FT/360. - new_state.position_h_sl_ft/360.))
-        heading_r = 2*(self.TARGET_HEADING_DEG/360. - new_state.attitude_psi_deg/360.)
-        alt_r = 2*(self.INITIAL_ALTITUDE_FT/360. - new_state.position_h_sl_ft/360.)
+        #heading_r = 2*(self.TARGET_HEADING_DEG/360. - new_state.attitude_psi_deg/360.)
+        heading_r = abs(self.TARGET_HEADING_DEG/360. - new_state.attitude_psi_deg/360.)
+        #alt_r = 2*(self.INITIAL_ALTITUDE_FT/360. - new_state.position_h_sl_ft/360.)
+        alt_r = abs(self.INITIAL_ALTITUDE_FT/360. - new_state.position_h_sl_ft/360.)
         #print(heading_r + alt_r, -(heading_r + alt_r), -(heading_r + alt_r)/2.)
-        return -(heading_r + alt_r)/2.
+        return -(heading_r + alt_r)/2. - (sim[self.nb_episodes] / 100)
         #return target_reward + (0.5 * stabilisation_reward)
     
     def _get_reward_cplx(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:

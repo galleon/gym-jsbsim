@@ -77,8 +77,8 @@ class HeadingControlTask(BaseFlightTask):
                               prp.initial_v_fps: 0,
                               prp.initial_w_fps: 0,
                               prp.initial_p_radps: 0,
-                              prp.initial_latitude_geod_deg: 43.6047,
-                              prp.initial_longitude_geoc_deg: 1.4442,
+                              prp.initial_latitude_geod_deg: 43.607404,
+                              prp.initial_longitude_geoc_deg: 1.361869,
                               prp.initial_q_radps: 0,
                               prp.initial_r_radps: 0,
                               prp.initial_roc_fpm: 0,
@@ -113,9 +113,11 @@ class HeadingControlTask(BaseFlightTask):
         #print(self.INITIAL_HEADING_DEG, self.INITIAL_HEADING_DEG/360., new_state.attitude_psi_deg, new_state.attitude_psi_deg/360., 2*(self.INITIAL_HEADING_DEG/360. - new_state.attitude_psi_deg/360.))
         #print(self.INITIAL_ALTITUDE_FT, self.INITIAL_ALTITUDE_FT/360., new_state.position_h_sl_ft, new_state.position_h_sl_ft/360., 2*(self.INITIAL_ALTITUDE_FT/360. - new_state.position_h_sl_ft/360.))
         #heading_r = 2*(self.TARGET_HEADING_DEG/360. - new_state.attitude_psi_deg/360.)
-        heading_r = abs(self.TARGET_HEADING_DEG - new_state.attitude_psi_deg)
+        print("HEADING REWARD !!! ", self.INITIAL_ALTITUDE_FT, last_state.position_h_sl_ft))
+        heading_r = abs(self.TARGET_HEADING_DEG - last_state.attitude_psi_deg)
         #alt_r = 2*(self.INITIAL_ALTITUDE_FT/360. - new_state.position_h_sl_ft/360.)
-        alt_r = abs(self.INITIAL_ALTITUDE_FT - new_state.position_h_sl_ft)
+        print("ALTITUDE REWARD !!! ", self.INITIAL_ALTITUDE_FT, last_state.position_h_sl_ft))
+        alt_r = abs(self.INITIAL_ALTITUDE_FT - last_state.position_h_sl_ft)
         #print(heading_r + alt_r, -(heading_r + alt_r), -(heading_r + alt_r)/2.)
         return -heading_r - alt_r
         #return target_reward + (0.5 * stabilisation_reward)

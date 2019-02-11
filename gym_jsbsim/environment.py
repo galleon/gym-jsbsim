@@ -13,6 +13,7 @@ from typing import Type, Tuple, Dict
 import boto3
 
 
+
 class JsbSimEnv(gym.Env):
     """
     A class wrapping the JSBSim flight dynamics module (FDM) for simulating
@@ -197,10 +198,10 @@ class JsbSimEnv(gym.Env):
         if self._l2f_queue:
             self._l2f_queue_is_dirty = True
             full_state = self._get_full_state()
-            print("FULL STATE TO JSON", full_state)
+            #print("FULL STATE TO JSON", full_state)
             message_body = json.dumps(full_state)
             self._pool.apply_async(
-                self._l2f_queue.send_message,
+        	        self._l2f_queue.send_message,
                 kwds=dict(
                     MessageBody=message_body,
                     MessageGroupId='state_action_history'
@@ -209,6 +210,7 @@ class JsbSimEnv(gym.Env):
         else:
             import warnings
             warnings.warn('No SQS queue available.')
+
 
 class NoFGJsbSimEnv(JsbSimEnv):
     """

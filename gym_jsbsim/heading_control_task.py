@@ -41,7 +41,7 @@ class HeadingControlTask(BaseFlightTask):
     INITIAL_HEADING_DEG = float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_heading_deg"])
     INITIAL_ALTITUDE_FT = float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_altitude_ft"])
     TARGET_HEADING_DEG = float(config["HEADING_CONTROL_TASK_CONDITION"]["target_heading_deg"])
-    DEFAULT_EPISODE_TIME_S = 60.
+    DEFAULT_EPISODE_TIME_S = 600.
     ALTITUDE_SCALING_FT = 150
     MAX_ALTITUDE_DEVIATION_FT = 1000  # terminate if altitude error exceeds this
 
@@ -82,6 +82,7 @@ class HeadingControlTask(BaseFlightTask):
                               prp.initial_q_radps: 0,
                               prp.initial_r_radps: 0,
                               prp.initial_roc_fpm: 0,
+                              prp.all_engine_running: -1,
                               prp.initial_heading_deg: self.INITIAL_HEADING_DEG,
                               self.nb_episodes: 0
                              }
@@ -96,6 +97,7 @@ class HeadingControlTask(BaseFlightTask):
     def _is_terminal(self, sim: Simulation, state: NamedTuple) -> bool:
         # terminate when time >= max, but use math.isclose() for float equality test
         terminal_step = sim[self.steps_left] <= 0
+        #terminal_step = sim[prp.dist_travel_m]  >= 100000
         return terminal_step or self._altitude_out_of_bounds(sim, state)
     
     def _get_reward(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
@@ -113,13 +115,19 @@ class HeadingControlTask(BaseFlightTask):
         #print(self.INITIAL_HEADING_DEG, self.INITIAL_HEADING_DEG/360., new_state.attitude_psi_deg, new_state.attitude_psi_deg/360., 2*(self.INITIAL_HEADING_DEG/360. - new_state.attitude_psi_deg/360.))
         #print(self.INITIAL_ALTITUDE_FT, self.INITIAL_ALTITUDE_FT/360., new_state.position_h_sl_ft, new_state.position_h_sl_ft/360., 2*(self.INITIAL_ALTITUDE_FT/360. - new_state.position_h_sl_ft/360.))
         #heading_r = 2*(self.TARGET_HEADING_DEG/360. - new_state.attitude_psi_deg/360.)
-        print("HEADING REWARD !!! ", self.INITIAL_ALTITUDE_FT, last_state.position_h_sl_ft))
-        heading_r = abs(self.TARGET_HEADING_DEG - last_state.attitude_psi_deg)
+        #print("HEADING REWARD !!! ", self.INITIAL_ALTITUDE_FT, last_state.position_h_sl_ft)i
+        
+        #print(sim[prp.dist_travel_m])
+        #if sim[prp.dist_travel_m]  >= 30000:
+        #    self.TARGET_HEADING_DEG = 200
+        #    self.INITIAL_ALTITUDE = 6000
+
+        heading_r = 1.0/math.sqrt((0.1*math.fabs(self.TARGET_HEADING_DEG - last_state.attitude_psi_deg)+1))
         #alt_r = 2*(self.INITIAL_ALTITUDE_FT/360. - new_state.position_h_sl_ft/360.)
-        print("ALTITUDE REWARD !!! ", self.INITIAL_ALTITUDE_FT, last_state.position_h_sl_ft))
-        alt_r = abs(self.INITIAL_ALTITUDE_FT - last_state.position_h_sl_ft)
+        #print("ALTITUDE REWARD !!! ", self.INITIAL_ALTITUDE_FT, last_state.position_h_sl_ft)
+        alt_r = 1.0/math.sqrt((0.1*math.fabs(self.INITIAL_ALTITUDE_FT - last_state.position_h_sl_ft)+1))
         #print(heading_r + alt_r, -(heading_r + alt_r), -(heading_r + alt_r)/2.)
-        return -heading_r - alt_r
+        return (heading_r + alt_r)/2.0
         #return target_reward + (0.5 * stabilisation_reward)
     
     def _get_reward_cplx(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:

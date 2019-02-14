@@ -124,7 +124,8 @@ class HeadingControlTask(BaseFlightTask):
         #    self.TARGET_HEADING_DEG = 200
         #    self.INITIAL_ALTITUDE = 6000
 
-        heading_r = 1.0/math.sqrt((0.1*math.fabs(self.INITIAL_HEADING_DEG - last_state.attitude_psi_deg)+1))
+        abs_h = math.fabs(self.INITIAL_HEADING_DEG - last_state.attitude_psi_deg)
+        heading_r = 1.0/math.sqrt((0.1*min(360-abs_h, abs_h)+1))
         #alt_r = 2*(self.INITIAL_ALTITUDE_FT/360. - new_state.position_h_sl_ft/360.)
         #print("ALTITUDE REWARD !!! ", self.INITIAL_ALTITUDE_FT, last_state.position_h_sl_ft)
         alt_r = 1.0/math.sqrt((0.1*math.fabs(self.INITIAL_ALTITUDE_FT - last_state.position_h_sl_ft)+1))

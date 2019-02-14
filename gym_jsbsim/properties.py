@@ -63,7 +63,7 @@ sim_dt = Property('simulation/dt', 'JSBSim simulation timestep [s]')
 sim_time_s = Property('simulation/sim-time-sec', 'Simulation time [s]')
 
 # initial conditions
-initial_altitude_ft = Property('ic/h-sl-ft', 'initial altitude MSL [ft]')
+initial_altitude_ft = BoundedProperty('ic/h-sl-ft', 'initial altitude MSL [ft]', altitude_sl_ft.min, altitude_sl_ft.max)
 initial_terrain_altitude_ft = Property('ic/terrain-elevation-ft', 'initial terrain alt [ft]')
 initial_longitude_geoc_deg = Property('ic/long-gc-deg', 'initial geocentric longitude [deg]')
 initial_latitude_geod_deg = Property('ic/lat-geod-deg', 'initial geodesic latitude [deg]')
@@ -74,7 +74,7 @@ initial_p_radps = Property('ic/p-rad_sec', 'roll rate [rad/s]')
 initial_q_radps = Property('ic/q-rad_sec', 'pitch rate [rad/s]')
 initial_r_radps = Property('ic/r-rad_sec', 'yaw rate [rad/s]')
 initial_roc_fpm = Property('ic/roc-fpm', 'initial rate of climb [ft/min]')
-initial_heading_deg = Property('ic/psi-true-deg', 'initial (true) heading [deg]')
+initial_heading_deg = BoundedProperty('ic/psi-true-deg', 'initial (true) heading [deg]', heading_deg.min, heading_deg.max)
 
 prp_dict = {"altitude_sl_ft": altitude_sl_ft,
 	"pitch_rad": pitch_rad,

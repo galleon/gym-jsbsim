@@ -38,9 +38,9 @@ class HeadingControlTask(BaseFlightTask):
     ### Set config var
     THROTTLE_CMD = float(config["HEADING_CONTROL_TASK_CONDITION"]["throttle_cmd"])
     MIXTURE_CMD = float(config["HEADING_CONTROL_TASK_CONDITION"]["mixture_cmd"])
-    INITIAL_HEADING_DEG = float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_heading_deg"])
-    INITIAL_ALTITUDE_FT = float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_altitude_ft"])
-    TARGET_HEADING_DEG = float(config["HEADING_CONTROL_TASK_CONDITION"]["target_heading_deg"])
+    #INITIAL_HEADING_DEG = float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_heading_deg"])
+    #INITIAL_ALTITUDE_FT = float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_altitude_ft"])
+    #TARGET_HEADING_DEG = float(config["HEADING_CONTROL_TASK_CONDITION"]["target_heading_deg"])
     DEFAULT_EPISODE_TIME_S = 600.
     ALTITUDE_SCALING_FT = 150
     MAX_ALTITUDE_DEVIATION_FT = 1000  # terminate if altitude error exceeds this
@@ -72,6 +72,8 @@ class HeadingControlTask(BaseFlightTask):
         super().__init__(debug)
 
     def get_initial_conditions(self) -> Dict[Property, float]:
+        self.INITIAL_ALTITUDE_FT = random.uniform(prp.altitude_sl_ft.min, prp.altitude_sl_ft.max)
+        self.INITIAL_HEADING_DEG = random.uniform(prp.heading_deg.min, prp.heading_deg.max)
         initial_conditions = {prp.initial_altitude_ft: self.INITIAL_ALTITUDE_FT,
                               prp.initial_u_fps: self.aircraft.get_cruise_speed_fps(),
                               prp.initial_v_fps: 0,
@@ -122,7 +124,7 @@ class HeadingControlTask(BaseFlightTask):
         #    self.TARGET_HEADING_DEG = 200
         #    self.INITIAL_ALTITUDE = 6000
 
-        heading_r = 1.0/math.sqrt((0.1*math.fabs(self.TARGET_HEADING_DEG - last_state.attitude_psi_deg)+1))
+        heading_r = 1.0/math.sqrt((0.1*math.fabs(self.INITIAL_HEADING_DEG - last_state.attitude_psi_deg)+1))
         #alt_r = 2*(self.INITIAL_ALTITUDE_FT/360. - new_state.position_h_sl_ft/360.)
         #print("ALTITUDE REWARD !!! ", self.INITIAL_ALTITUDE_FT, last_state.position_h_sl_ft)
         alt_r = 1.0/math.sqrt((0.1*math.fabs(self.INITIAL_ALTITUDE_FT - last_state.position_h_sl_ft)+1))

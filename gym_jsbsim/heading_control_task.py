@@ -17,13 +17,13 @@ print(config.read('/home/ubuntu/gym-jsbsim/gym_jsbsim/config-state-action.ini'))
 print(config.sections())
 
 ### collect state var from config file
-state_list = config.get('SA_DEFAULT_CPLX', 'states').split('\n')
+state_list = config.get('SA_DEFAULT', 'states').split('\n')
 state_var = ()
 for s in state_list:
     print(s)
     state_var = state_var + (prp.prp_dict[s],)
 
-action_list = config.get('SA_DEFAULT_CPLX', 'actions').split('\n')
+action_list = config.get('SA_DEFAULT', 'actions').split('\n')
 action_var = ()
 for a in action_list:
     print(a)
@@ -100,7 +100,7 @@ class HeadingControlTask(BaseFlightTask):
         #terminal_step = sim[prp.dist_travel_m]  >= 100000
         return terminal_step or self._altitude_out_of_bounds(sim, state)
     
-    def _get_reward_opt(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
+    def _get_reward(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
         ### Get negative reward proportional to normalised heading and altitude errors
         #track_deg = prp.Vector2(last_state.velocities_v_east_fps, last_state.velocities_v_north_fps).heading_deg()
         #normalised_error_track_deg = math.fabs(utils.reduce_reflex_angle_deg(track_deg - self.INITIAL_HEADING_DEG)) / 180.0
@@ -130,7 +130,7 @@ class HeadingControlTask(BaseFlightTask):
         return (heading_r + alt_r)/2.0
         #return target_reward + (0.5 * stabilisation_reward)
     
-    def _get_reward(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
+    def _get_reward_cplx(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
         # Get   
         track_deg = prp.Vector2(last_state.velocities_v_east_fps, last_state.velocities_v_north_fps).heading_deg()
         normalised_error_track_deg = math.fabs(utils.reduce_reflex_angle_deg(track_deg - self.INITIAL_HEADING_DEG)) / 180.0

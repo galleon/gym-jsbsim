@@ -41,7 +41,7 @@ class HeadingControlTask(BaseFlightTask):
     #INITIAL_HEADING_DEG = float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_heading_deg"])
     #INITIAL_ALTITUDE_FT = float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_altitude_ft"])
     #TARGET_HEADING_DEG = float(config["HEADING_CONTROL_TASK_CONDITION"]["target_heading_deg"])
-    DEFAULT_EPISODE_TIME_S = 600.
+    DEFAULT_EPISODE_TIME_S = 1000.
     ALTITUDE_SCALING_FT = 150
     MAX_ALTITUDE_DEVIATION_FT = 800  # terminate if altitude error exceeds this
 

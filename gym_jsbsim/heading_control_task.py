@@ -13,20 +13,20 @@ import configparser
 
 ### Collect Config Value
 config = configparser.ConfigParser()
-print(config.read('/home/ubuntu/gym-jsbsim/gym_jsbsim/config-state-action.ini'))
-print(config.sections())
+#print(config.read('/home/ubuntu/gym-jsbsim/gym_jsbsim/config-state-action.ini'))
+#print(config.sections())
 
 ### collect state var from config file
 state_list = config.get('SA_DEFAULT', 'states').split('\n')
 state_var = ()
 for s in state_list:
-    print(s)
+    #print(s)
     state_var = state_var + (prp.prp_dict[s],)
 
 action_list = config.get('SA_DEFAULT', 'actions').split('\n')
 action_var = ()
 for a in action_list:
-    print(a)
+    #print(a)
     action_var = action_var + (prp.prp_dict[a],)
 
 class HeadingControlTask(BaseFlightTask):
@@ -65,10 +65,10 @@ class HeadingControlTask(BaseFlightTask):
         #self.state_variables = (prp.pitch_rad, prp.roll_rad, prp.sideslip_deg, prp.v_north_fps, prp.v_east_fps, prp.altitude_sl_ft, # minimal state variables for the task
         #                       prp.v_down_fps, prp.p_radps, prp.q_radps, prp.r_radps) # additional state variables used for reward shaping
         self.state_variables = state_var
-        print("state_variables = " , self.state_variables)
+        #print("state_variables = " , self.state_variables)
         #self.action_variables = (prp.aileron_cmd, prp.elevator_cmd, prp.rudder_cmd)
         self.action_variables = action_var
-        print("action_variables = ", self.action_variables)
+        #print("action_variables = ", self.action_variables)
         super().__init__(debug)
 
     def get_initial_conditions(self) -> Dict[Property, float]:

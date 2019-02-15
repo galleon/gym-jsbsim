@@ -103,35 +103,13 @@ class HeadingControlTask(BaseFlightTask):
         return terminal_step or self._altitude_out_of_bounds(sim, state)
     
     def _get_reward(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
-        ### Get negative reward proportional to normalised heading and altitude errors
-        #track_deg = prp.Vector2(last_state.velocities_v_east_fps, last_state.velocities_v_north_fps).heading_deg()
-        #normalised_error_track_deg = math.fabs(utils.reduce_reflex_angle_deg(track_deg - self.INITIAL_HEADING_DEG)) / 180.0
-        #normalised_altitude_error = min(math.fabs(last_state.position_h_sl_ft - self.INITIAL_ALTITUDE_FT) / self.INITIAL_ALTITUDE_FT, 1.0)
-        #target_reward = - normalised_error_track_deg - normalised_altitude_error
-
-        ### Get negative reward proportional to normalised speed angles and vertical speed
-        #normalised_angle_speed = min((math.fabs(last_state.velocities_p_rad_sec) + math.fabs(last_state.velocities_q_rad_sec) + math.fabs(last_state.velocities_r_rad_sec)) / (3*2*math.pi), 1.0)
-        #normalised_vertical_speed = min(math.fabs(last_state.velocities_v_down_fps) / self.INITIAL_ALTITUDE_FT, 1.0)
-        #stabilisation_reward = - normalised_angle_speed - normalised_vertical_speed
-
-        #print(self.INITIAL_HEADING_DEG, self.INITIAL_HEADING_DEG/360., new_state.attitude_psi_deg, new_state.attitude_psi_deg/360., 2*(self.INITIAL_HEADING_DEG/360. - new_state.attitude_psi_deg/360.))
-        #print(self.INITIAL_ALTITUDE_FT, self.INITIAL_ALTITUDE_FT/360., new_state.position_h_sl_ft, new_state.position_h_sl_ft/360., 2*(self.INITIAL_ALTITUDE_FT/360. - new_state.position_h_sl_ft/360.))
-        #heading_r = 2*(self.TARGET_HEADING_DEG/360. - new_state.attitude_psi_deg/360.)
-        #print("HEADING REWARD !!! ", self.INITIAL_ALTITUDE_FT, last_state.position_h_sl_ft)i
-        
-        #print(sim[prp.dist_travel_m])
-        #if sim[prp.dist_travel_m]  >= 30000:
-        #    self.TARGET_HEADING_DEG = 200
-        #    self.INITIAL_ALTITUDE = 6000
-
+        # inverse of the proportional absolute value of the minimal angle between the initial and current heading ... 
         abs_h = math.fabs(self.INITIAL_HEADING_DEG - last_state.attitude_psi_deg)
         heading_r = 1.0/math.sqrt((0.1*min(360-abs_h, abs_h)+1))
-        #alt_r = 2*(self.INITIAL_ALTITUDE_FT/360. - new_state.position_h_sl_ft/360.)
-        #print("ALTITUDE REWARD !!! ", self.INITIAL_ALTITUDE_FT, last_state.position_h_sl_ft)
+        # inverse of the proportional absolute value between the initial and current altitude ... 
         alt_r = 1.0/math.sqrt((0.1*math.fabs(self.INITIAL_ALTITUDE_FT - last_state.position_h_sl_ft)+1))
-        #print(heading_r + alt_r, -(heading_r + alt_r), -(heading_r + alt_r)/2.)
+
         return (heading_r + alt_r)/2.0
-        #return target_reward + (0.5 * stabilisation_reward)
     
     def _get_reward_cplx(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
         # Get   

@@ -43,7 +43,7 @@ class HeadingControlTask(BaseFlightTask):
     #TARGET_HEADING_DEG = float(config["HEADING_CONTROL_TASK_CONDITION"]["target_heading_deg"])
     DEFAULT_EPISODE_TIME_S = 600.
     ALTITUDE_SCALING_FT = 150
-    MAX_ALTITUDE_DEVIATION_FT = 1000  # terminate if altitude error exceeds this
+    MAX_ALTITUDE_DEVIATION_FT = 800  # terminate if altitude error exceeds this
 
     def __init__(self, step_frequency_hz: float, aircraft: Aircraft,
                  episode_time_s: float = DEFAULT_EPISODE_TIME_S, debug: bool = False) -> None:

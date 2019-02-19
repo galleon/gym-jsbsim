@@ -41,7 +41,7 @@ class HeadingControlTask(BaseFlightTask):
     #INITIAL_HEADING_DEG = float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_heading_deg"])
     #INITIAL_ALTITUDE_FT = float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_altitude_ft"])
     #TARGET_HEADING_DEG = float(config["HEADING_CONTROL_TASK_CONDITION"]["target_heading_deg"])
-    DEFAULT_EPISODE_TIME_S = 1000.
+    DEFAULT_EPISODE_TIME_S = 500.
     ALTITUDE_SCALING_FT = 150
     MAX_ALTITUDE_DEVIATION_FT = 800  # terminate if altitude error exceeds this
 
@@ -108,10 +108,14 @@ class HeadingControlTask(BaseFlightTask):
         # inverse of the proportional absolute value of the minimal angle between the initial and current heading ... 
         abs_h = math.fabs(self.INITIAL_HEADING_DEG - last_state.attitude_psi_deg)
         heading_r = 1.0/math.sqrt((0.1*min(360-abs_h, abs_h)+1))
+        # inverse of the proportional absolute value between the initial and current ground speed ... 
+        vel_i = math.sqrt(prp.initial_u_fps**2 + prp.initial_v_fps**2) 
+        vel_c = math.sqrt(last_state.velocities_u_fps**2 + last_state.velocities_v_fps**2) 
+        vel_r = 1.0/math.sqrt((0.1*math.fabs(vel_i - vel_c)+1))
         # inverse of the proportional absolute value between the initial and current altitude ... 
         alt_r = 1.0/math.sqrt((0.1*math.fabs(self.INITIAL_ALTITUDE_FT - last_state.position_h_sl_ft)+1))
 
-        return (heading_r + alt_r)/2.0
+        return (heading_r + alt_r + vel_r)/3.0
     
     def _get_reward_cplx(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
         # Get   

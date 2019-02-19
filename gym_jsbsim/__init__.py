@@ -1,7 +1,7 @@
 import gym.envs.registration
 import enum
 from gym_jsbsim.base_flight_task import BaseFlightTask
-from gym_jsbsim.heading_control_task import HeadingControlTask, TurnHeadingChangeLevelControlTask
+from gym_jsbsim.heading_control_task import HeadingControlTask, TurnHeadingChangeLevelControlTask,HeadingControlTask_1Bis
 from gym_jsbsim.aircraft import Aircraft, cessna172P
 from gym_jsbsim import utils
 

@@ -74,11 +74,13 @@ class HeadingControlTask(BaseFlightTask):
     def get_initial_conditions(self) -> Dict[Property, float]:
         self.INITIAL_ALTITUDE_FT = random.uniform(1000, 32000)
         self.INITIAL_HEADING_DEG = random.uniform(prp.heading_deg.min, prp.heading_deg.max)
+        self.INITIAL_VELOCITY_U = self.aircraft.get_cruise_speed_fps()
+        self.INITIAL_VELOCITY_V = 0
         #print("self.INITIAL_ALTITUDE_FT", self.INITIAL_ALTITUDE_FT)
         #print("self.INITIAL_HEADING_DEG", self.INITIAL_HEADING_DEG)
         initial_conditions = {prp.initial_altitude_ft: self.INITIAL_ALTITUDE_FT,
-                              prp.initial_u_fps: self.aircraft.get_cruise_speed_fps(),
-                              prp.initial_v_fps: 0,
+                              prp.initial_u_fps: self.INITIAL_VELOCITY_U,
+                              prp.initial_v_fps: self.INITIAL_VELOCITY_V,
                               prp.initial_w_fps: 0,
                               prp.initial_p_radps: 0,
                               prp.initial_latitude_geod_deg: 49.243824,
@@ -109,7 +111,7 @@ class HeadingControlTask(BaseFlightTask):
         abs_h = math.fabs(self.INITIAL_HEADING_DEG - last_state.attitude_psi_deg)
         heading_r = 1.0/math.sqrt((0.1*min(360-abs_h, abs_h)+1))
         # inverse of the proportional absolute value between the initial and current ground speed ... 
-        vel_i = math.sqrt(math.pow(self.get_initial_conditions()[prp.initial_u_fps],2) + math.pow(self.get_initial_conditions()[prp.initial_v_fps],2)) 
+        vel_i = math.sqrt(math.pow(self.INITIAL_VELOCITY_U,2) + math.pow(self.INITIAL_VELOCITY_V,2)) 
         vel_c = math.sqrt(math.pow(last_state.velocities_u_fps,2) + math.pow(last_state.velocities_v_fps,2)) 
         vel_r = 1.0/math.sqrt((0.1*math.fabs(vel_i - vel_c)+1))
         # inverse of the proportional absolute value between the initial and current altitude ... 

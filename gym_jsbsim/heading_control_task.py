@@ -112,10 +112,9 @@ class HeadingControlTask(BaseFlightTask):
         vel_i = math.sqrt(math.pow(self.get_initial_conditions()[prp.initial_u_fps],2) + math.pow(self.get_initial_conditions()[prp.initial_v_fps],2)) 
         vel_c = math.sqrt(math.pow(last_state.velocities_u_fps,2) + math.pow(last_state.velocities_v_fps,2)) 
         vel_r = 1.0/math.sqrt((0.1*math.fabs(vel_i - vel_c)+1))
-        print(self.get_initial_conditions()[prp.initial_u_fps], last_state.velocities_u_fps, vel_r)
         # inverse of the proportional absolute value between the initial and current altitude ... 
         alt_r = 1.0/math.sqrt((0.1*math.fabs(self.INITIAL_ALTITUDE_FT - last_state.position_h_sl_ft)+1))
-
+        print(self.get_initial_conditions()[prp.initial_u_fps], last_state.velocities_u_fps, vel_r, heading_r, alt_r, (heading_r + alt_r + vel_r)/3.0)
         return (heading_r + alt_r + vel_r)/3.0
     
     def _get_reward_cplx(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:

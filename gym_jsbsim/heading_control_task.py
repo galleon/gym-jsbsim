@@ -109,7 +109,7 @@ class HeadingControlTask(BaseFlightTask):
         abs_h = math.fabs(self.INITIAL_HEADING_DEG - last_state.attitude_psi_deg)
         heading_r = 1.0/math.sqrt((0.1*min(360-abs_h, abs_h)+1))
         # inverse of the proportional absolute value between the initial and current ground speed ... 
-        vel_i = math.sqrt(math.pow(prp.initial_u_fps,2) + math.pow(prp.initial_v_fps,2)) 
+        vel_i = math.sqrt(math.pow(self.get_initial_conditions()[prp.initial_u_fps],2) + math.pow(self.get_initial_conditions()[prp.initial_v_fps],2)) 
         vel_c = math.sqrt(math.pow(last_state.velocities_u_fps,2) + math.pow(last_state.velocities_v_fps,2)) 
         vel_r = 1.0/math.sqrt((0.1*math.fabs(vel_i - vel_c)+1))
         # inverse of the proportional absolute value between the initial and current altitude ... 

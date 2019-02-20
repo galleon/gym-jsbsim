@@ -91,8 +91,8 @@ class HeadingControlTask(BaseFlightTask):
                               prp.initial_roc_fpm: 0,
                               prp.all_engine_running: -1,
                               prp.initial_heading_deg: self.INITIAL_HEADING_DEG,
-                              prp.throttle_cmd = self.THROTTLE_CMD
-                              prp.mixture_cmd = self.MIXTURE_CMD
+                              prp.throttle_cmd : self.THROTTLE_CMD
+                              prp.mixture_cmd : self.MIXTURE_CMD
                               self.nb_episodes: 0
                              }
         return initial_conditions

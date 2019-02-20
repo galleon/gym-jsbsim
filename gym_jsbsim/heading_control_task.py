@@ -76,6 +76,7 @@ class HeadingControlTask(BaseFlightTask):
         self.INITIAL_HEADING_DEG = random.uniform(prp.heading_deg.min, prp.heading_deg.max)
         self.INITIAL_VELOCITY_U = self.aircraft.get_cruise_speed_fps()
         self.INITIAL_VELOCITY_V = 0
+        
         #print("self.INITIAL_ALTITUDE_FT", self.INITIAL_ALTITUDE_FT)
         #print("self.INITIAL_HEADING_DEG", self.INITIAL_HEADING_DEG)
         initial_conditions = {prp.initial_altitude_ft: self.INITIAL_ALTITUDE_FT,
@@ -90,6 +91,8 @@ class HeadingControlTask(BaseFlightTask):
                               prp.initial_roc_fpm: 0,
                               prp.all_engine_running: -1,
                               prp.initial_heading_deg: self.INITIAL_HEADING_DEG,
+                              prp.throttle_cmd = self.THROTTLE_CMD
+                              prp.mixture_cmd = self.MIXTURE_CMD
                               self.nb_episodes: 0
                              }
         return initial_conditions
@@ -139,7 +142,7 @@ class HeadingControlTask(BaseFlightTask):
 
     def _new_episode_init(self, sim: Simulation) -> None:
         super()._new_episode_init(sim)
-        sim.set_throttle_mixture_controls(self.THROTTLE_CMD, self.MIXTURE_CMD)
+        #sim.set_throttle_mixture_controls(self.THROTTLE_CMD, self.MIXTURE_CMD)
         sim[self.steps_left] = self.steps_left.max
         sim[self.nb_episodes] += 1
 

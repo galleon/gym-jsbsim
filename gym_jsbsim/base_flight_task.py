@@ -60,8 +60,9 @@ class BaseFlightTask(ABC):
         # input actions
         for prop, command in zip(self.action_variables, action):
             sim[prop] = command
+        #sim.set_throttle_mixture_controls(self.THROTTLE_CMD, self.MIXTURE_CMD)
         try:
-            sim[throttle_1_cmd] = sim[throttle_cmd]
+            sim[prp.throttle_1_cmd] = sim[prp.throttle_cmd]
         except KeyError:
             pass  # must be single-control aircraft
         

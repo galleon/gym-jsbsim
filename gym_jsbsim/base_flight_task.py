@@ -60,7 +60,6 @@ class BaseFlightTask(ABC):
         # input actions
         for prop, command in zip(self.action_variables, action):
             sim[prop] = command
-
         try:
             sim["fcs_throttle_cmd_norm[1]"] = sim["fcs_throttle_cmd_norm"]
         except KeyError:

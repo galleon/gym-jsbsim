@@ -61,6 +61,12 @@ class BaseFlightTask(ABC):
         for prop, command in zip(self.action_variables, action):
             sim[prop] = command
 
+        try:
+            sim["fcs_throttle_cmd_norm[1]"] = sim["fcs_throttle_cmd_norm"]
+        except KeyError:
+            pass  # must be single-control aircraft
+        
+
         # run simulation
         for _ in range(sim_steps):
             sim.run()

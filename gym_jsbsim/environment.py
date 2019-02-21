@@ -145,7 +145,7 @@ class JsbSimEnv(gym.Env):
         :param flightgear_blocking: waits for FlightGear to load before
             returning if True, else returns immediately
         """
-        if mode == 'human':
+        if mode == 'human_sqs':
             self._send_state_to_sqs()
         elif mode == 'flightgear':
             if not self.flightgear_visualiser:

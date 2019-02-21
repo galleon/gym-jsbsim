@@ -58,7 +58,6 @@ class BaseFlightTask(ABC):
             info: dict, optional, containing diagnostic info for debugging etc.
         """
         # input actions
-        print(self.action_variables, action)
         for prop, command in zip(self.action_variables, action):
             sim[prop] = command
         try:

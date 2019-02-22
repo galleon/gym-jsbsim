@@ -60,16 +60,19 @@ class BaseFlightTask(ABC):
         # input actions
         for prop, command in zip(self.action_variables, action):
             sim[prop] = command
-        #sim.set_throttle_mixture_controls(self.THROTTLE_CMD, self.MIXTURE_CMD)
+        
+        # set throttle1 in case of more than 1 engine (ie: A320)
         try:
             sim[prp.throttle_1_cmd] = sim[prp.throttle_cmd]
         except KeyError:
-            pass  # must be single-control aircraft
-        
+            pass  # must be single-control aircraft     
+
+        print(f'past heading = {sim[prp.attitude_psi_deg]}, target = {sim[prp.target_altitude_ft]}, past delta heading = {sim[prp.delta_heading]}')
 
         # run simulation
         for _ in range(sim_steps):
             sim.run()
+
 
         self._update_custom_properties(sim)
         state = self.State(*(sim[prop] for prop in self.state_variables))
@@ -80,6 +83,12 @@ class BaseFlightTask(ABC):
             self._validate_state(state, done, action, reward)
         self.last_state = state
         info = {'reward': reward}
+
+        
+        # update delta heading according to the new heading
+        abs_h = math.fabs(sim[prp.target_altitude_ft] - state.attitude_psi_deg)
+        state.delta_heading = min(360-abs_h, abs_h)
+        print(f'new heading = {state.attitude_psi_deg}, target = {sim[prp.target_altitude_ft]}, past delta heading = {state.delta_heading}')
 
         return state, reward, done, info
 

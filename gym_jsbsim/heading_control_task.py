@@ -38,9 +38,8 @@ class HeadingControlTask(BaseFlightTask):
     ### Set config var
     THROTTLE_CMD = float(config["HEADING_CONTROL_TASK_CONDITION"]["throttle_cmd"])
     MIXTURE_CMD = float(config["HEADING_CONTROL_TASK_CONDITION"]["mixture_cmd"])
-    #INITIAL_HEADING_DEG = float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_heading_deg"])
-    #INITIAL_ALTITUDE_FT = float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_altitude_ft"])
-    #TARGET_HEADING_DEG = float(config["HEADING_CONTROL_TASK_CONDITION"]["target_heading_deg"])
+    INITIAL_LAT = float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_latitude_geod_deg"])
+    INITIAL_LONG = float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_longitude_geoc_deg"])
     DEFAULT_EPISODE_TIME_S = 1000.
     ALTITUDE_SCALING_FT = 150
     MAX_ALTITUDE_DEVIATION_FT = 800  # terminate if altitude error exceeds this
@@ -60,41 +59,35 @@ class HeadingControlTask(BaseFlightTask):
         self.nb_episodes = Property('info/nb_episodes', 'number of episodes since the beginning')
         self.aircraft = aircraft
 
-
-
-        #self.state_variables = (prp.pitch_rad, prp.roll_rad, prp.sideslip_deg, prp.v_north_fps, prp.v_east_fps, prp.altitude_sl_ft, # minimal state variables for the task
-        #                       prp.v_down_fps, prp.p_radps, prp.q_radps, prp.r_radps) # additional state variables used for reward shaping
         self.state_variables = state_var
-        #print("state_variables = " , self.state_variables)
-        #self.action_variables = (prp.aileron_cmd, prp.elevator_cmd, prp.rudder_cmd)
         self.action_variables = action_var
-        #print("action_variables = ", self.action_variables)
+
         super().__init__(debug)
 
     def get_initial_conditions(self) -> Dict[Property, float]:
         self.INITIAL_ALTITUDE_FT = random.uniform(1000, 34000)
         self.INITIAL_HEADING_DEG = random.uniform(prp.heading_deg.min, prp.heading_deg.max)
+        self.TARGET_ALTITUDE_FT = self.INITIAL_ALTITUDE_FT
+        self.TARGET_HEADING_DEG = self.INITIAL_HEADING_DEG
         self.INITIAL_VELOCITY_U = self.aircraft.get_cruise_speed_fps()
         self.INITIAL_VELOCITY_V = 0
         
-        #print("self.INITIAL_ALTITUDE_FT", self.INITIAL_ALTITUDE_FT)
-        #print("self.INITIAL_HEADING_DEG", self.INITIAL_HEADING_DEG)
         initial_conditions = {prp.initial_altitude_ft: self.INITIAL_ALTITUDE_FT,
                               prp.initial_u_fps: self.INITIAL_VELOCITY_U,
                               prp.initial_v_fps: self.INITIAL_VELOCITY_V,
                               prp.initial_w_fps: 0,
                               prp.initial_p_radps: 0,
-                              prp.initial_latitude_geod_deg: 49.243824,
-                              prp.initial_longitude_geoc_deg: -121.887340,
+                              prp.initial_latitude_geod_deg: self.INITIAL_LAT,
+                              prp.initial_longitude_geoc_deg: self.INITIAL_LONG,
                               prp.initial_q_radps: 0,
                               prp.initial_r_radps: 0,
                               prp.initial_roc_fpm: 0,
                               prp.all_engine_running: -1,
                               prp.initial_heading_deg: self.INITIAL_HEADING_DEG,
-                              #prp.throttle_cmd : self.THROTTLE_CMD,
-                              #prp.throttle_1_cmd: self.THROTTLE_CMD,
-                              #prp.mixture_cmd :  self.MIXTURE_CMD,
-                              #prp.mixture_1_cmd: self.MIXTURE_CMD,
+                              prp.initial_altitude_ft: self.INITIAL_ALTITUDE_FT,
+                              prp.delta_heading: min(360-math.fabs(self.INITIAL_HEADING_DEG, self.TARGET_HEADING_DEG), math.fabs(self.INITIAL_HEADING_DEG, self.TARGET_HEADING_DEG)),
+                              prp.target_altitude_ft: self.TARGET_ALTITUDE_FT,
+                              prp.target_heading_deg: self.TARGET_HEADING_DEG,
                               self.nb_episodes: 0
                              }
         return initial_conditions
@@ -122,7 +115,7 @@ class HeadingControlTask(BaseFlightTask):
         # inverse of the proportional absolute value between the initial and current altitude ... 
         alt_r = 1.0/math.sqrt((0.1*math.fabs(self.INITIAL_ALTITUDE_FT - last_state.position_h_sl_ft)+1))
         #print(" -v- ", self.INITIAL_VELOCITY_U, last_state.velocities_u_fps, vel_r, " -h- ", self.INITIAL_HEADING_DEG, last_state.attitude_psi_deg, heading_r, " -a- ", self.INITIAL_ALTITUDE_FT, last_state.position_h_sl_ft, alt_r, " -r- ", (heading_r + alt_r + vel_r)/3.0)
-        return (heading_r + alt_r)/2.0
+        return (heading_r + alt_r + vel_r)/3.0
     
     def _get_reward_cplx(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
         # Get   

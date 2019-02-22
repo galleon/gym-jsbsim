@@ -22,6 +22,7 @@ sideslip_deg = BoundedProperty('aero/beta-deg', 'sideslip [deg]', -180, +180)
 lat_geod_deg = BoundedProperty('position/lat-geod-deg', 'geocentric latitude [deg]', -90, 90)
 lng_geoc_deg = BoundedProperty('position/long-gc-deg', 'geodesic longitude [deg]', -180, 180)
 dist_travel_m = Property('position/distance-from-start-mag-mt', 'distance travelled from starting position [m]')
+delta_heading = BoundedProperty('position/delat-heading-to-target-deg', 'absolute delta heading to target [deg]', 0, 180)
 
 # velocities
 u_fps = BoundedProperty('velocities/u-fps', 'body frame x-axis velocity [ft/s]', -2200, 2200)
@@ -75,6 +76,10 @@ initial_q_radps = Property('ic/q-rad_sec', 'pitch rate [rad/s]')
 initial_r_radps = Property('ic/r-rad_sec', 'yaw rate [rad/s]')
 initial_roc_fpm = Property('ic/roc-fpm', 'initial rate of climb [ft/min]')
 initial_heading_deg = BoundedProperty('ic/psi-true-deg', 'initial (true) heading [deg]', heading_deg.min, heading_deg.max)
+
+# target conditions
+target_altitude_ft = BoundedProperty('tc/h-sl-ft', 'target altitude MSL [ft]', altitude_sl_ft.min, altitude_sl_ft.max)
+target_heading_deg = BoundedProperty('tc/target-heading-deg', 'target heading [deg]', heading_deg.min, heading_deg.max)
 
 prp_dict = {"altitude_sl_ft": altitude_sl_ft,
 	"pitch_rad": pitch_rad,

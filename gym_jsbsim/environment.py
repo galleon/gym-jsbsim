@@ -10,6 +10,8 @@ from gym_jsbsim.simulation import Simulation
 from gym_jsbsim.visualiser import FigureVisualiser, FlightGearVisualiser
 from gym_jsbsim.aircraft import Aircraft, cessna172P
 from typing import Type, Tuple, Dict
+import boto3
+
 
 
 class JsbSimEnv(gym.Env):
@@ -54,6 +56,12 @@ class JsbSimEnv(gym.Env):
         self.figure_visualiser: FigureVisualiser = None
         self.flightgear_visualiser: FlightGearVisualiser = None
         self.step_delay = None
+
+        try:
+            self._NUM_THREADS = 100
+            self._pool = ThreadPool(self._NUM_THREADS)
+        except Exception:
+            self._pool = None
 
     def step(self, action: np.ndarray) -> Tuple[np.ndarray, float, bool, Dict]:
         """
@@ -101,7 +109,6 @@ class JsbSimEnv(gym.Env):
             
         return np.array(state)
    
-
     def _init_new_sim(self, dt, aircraft, initial_conditions):
         return Simulation(sim_frequency_hz=dt,
                           aircraft=aircraft,
@@ -122,7 +129,6 @@ class JsbSimEnv(gym.Env):
         :param flightgear_blocking: waits for FlightGear to load before
             returning if True, else returns immediately
         """
-        
         if mode == 'flightgear':
             if not self.flightgear_visualiser:
                 self.flightgear_visualiser = FlightGearVisualiser(self.sim,
@@ -166,7 +172,6 @@ class JsbSimEnv(gym.Env):
         state = {prop.name: self.sim[prop] for prop in self.task.all_props}
         state['epochtime'] = time.time() # required to sort queue
         return state
-
 
 
 class NoFGJsbSimEnv(JsbSimEnv):

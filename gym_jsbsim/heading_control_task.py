@@ -125,7 +125,7 @@ class HeadingControlTask(BaseFlightTask):
         Reward with delat heading directly in the input vector state.
         '''
         # inverse of the proportional absolute value of the minimal angle between the initial and current heading ... 
-        heading_r = 1.0/math.sqrt((0.5*last_state.delta_heading+1))
+        heading_r = 1.0/math.sqrt((0.5*last_state.position_delta_heading_to_target_deg+1))
         # inverse of the proportional absolute value between the initial and current ground speed ... 
         vel_i = math.sqrt(math.pow(self.INITIAL_VELOCITY_U,2) + math.pow(self.INITIAL_VELOCITY_V,2)) 
         vel_c = math.sqrt(math.pow(last_state.velocities_u_fps,2) + math.pow(last_state.velocities_v_fps,2)) 

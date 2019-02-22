@@ -68,6 +68,7 @@ class BaseFlightTask(ABC):
         
         # set throttle1 in case of more than 1 engine (ie: A320)
         try:
+            sim[prp.all_engine_running] = -1
             sim[prp.throttle_1_cmd] = sim[prp.throttle_cmd]
         except KeyError:
             pass  # must be single-control aircraft     

@@ -59,6 +59,7 @@ class BaseFlightTask(ABC):
         """
         # input actions
         for prop, command in zip(self.action_variables, action):
+            ### bounded the action
             if command <= prop.min:
                 command = prop.min
             if command >= prop.max

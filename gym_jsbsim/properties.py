@@ -22,7 +22,7 @@ sideslip_deg = BoundedProperty('aero/beta-deg', 'sideslip [deg]', -180, +180)
 lat_geod_deg = BoundedProperty('position/lat-geod-deg', 'geocentric latitude [deg]', -90, 90)
 lng_geoc_deg = BoundedProperty('position/long-gc-deg', 'geodesic longitude [deg]', -180, 180)
 dist_travel_m = Property('position/distance-from-start-mag-mt', 'distance travelled from starting position [m]')
-delta_heading = BoundedProperty('position/delat-heading-to-target-deg', 'absolute delta heading to target [deg]', 0, 180)
+delta_heading = BoundedProperty('position/delta-heading-to-target-deg', 'absolute delta heading to target [deg]', 0, 180)
 
 # velocities
 u_fps = BoundedProperty('velocities/u-fps', 'body frame x-axis velocity [ft/s]', -2200, 2200)

@@ -84,7 +84,7 @@ class BaseFlightTask(ABC):
         self.last_state = state
         info = {'reward': reward}
 
-        
+        print("STATE BASE FLIGHT", state)
         # update delta heading according to the new heading
         abs_h = math.fabs(sim[prp.target_altitude_ft] - state.attitude_psi_deg)
         state.delta_heading = min(360-abs_h, abs_h)

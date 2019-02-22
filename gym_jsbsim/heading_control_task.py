@@ -104,10 +104,28 @@ class HeadingControlTask(BaseFlightTask):
         #terminal_step = sim[prp.dist_travel_m]  >= 100000
         return terminal_step or self._altitude_out_of_bounds(sim, state)
     
-    def _get_reward(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
+    def _get_reward_with_heading(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
+        '''
+        reward with current heading and initial heading
+        '''
         # inverse of the proportional absolute value of the minimal angle between the initial and current heading ... 
         abs_h = math.fabs(self.INITIAL_HEADING_DEG - last_state.attitude_psi_deg)
         heading_r = 1.0/math.sqrt((0.5*min(360-abs_h, abs_h)+1))
+        # inverse of the proportional absolute value between the initial and current ground speed ... 
+        vel_i = math.sqrt(math.pow(self.INITIAL_VELOCITY_U,2) + math.pow(self.INITIAL_VELOCITY_V,2)) 
+        vel_c = math.sqrt(math.pow(last_state.velocities_u_fps,2) + math.pow(last_state.velocities_v_fps,2)) 
+        vel_r = 1.0/math.sqrt((0.1*math.fabs(vel_i - vel_c)+1))
+        # inverse of the proportional absolute value between the initial and current altitude ... 
+        alt_r = 1.0/math.sqrt((0.1*math.fabs(self.INITIAL_ALTITUDE_FT - last_state.position_h_sl_ft)+1))
+        #print(" -v- ", self.INITIAL_VELOCITY_U, last_state.velocities_u_fps, vel_r, " -h- ", self.INITIAL_HEADING_DEG, last_state.attitude_psi_deg, heading_r, " -a- ", self.INITIAL_ALTITUDE_FT, last_state.position_h_sl_ft, alt_r, " -r- ", (heading_r + alt_r + vel_r)/3.0)
+        return (heading_r + alt_r + vel_r)/3.0
+    
+    def _get_reward(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
+        '''
+        Reward with delat heading directly in the input vector state.
+        '''
+        # inverse of the proportional absolute value of the minimal angle between the initial and current heading ... 
+        heading_r = 1.0/math.sqrt((0.5*last_state.delta_heading+1))
         # inverse of the proportional absolute value between the initial and current ground speed ... 
         vel_i = math.sqrt(math.pow(self.INITIAL_VELOCITY_U,2) + math.pow(self.INITIAL_VELOCITY_V,2)) 
         vel_c = math.sqrt(math.pow(last_state.velocities_u_fps,2) + math.pow(last_state.velocities_v_fps,2)) 

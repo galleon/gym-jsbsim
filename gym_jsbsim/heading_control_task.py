@@ -86,7 +86,7 @@ class HeadingControlTask(BaseFlightTask):
                               prp.initial_heading_deg: self.INITIAL_HEADING_DEG,
                               prp.initial_altitude_ft: self.INITIAL_ALTITUDE_FT,
                               prp.delta_heading: min(360-math.fabs(self.INITIAL_HEADING_DEG - self.TARGET_HEADING_DEG), math.fabs(self.INITIAL_HEADING_DEG - self.TARGET_HEADING_DEG)),
-                              prp.delta_altitude: math.fabs(self.INITIAL_ALTITUDE_FT - self.TARGET_ALTITUDE_FT)
+                              prp.delta_altitude: math.fabs(self.INITIAL_ALTITUDE_FT - self.TARGET_ALTITUDE_FT),
                               prp.target_altitude_ft: self.TARGET_ALTITUDE_FT,
                               prp.target_heading_deg: self.TARGET_HEADING_DEG,
                               self.nb_episodes: 0

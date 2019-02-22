@@ -10,8 +10,6 @@ from gym_jsbsim.simulation import Simulation
 from gym_jsbsim.visualiser import FigureVisualiser, FlightGearVisualiser
 from gym_jsbsim.aircraft import Aircraft, cessna172P
 from typing import Type, Tuple, Dict
-import boto3
-
 
 
 class JsbSimEnv(gym.Env):
@@ -56,22 +54,6 @@ class JsbSimEnv(gym.Env):
         self.figure_visualiser: FigureVisualiser = None
         self.flightgear_visualiser: FlightGearVisualiser = None
         self.step_delay = None
-
-        #try:
-        if (True):
-            #with open('/home/ubuntu/sqs_url.conf', 'r') as file:
-            #    self._sqs_url = file.readline()
-            self._sqs_url = "https://sqs.eu-west-1.amazonaws.com/190334810943/L2F.fifo"
-            sqs = boto3.resource('sqs')
-            self._l2f_queue = sqs.Queue(self._sqs_url)
-            #self._l2f_queue.purge()
-            self._l2f_queue_is_dirty = False # Signal if queue might not be empty
-            self._NUM_THREADS = 100
-            self._pool = ThreadPool(self._NUM_THREADS)
-        #except Exception:
-        #    self._sqs_url = None
-        #    self._l2f_queue = None
-        #    self._pool = None
 
     def step(self, action: np.ndarray) -> Tuple[np.ndarray, float, bool, Dict]:
         """
@@ -119,11 +101,6 @@ class JsbSimEnv(gym.Env):
             
         return np.array(state)
    
-    def reset_queue(self):
-        if self._l2f_queue and self._l2f_queue_is_dirty:
-            self._l2f_queue.purge()
-            self._l2f_queue_is_dirty = False
- 
 
     def _init_new_sim(self, dt, aircraft, initial_conditions):
         return Simulation(sim_frequency_hz=dt,
@@ -145,9 +122,8 @@ class JsbSimEnv(gym.Env):
         :param flightgear_blocking: waits for FlightGear to load before
             returning if True, else returns immediately
         """
-        if mode == 'human_sqs':
-            self._send_state_to_sqs()
-        elif mode == 'flightgear':
+        
+        if mode == 'flightgear':
             if not self.flightgear_visualiser:
                 self.flightgear_visualiser = FlightGearVisualiser(self.sim,
                                                                   self.task.get_props_to_output(self.sim),
@@ -191,25 +167,6 @@ class JsbSimEnv(gym.Env):
         state['epochtime'] = time.time() # required to sort queue
         return state
 
-    def _send_state_to_sqs(self):
-        '''
-        Send the rendering deque to SQS
-        '''
-        if self._l2f_queue:
-            self._l2f_queue_is_dirty = True
-            full_state = self._get_full_state()
-            #print("FULL STATE TO JSON", full_state)
-            message_body = json.dumps(full_state)
-            self._pool.apply_async(
-        	        self._l2f_queue.send_message,
-                kwds=dict(
-                    MessageBody=message_body,
-                    MessageGroupId='state_action_history'
-                )
-            )
-        else:
-            import warnings
-            warnings.warn('No SQS queue available.')
 
 
 class NoFGJsbSimEnv(JsbSimEnv):

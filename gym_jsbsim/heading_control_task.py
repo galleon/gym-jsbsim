@@ -65,8 +65,8 @@ class HeadingControlTask(BaseFlightTask):
         super().__init__(debug)
 
     def get_initial_conditions(self) -> Dict[Property, float]:
-        self.INITIAL_ALTITUDE_FT = random.uniform(1000, 34000)
-        self.INITIAL_HEADING_DEG = random.uniform(prp.heading_deg.min, prp.heading_deg.max)
+        self.INITIAL_ALTITUDE_FT = 10000.0#random.uniform(1000, 34000)
+        self.INITIAL_HEADING_DEG = 100.0#random.uniform(prp.heading_deg.min, prp.heading_deg.max)
         self.TARGET_ALTITUDE_FT = self.INITIAL_ALTITUDE_FT
         self.TARGET_HEADING_DEG = self.INITIAL_HEADING_DEG
         self.INITIAL_VELOCITY_U = self.aircraft.get_cruise_speed_fps()

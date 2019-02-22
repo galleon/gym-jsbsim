@@ -80,7 +80,6 @@ class BaseFlightTask(ABC):
         abs_h = math.fabs(sim[prp.target_heading_deg] - sim[prp.heading_deg])
         sim[prp.delta_heading] = min(360-abs_h, abs_h)
         sim[prp.delta_altitude] = math.fabs(sim[prp.target_altitude_ft] - sim[prp.altitude_sl_ft])
-        sim[prp.all_engine_running] = -1
         #print(f'new heading = {sim[prp.heading_deg]}, target = {sim[prp.target_heading_deg]}, new delta heading = {state.position_delta_heading_to_target_deg} (from sim: {sim[prp.delta_heading]}')
 
         state = self.State(*(sim[prop] for prop in self.state_variables))

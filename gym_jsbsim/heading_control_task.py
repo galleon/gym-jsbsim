@@ -20,7 +20,7 @@ print(config.read('/home/ubuntu/gym-jsbsim/gym_jsbsim/config-state-action.ini'))
 state_list = config.get('SA_DEFAULT', 'states').split('\n')
 state_var = ()
 for s in state_list:
-    #print(s)
+    print(s)
     state_var = state_var + (prp.prp_dict[s],)
 
 action_list = config.get('SA_DEFAULT', 'actions').split('\n')

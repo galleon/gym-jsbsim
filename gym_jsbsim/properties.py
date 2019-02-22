@@ -89,6 +89,7 @@ prp_dict = {"altitude_sl_ft": altitude_sl_ft,
 	"lat_geod_deg": lat_geod_deg,
 	"lng_geoc_deg": lng_geoc_deg,
 	"dist_travel_m": dist_travel_m,
+	"delta_heading": delta_heading,
 	"u_fps": u_fps,
 	"v_fps": v_fps,
 	"w_fps": w_fps,
@@ -129,7 +130,9 @@ prp_dict = {"altitude_sl_ft": altitude_sl_ft,
 	"initial_q_radps": initial_q_radps,
 	"initial_r_radps": initial_r_radps,
 	"initial_roc_fpm": initial_roc_fpm,
-	"initial_heading_deg": initial_heading_deg} 
+	"initial_heading_deg": initial_heading_deg,
+	"target_altitude_ft": target_altitude_ft,
+	"target_heading_deg": target_heading_deg} 
 
 
 class Vector2(object):

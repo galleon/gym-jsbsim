@@ -67,7 +67,7 @@ class BaseFlightTask(ABC):
         except KeyError:
             pass  # must be single-control aircraft     
 
-        print(f'past heading = {sim[prp.attitude_psi_deg]}, target = {sim[prp.target_altitude_ft]}, past delta heading = {sim[prp.delta_heading]}')
+        print(f'past heading = {sim[prp.heading_deg]}, target = {sim[prp.target_altitude_ft]}, past delta heading = {sim[prp.delta_heading]}')
 
         # run simulation
         for _ in range(sim_steps):

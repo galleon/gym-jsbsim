@@ -62,7 +62,7 @@ class BaseFlightTask(ABC):
             ### bounded the action
             if command <= prop.min:
                 command = prop.min
-            if command >= prop.max
+            if command >= prop.max:
                 command = prop.max
             sim[prop] = command
         

@@ -59,6 +59,10 @@ class BaseFlightTask(ABC):
         """
         # input actions
         for prop, command in zip(self.action_variables, action):
+            if command <= prop.min:
+                command = prop.min
+            if command >= prop.max
+                command = prop.max
             sim[prop] = command
         
         # set throttle1 in case of more than 1 engine (ie: A320)

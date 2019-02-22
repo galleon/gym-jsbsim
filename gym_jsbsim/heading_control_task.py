@@ -86,6 +86,7 @@ class HeadingControlTask(BaseFlightTask):
                               prp.initial_heading_deg: self.INITIAL_HEADING_DEG,
                               prp.initial_altitude_ft: self.INITIAL_ALTITUDE_FT,
                               prp.delta_heading: min(360-math.fabs(self.INITIAL_HEADING_DEG - self.TARGET_HEADING_DEG), math.fabs(self.INITIAL_HEADING_DEG - self.TARGET_HEADING_DEG)),
+                              prp.delta_altitude: math.fabs(self.INITIAL_ALTITUDE_FT - self.TARGET_ALTITUDE_FT)
                               prp.target_altitude_ft: self.TARGET_ALTITUDE_FT,
                               prp.target_heading_deg: self.TARGET_HEADING_DEG,
                               self.nb_episodes: 0
@@ -122,7 +123,7 @@ class HeadingControlTask(BaseFlightTask):
     
     def _get_reward(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
         '''
-        Reward with delat heading directly in the input vector state.
+        Reward with delta and altitude heading directly in the input vector state.
         '''
         # inverse of the proportional absolute value of the minimal angle between the initial and current heading ... 
         heading_r = 1.0/math.sqrt((0.5*last_state.position_delta_heading_to_target_deg+1))
@@ -131,7 +132,7 @@ class HeadingControlTask(BaseFlightTask):
         vel_c = math.sqrt(math.pow(last_state.velocities_u_fps,2) + math.pow(last_state.velocities_v_fps,2)) 
         vel_r = 1.0/math.sqrt((0.1*math.fabs(vel_i - vel_c)+1))
         # inverse of the proportional absolute value between the initial and current altitude ... 
-        alt_r = 1.0/math.sqrt((0.1*math.fabs(self.INITIAL_ALTITUDE_FT - last_state.position_h_sl_ft)+1))
+        alt_r = 1.0/math.sqrt((0.1*position_delta_altitude_to_target_ft+1))
         #print(" -v- ", self.INITIAL_VELOCITY_U, last_state.velocities_u_fps, vel_r, " -h- ", self.INITIAL_HEADING_DEG, last_state.attitude_psi_deg, heading_r, " -a- ", self.INITIAL_ALTITUDE_FT, last_state.position_h_sl_ft, alt_r, " -r- ", (heading_r + alt_r + vel_r)/3.0)
         return (heading_r + alt_r + vel_r)/3.0
     

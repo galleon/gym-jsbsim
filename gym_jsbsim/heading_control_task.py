@@ -103,7 +103,7 @@ class HeadingControlTask(BaseFlightTask):
         # terminate when time >= max, but use math.isclose() for float equality test
         terminal_step = sim[self.steps_left] <= 0
         #terminal_step = sim[prp.dist_travel_m]  >= 100000
-        return terminal_step #or self._altitude_out_of_bounds(sim, state)
+        return terminal_step or sim[prp.delta_altitude] >= 600 or sim[prp.delta_heading] >= 80
     
     def _get_reward_with_heading(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
         '''

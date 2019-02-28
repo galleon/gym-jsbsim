@@ -43,6 +43,8 @@ class HeadingControlTask(BaseFlightTask):
     DEFAULT_EPISODE_TIME_S = 1000.
     ALTITUDE_SCALING_FT = 150
     MAX_ALTITUDE_DEVIATION_FT = 800  # terminate if altitude error exceeds this
+    TIME_TO_CHANGE_HEADING_ALT = random.uniform((self.DEFAULT_EPISODE_TIME_S*5.)*0.25, (self.DEFAULT_EPISODE_TIME_S*5.)*0.75)
+    ALREADY_CHANGE = False
 
     def __init__(self, step_frequency_hz: float, aircraft: Aircraft,
                  episode_time_s: float = DEFAULT_EPISODE_TIME_S, debug: bool = False) -> None:
@@ -101,15 +103,19 @@ class HeadingControlTask(BaseFlightTask):
 
     def _is_terminal(self, sim: Simulation, state: NamedTuple) -> bool:
         # terminate when time >= max, but use math.isclose() for float equality test
-        TIME_TO_CHANGE_HEADING_ALT = random.uniform((self.DEFAULT_EPISODE_TIME_S*5.)*0.25, (self.DEFAULT_EPISODE_TIME_S*5.)*0.75)
-        ALREADY_CHANGE = False
-        if (sim[self.steps_left] <= TIME_TO_CHANGE_HEADING_ALT and not ALREADY_CHANGE):
-            print(sim[prp.target_altitude_ft], sim[prp.target_heading_deg])
+        if (sim[self.steps_left] <= self.TIME_TO_CHANGE_HEADING_ALT and not self.ALREADY_CHANGE):
+            print(f"Steps left: {sim[self.steps_left]}, Time to Change: {self.TIME_TO_CHANGE_HEADING_ALT}: previous ALT and HEAD: {sim[prp.target_altitude_ft]}, {sim[prp.target_heading_deg]}")
             sim[prp.target_altitude_ft] = sim[prp.target_altitude_ft] + random.uniform(-2000, 2000)
-            new_heading = sim[prp.target_heading_deg] + random.uniform(0, 90)
-            sim[prp.target_heading_deg] = min(new_heading, new_heading-360)
+
+            new_heading = sim[prp.target_heading_deg] + random.uniform(-90, 90)
+            if (new_heading <= 0):
+                new_heading = 360 - new_heading
+            if (new_heading >= 360):
+                new_heading = new_heading - 360
+            sim[prp.target_heading_deg] = new_heading
+
             print(sim[prp.target_altitude_ft], sim[prp.target_heading_deg])
-            ALREADY_CHANGE = True
+            self.ALREADY_CHANGE = True
         terminal_step = sim[self.steps_left] <= 0
         #terminal_step = sim[prp.dist_travel_m]  >= 100000
         return terminal_step or sim[prp.delta_altitude] >= 600 or sim[prp.delta_heading] >= 80

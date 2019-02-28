@@ -101,7 +101,12 @@ class HeadingControlTask(BaseFlightTask):
 
     def _is_terminal(self, sim: Simulation, state: NamedTuple) -> bool:
         # terminate when time >= max, but use math.isclose() for float equality test
-        print(sim[self.steps_left])
+        TIME_TO_CHANGE_HEADING_ALT = random.uniform((DEFAULT_EPISODE_TIME_S*5.)*0.25, (DEFAULT_EPISODE_TIME_S*5.)*0.75)
+        ALREADY_CHANGE = False
+        if (sim[self.steps_left] <= TIME_TO_CHANGE_HEADING_ALT and not ALREADY_CHANGE):
+            sim[prp.target_altitude_ft] = sim[prp.target_altitude_ft] + random.uniform(-2000, 2000)
+            sim[prp.target_heading_deg] = sim[prp.target_altitude_ft] + random.uniform(-90, 90)
+            ALREADY_CHANGE = True
         terminal_step = sim[self.steps_left] <= 0
         #terminal_step = sim[prp.dist_travel_m]  >= 100000
         return terminal_step or sim[prp.delta_altitude] >= 600 or sim[prp.delta_heading] >= 80

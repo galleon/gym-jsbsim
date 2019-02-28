@@ -101,6 +101,7 @@ class HeadingControlTask(BaseFlightTask):
 
     def _is_terminal(self, sim: Simulation, state: NamedTuple) -> bool:
         # terminate when time >= max, but use math.isclose() for float equality test
+        print(sim[self.steps_left])
         terminal_step = sim[self.steps_left] <= 0
         #terminal_step = sim[prp.dist_travel_m]  >= 100000
         return terminal_step or sim[prp.delta_altitude] >= 600 or sim[prp.delta_heading] >= 80

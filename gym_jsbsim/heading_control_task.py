@@ -103,19 +103,7 @@ class HeadingControlTask(BaseFlightTask):
 
     def _is_terminal(self, sim: Simulation, state: NamedTuple) -> bool:
         # terminate when time >= max, but use math.isclose() for float equality test
-        if (sim[self.steps_left] <= self.TIME_TO_CHANGE_HEADING_ALT and not self.ALREADY_CHANGE):
-            print(f"Steps left: {sim[self.steps_left]}, Time to Change: {self.TIME_TO_CHANGE_HEADING_ALT}: previous ALT and HEAD: {sim[prp.target_altitude_ft]}, {sim[prp.target_heading_deg]}")
-            sim[prp.target_altitude_ft] = sim[prp.target_altitude_ft] + random.uniform(-2000, 2000)
-
-            new_heading = sim[prp.target_heading_deg] + random.uniform(-90, 90)
-            if (new_heading <= 0):
-                new_heading = 360 - new_heading
-            if (new_heading >= 360):
-                new_heading = new_heading - 360
-            sim[prp.target_heading_deg] = new_heading
-
-            print(sim[prp.target_altitude_ft], sim[prp.target_heading_deg])
-            self.ALREADY_CHANGE = True
+        
         terminal_step = sim[self.steps_left] <= 0
         #terminal_step = sim[prp.dist_travel_m]  >= 100000
         return terminal_step or sim[prp.delta_altitude] >= 600 or sim[prp.delta_heading] >= 80
@@ -178,6 +166,142 @@ class HeadingControlTask(BaseFlightTask):
     def get_props_to_output(self, sim: Simulation) -> Tuple:
         return (*self.state_variables, prp.lat_geod_deg, prp.lng_geoc_deg, self.steps_left)
 
+
+class ChangeHeadingControlTask(BaseFlightTask):
+    """
+    A task in which the agent must perform steady, level flight maintaining its
+    initial heading.
+    """
+
+    ### Set config var
+    THROTTLE_CMD = float(config["HEADING_CONTROL_TASK_CONDITION"]["throttle_cmd"])
+    MIXTURE_CMD = float(config["HEADING_CONTROL_TASK_CONDITION"]["mixture_cmd"])
+    INITIAL_LAT = float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_latitude_geod_deg"])
+    INITIAL_LONG = float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_longitude_geoc_deg"])
+    DEFAULT_EPISODE_TIME_S = 1000.
+    ALTITUDE_SCALING_FT = 150
+    MAX_ALTITUDE_DEVIATION_FT = 800  # terminate if altitude error exceeds this
+    TIME_TO_CHANGE_HEADING_ALT = random.uniform((DEFAULT_EPISODE_TIME_S*5.)*0.33, (DEFAULT_EPISODE_TIME_S*5.)*0.66)
+    ALREADY_CHANGE = False
+
+    def __init__(self, step_frequency_hz: float, aircraft: Aircraft,
+                 episode_time_s: float = DEFAULT_EPISODE_TIME_S, debug: bool = False) -> None:
+        """
+        Constructor.
+
+        :param step_frequency_hz: the number of agent interaction steps per second
+        :param aircraft: the aircraft used in the simulation
+        """
+        self.max_time_s = episode_time_s
+        episode_steps = math.ceil(self.max_time_s * step_frequency_hz)
+        self.steps_left = BoundedProperty('info/steps_left', 'steps remaining in episode', 0,
+                                          episode_steps)
+        self.nb_episodes = Property('info/nb_episodes', 'number of episodes since the beginning')
+        self.aircraft = aircraft
+
+        self.state_variables = state_var
+        self.action_variables = action_var
+
+        super().__init__(debug)
+
+    def get_initial_conditions(self) -> Dict[Property, float]:
+        self.INITIAL_ALTITUDE_FT = random.uniform(10000, 20000)
+        self.INITIAL_HEADING_DEG = random.uniform(prp.heading_deg.min, prp.heading_deg.max)
+        self.TARGET_ALTITUDE_FT = self.INITIAL_ALTITUDE_FT
+        self.TARGET_HEADING_DEG = self.INITIAL_HEADING_DEG
+        self.INITIAL_VELOCITY_U = self.aircraft.get_cruise_speed_fps()
+        self.INITIAL_VELOCITY_V = 0
+        
+        initial_conditions = {prp.initial_altitude_ft: self.INITIAL_ALTITUDE_FT,
+                              prp.initial_u_fps: self.INITIAL_VELOCITY_U,
+                              prp.initial_v_fps: self.INITIAL_VELOCITY_V,
+                              prp.initial_w_fps: 0,
+                              prp.initial_p_radps: 0,
+                              prp.initial_latitude_geod_deg: self.INITIAL_LAT,
+                              prp.initial_longitude_geoc_deg: self.INITIAL_LONG,
+                              prp.initial_q_radps: 0,
+                              prp.initial_r_radps: 0,
+                              prp.initial_roc_fpm: 0,
+                              prp.all_engine_running: -1,
+                              prp.initial_heading_deg: self.INITIAL_HEADING_DEG,
+                              prp.initial_altitude_ft: self.INITIAL_ALTITUDE_FT,
+                              prp.delta_heading: min(360-math.fabs(self.INITIAL_HEADING_DEG - self.TARGET_HEADING_DEG), math.fabs(self.INITIAL_HEADING_DEG - self.TARGET_HEADING_DEG)),
+                              prp.delta_altitude: math.fabs(self.INITIAL_ALTITUDE_FT - self.TARGET_ALTITUDE_FT),
+                              prp.target_altitude_ft: self.TARGET_ALTITUDE_FT,
+                              prp.target_heading_deg: self.TARGET_HEADING_DEG,
+                              self.nb_episodes: 0
+                             }
+        return initial_conditions
+
+    def _update_custom_properties(self, sim: Simulation) -> None:
+        self._decrement_steps_left(sim)
+
+    def _decrement_steps_left(self, sim: Simulation):
+        sim[self.steps_left] -= 1
+
+    def _is_terminal(self, sim: Simulation, state: NamedTuple) -> bool:
+        # terminate when time >= max, but use math.isclose() for float equality test
+        if (sim[self.steps_left] <= self.TIME_TO_CHANGE_HEADING_ALT and not self.ALREADY_CHANGE):
+            print(f"Steps left: {sim[self.steps_left]}, Time to Change: {self.TIME_TO_CHANGE_HEADING_ALT}: previous ALT and HEAD: {sim[prp.target_altitude_ft]}, {sim[prp.target_heading_deg]}")
+            sim[prp.target_altitude_ft] = sim[prp.target_altitude_ft] + random.uniform(-2000, 2000)
+
+            new_heading = sim[prp.target_heading_deg] + random.uniform(-90, 90)
+            if (new_heading <= 0):
+                new_heading = 360 - new_heading
+            if (new_heading >= 360):
+                new_heading = new_heading - 360
+            sim[prp.target_heading_deg] = new_heading
+
+            print(sim[prp.target_altitude_ft], sim[prp.target_heading_deg])
+            self.ALREADY_CHANGE = True
+        terminal_step = sim[self.steps_left] <= 0
+        #terminal_step = sim[prp.dist_travel_m]  >= 100000
+        return terminal_step or sim[prp.delta_altitude] >= 600 or sim[prp.delta_heading] >= 80
+    
+    def _get_reward_with_heading(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
+        '''
+        reward with current heading and initial heading
+        '''
+        # inverse of the proportional absolute value of the minimal angle between the initial and current heading ... 
+        abs_h = math.fabs(self.INITIAL_HEADING_DEG - last_state.attitude_psi_deg)
+        heading_r = 1.0/math.sqrt((0.5*min(360-abs_h, abs_h)+1))
+        # inverse of the proportional absolute value between the initial and current ground speed ... 
+        vel_i = math.sqrt(math.pow(self.INITIAL_VELOCITY_U,2) + math.pow(self.INITIAL_VELOCITY_V,2)) 
+        vel_c = math.sqrt(math.pow(last_state.velocities_u_fps,2) + math.pow(last_state.velocities_v_fps,2)) 
+        vel_r = 1.0/math.sqrt((0.1*math.fabs(vel_i - vel_c)+1))
+        # inverse of the proportional absolute value between the initial and current altitude ... 
+        alt_r = 1.0/math.sqrt((0.1*math.fabs(self.INITIAL_ALTITUDE_FT - last_state.position_h_sl_ft)+1))
+        #print(" -v- ", self.INITIAL_VELOCITY_U, last_state.velocities_u_fps, vel_r, " -h- ", self.INITIAL_HEADING_DEG, last_state.attitude_psi_deg, heading_r, " -a- ", self.INITIAL_ALTITUDE_FT, last_state.position_h_sl_ft, alt_r, " -r- ", (heading_r + alt_r + vel_r)/3.0)
+        return (heading_r + alt_r + vel_r)/3.0
+    
+    def _get_reward(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
+        '''
+        Reward with delta and altitude heading directly in the input vector state.
+        '''
+        # inverse of the proportional absolute value of the minimal angle between the initial and current heading ... 
+        heading_r = 1.0/math.sqrt((0.1*last_state.position_delta_heading_to_target_deg+1))
+        # inverse of the proportional absolute value between the initial and current ground speed ... 
+        vel_i = math.sqrt(math.pow(self.INITIAL_VELOCITY_U,2) + math.pow(self.INITIAL_VELOCITY_V,2)) 
+        vel_c = math.sqrt(math.pow(last_state.velocities_u_fps,2) + math.pow(last_state.velocities_v_fps,2)) 
+        vel_r = 1.0/math.sqrt((0.1*math.fabs(vel_i - vel_c)+1))
+        # inverse of the proportional absolute value between the initial and current altitude ... 
+        alt_r = 1.0/math.sqrt((0.1*last_state.position_delta_altitude_to_target_ft+1))
+        #print(" -v- ", self.INITIAL_VELOCITY_U, last_state.velocities_u_fps, vel_r, " -h- ", self.INITIAL_HEADING_DEG, last_state.attitude_psi_deg, heading_r, " -a- ", self.INITIAL_ALTITUDE_FT, last_state.position_h_sl_ft, alt_r, " -r- ", (heading_r + alt_r + vel_r)/3.0)
+        return (heading_r + alt_r)/2.0
+    
+
+    def _altitude_out_of_bounds(self, sim: Simulation, state: NamedTuple) -> bool:
+        altitude_error_ft = math.fabs(state.position_h_sl_ft - self.INITIAL_ALTITUDE_FT)
+        return abs(altitude_error_ft) > self.MAX_ALTITUDE_DEVIATION_FT
+
+    def _new_episode_init(self, sim: Simulation) -> None:
+        super()._new_episode_init(sim)
+        sim.set_throttle_mixture_controls(self.THROTTLE_CMD, self.MIXTURE_CMD)
+        sim[self.steps_left] = self.steps_left.max
+        sim[self.nb_episodes] += 1
+
+    def get_props_to_output(self, sim: Simulation) -> Tuple:
+        return (*self.state_variables, prp.lat_geod_deg, prp.lng_geoc_deg, self.steps_left)
 
 class HeadingControlTask_1Bis(BaseFlightTask):
     """

@@ -43,7 +43,7 @@ class HeadingControlTask(BaseFlightTask):
     DEFAULT_EPISODE_TIME_S = 1000.
     ALTITUDE_SCALING_FT = 150
     MAX_ALTITUDE_DEVIATION_FT = 800  # terminate if altitude error exceeds this
-    TIME_TO_CHANGE_HEADING_ALT = random.uniform((DEFAULT_EPISODE_TIME_S*5.)*0.25, (DEFAULT_EPISODE_TIME_S*5.)*0.75)
+    TIME_TO_CHANGE_HEADING_ALT = random.uniform((DEFAULT_EPISODE_TIME_S*5.)*0.33, (DEFAULT_EPISODE_TIME_S*5.)*0.66)
     ALREADY_CHANGE = False
 
     def __init__(self, step_frequency_hz: float, aircraft: Aircraft,

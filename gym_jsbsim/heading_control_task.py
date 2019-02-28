@@ -106,7 +106,8 @@ class HeadingControlTask(BaseFlightTask):
         if (sim[self.steps_left] <= TIME_TO_CHANGE_HEADING_ALT and not ALREADY_CHANGE):
             print(sim[prp.target_altitude_ft], sim[prp.target_heading_deg])
             sim[prp.target_altitude_ft] = sim[prp.target_altitude_ft] + random.uniform(-2000, 2000)
-            sim[prp.target_heading_deg] = max(sim[prp.target_heading_deg] + random.uniform(0, 90), sim[prp.target_heading_deg] + random.uniform(0, 90)-360)
+            new heading = sim[prp.target_heading_deg] + random.uniform(0, 90)
+            sim[prp.target_heading_deg] = max(heading, heading-360)
             print(sim[prp.target_altitude_ft], sim[prp.target_heading_deg])
             ALREADY_CHANGE = True
         terminal_step = sim[self.steps_left] <= 0

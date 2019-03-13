@@ -186,6 +186,8 @@ class ChangeHeadingControlTask(BaseFlightTask):
     THRESHOLD_CONTROL = 0.5
     PENALTY_CONTROL = -0.2
 
+    
+
     def __init__(self, step_frequency_hz: float, aircraft: Aircraft,
                  episode_time_s: float = DEFAULT_EPISODE_TIME_S, debug: bool = False) -> None:
         """
@@ -233,6 +235,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
                               prp.target_heading_deg: self.TARGET_HEADING_DEG,
                               self.nb_episodes: 0
                              }
+        self.LAST_CONTROL_STATE = [0,0,0,0,0]
         return initial_conditions
 
     def _update_custom_properties(self, sim: Simulation) -> None:
@@ -293,28 +296,31 @@ class ChangeHeadingControlTask(BaseFlightTask):
         #print(" -v- ", self.INITIAL_VELOCITY_U, last_state.velocities_u_fps, vel_r, " -h- ", self.INITIAL_HEADING_DEG, last_state.attitude_psi_deg, heading_r, " -a- ", self.INITIAL_ALTITUDE_FT, last_state.position_h_sl_ft, alt_r, " -r- ", (heading_r + alt_r + vel_r)/3.0)
 
         #check to strong manoeuvres
-        delta_left_aileron = math.fabs(last_state.fcs_left_aileron_pos_norm, new_state.fcs_left_aileron_pos_norm)
-        delta_right_aileron = math.fabs(last_state.fcs_right_aileron_pos_norm, new_state.fcs_right_aileron_pos_norm)
-        delta_elevator = math.fabs(last_state.fcs_elevator_pos_norm, new_state.fcs_elevator_pos_norm)
-        delta_rudder = math.fabs(last_state.fcs_rudder_pos_norm, new_state.fcs_rudder_pos_norm)
-        delta_throttle = math.fabs(last_state.fcs_throttle_pos_norm, new_state.fcs_throttle_pos_norm)
-
         sum_penalty_control_state = 0
-        if delta_left_aileron >= self.THRESHOLD_CONTROL:
-            sum_penalty_control_state += self.PENALTY_CONTROL
-        if delta_right_aileron >= self.THRESHOLD_CONTROL:
-            sum_penalty_control_state += self.PENALTY_CONTROL
-        if delta_elevator >= self.THRESHOLD_CONTROL:
-            sum_penalty_control_state += self.PENALTY_CONTROL 
-        if delta_rudder >= self.THRESHOLD_CONTROL:
-            sum_penalty_control_state += self.PENALTY_CONTROL 
-        if delta_throttle >= self.THRESHOLD_CONTROL:
-            sum_penalty_control_state += self.PENALTY_CONTROL  
+
+        if (sim[self.nb_episodes]>=1):
+            delta_left_aileron = math.fabs(self.LAST_CONTROL_STATE[0], sim[prp.aileron_left])
+            delta_right_aileron = math.fabs(self.LAST_CONTROL_STATE[1], sim[prp.aileron_right])
+            delta_elevator = math.fabs(self.LAST_CONTROL_STATE[2], sim[prp.elevator])
+            delta_rudder = math.fabs(self.LAST_CONTROL_STATE[3], sim[prp.rudder])
+            delta_throttle = math.fabs(self.LAST_CONTROL_STATE[4], sim[prp.throttle])
+
+            
+            if delta_left_aileron >= self.THRESHOLD_CONTROL:
+                sum_penalty_control_state += self.PENALTY_CONTROL
+            if delta_right_aileron >= self.THRESHOLD_CONTROL:
+                sum_penalty_control_state += self.PENALTY_CONTROL
+            if delta_elevator >= self.THRESHOLD_CONTROL:
+                sum_penalty_control_state += self.PENALTY_CONTROL 
+            if delta_rudder >= self.THRESHOLD_CONTROL:
+                sum_penalty_control_state += self.PENALTY_CONTROL 
+            if delta_throttle >= self.THRESHOLD_CONTROL:
+                sum_penalty_control_state += self.PENALTY_CONTROL  
         
         #reward if finish the simulation 
         reward_nb_episode = 1/(sim[self.steps_left] + 1)
 
-        
+        self.LAST_CONTROL_STATE = [sim[prp.aileron_left], sim[prp.aileron_right], sim[prp.elevator], sim[prp.rudder], sim[prp.throttle]]
 
         return (heading_r + alt_r)/2.0 + sum_penalty_control_state + reward_nb_episode
     

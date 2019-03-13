@@ -183,7 +183,6 @@ class ChangeHeadingControlTask(BaseFlightTask):
     ALTITUDE_SCALING_FT = 150
     MAX_ALTITUDE_DEVIATION_FT = 800  # terminate if altitude error exceeds this
     TIME_TO_CHANGE_HEADING_ALT = random.uniform((DEFAULT_EPISODE_TIME_S*5.)*0.33, (DEFAULT_EPISODE_TIME_S*5.)*0.66)
-    ALREADY_CHANGE = False
     THRESHOLD_CONTROL = 0.5
     PENALTY_CONTROL = -0.2
 

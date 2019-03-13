@@ -262,6 +262,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
 
             self.ALREADY_CHANGE = True
         terminal_step = sim[self.steps_left] <= 0
+        sim[self.nb_episodes] += 1
         #terminal_step = sim[prp.dist_travel_m]  >= 100000
         return terminal_step or sim[prp.delta_altitude] >= 600 or sim[prp.delta_heading] >= 80
     

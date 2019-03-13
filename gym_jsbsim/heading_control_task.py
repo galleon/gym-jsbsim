@@ -73,7 +73,7 @@ class HeadingControlTask(BaseFlightTask):
         self.TARGET_HEADING_DEG = self.INITIAL_HEADING_DEG
         self.INITIAL_VELOCITY_U = self.aircraft.get_cruise_speed_fps()
         self.INITIAL_VELOCITY_V = 0
-        self.ALREADY_CHANGE = False
+        
         
         initial_conditions = {prp.initial_altitude_ft: self.INITIAL_ALTITUDE_FT,
                               prp.initial_u_fps: self.INITIAL_VELOCITY_U,
@@ -186,8 +186,6 @@ class ChangeHeadingControlTask(BaseFlightTask):
     THRESHOLD_CONTROL = 0.5
     PENALTY_CONTROL = -0.2
 
-    
-
     def __init__(self, step_frequency_hz: float, aircraft: Aircraft,
                  episode_time_s: float = DEFAULT_EPISODE_TIME_S, debug: bool = False) -> None:
         """
@@ -215,6 +213,8 @@ class ChangeHeadingControlTask(BaseFlightTask):
         self.TARGET_HEADING_DEG = self.INITIAL_HEADING_DEG
         self.INITIAL_VELOCITY_U = self.aircraft.get_cruise_speed_fps()
         self.INITIAL_VELOCITY_V = 0
+        self.ALREADY_CHANGE = False
+        self.LAST_CONTROL_STATE = [0,0,0,0,0]
         
         initial_conditions = {prp.initial_altitude_ft: self.INITIAL_ALTITUDE_FT,
                               prp.initial_u_fps: self.INITIAL_VELOCITY_U,
@@ -235,7 +235,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
                               prp.target_heading_deg: self.TARGET_HEADING_DEG,
                               self.nb_episodes: 0
                              }
-        self.LAST_CONTROL_STATE = [0,0,0,0,0]
+        
         return initial_conditions
 
     def _update_custom_properties(self, sim: Simulation) -> None:

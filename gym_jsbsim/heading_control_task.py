@@ -182,7 +182,6 @@ class ChangeHeadingControlTask(BaseFlightTask):
     DEFAULT_EPISODE_TIME_S = 1000.
     ALTITUDE_SCALING_FT = 150
     MAX_ALTITUDE_DEVIATION_FT = 800  # terminate if altitude error exceeds this
-    TIME_TO_CHANGE_HEADING_ALT = random.uniform((DEFAULT_EPISODE_TIME_S*5.)*0.33, (DEFAULT_EPISODE_TIME_S*5.)*0.66)
     THRESHOLD_CONTROL = 0.5
     PENALTY_CONTROL = -0.2
 
@@ -215,6 +214,14 @@ class ChangeHeadingControlTask(BaseFlightTask):
         self.INITIAL_VELOCITY_V = 0
         self.ALREADY_CHANGE = False
         self.LAST_CONTROL_STATE = [0,0,0,0,0]
+        self.TIME_TO_CHANGE_HEADING_ALT = random.uniform((DEFAULT_EPISODE_TIME_S*5.)*0.33, (DEFAULT_EPISODE_TIME_S*5.)*0.66)
+        self.NEW_ALTITUDE_FT = self.TARGET_ALTITUDE_FT + random.uniform(-4000, 4000)
+        new_heading = self.TARGET_HEADING_DEG + random.uniform(-90, 90)
+        if (new_heading <= 0):
+                new_heading = 360 - new_heading
+            if (new_heading >= 360):
+                new_heading = new_heading - 360
+        self.NEW_HEADING_DEG = new_heading
         
         initial_conditions = {prp.initial_altitude_ft: self.INITIAL_ALTITUDE_FT,
                               prp.initial_u_fps: self.INITIAL_VELOCITY_U,
@@ -235,7 +242,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
                               prp.target_heading_deg: self.TARGET_HEADING_DEG,
                               self.nb_episodes: 0
                              }
-        
+        print(f'Time to change: {self.TIME_TO_CHANGE_HEADING_ALT} (Altitude: {self.TARGET_ALTITUDE_FT} -> {self.NEW_ALTITUDE_FT}, Heading: {self.TARGET_HEADING_DEG} -> {self.NEW_HEADING_DEG})')
         return initial_conditions
 
     def _update_custom_properties(self, sim: Simulation) -> None:
@@ -247,19 +254,11 @@ class ChangeHeadingControlTask(BaseFlightTask):
     def _is_terminal(self, sim: Simulation, state: NamedTuple) -> bool:
         # Change target ALT and HEADING
         #print(f'nombre episode: {sim[self.nb_episodes]}, nombre step left: {sim[self.steps_left]}')
+
         if (sim[self.steps_left] <= self.TIME_TO_CHANGE_HEADING_ALT and not self.ALREADY_CHANGE):
-            print(f"Steps left: {sim[self.steps_left]}, Time to Change: {self.TIME_TO_CHANGE_HEADING_ALT}: previous ALT and HEAD: {sim[prp.target_altitude_ft]}, {sim[prp.target_heading_deg]}")
-            sim[prp.target_altitude_ft] = sim[prp.target_altitude_ft] + random.uniform(-4000, 4000)
-
-            new_heading = sim[prp.target_heading_deg] + random.uniform(-90, 90)
-            if (new_heading <= 0):
-                new_heading = 360 - new_heading
-            if (new_heading >= 360):
-                new_heading = new_heading - 360
-            sim[prp.target_heading_deg] = new_heading
-
-            print(f'New ALT and HEAD:{sim[prp.target_altitude_ft]}, {sim[prp.target_heading_deg]}')
-
+            print(f'Time to change: {self.TIME_TO_CHANGE_HEADING_ALT} (Altitude: {self.TARGET_ALTITUDE_FT} -> {self.NEW_ALTITUDE_FT}, Heading: {self.TARGET_HEADING_DEG} -> {self.NEW_HEADING_DEG})')
+            sim[prp.target_altitude_ft] = self.NEW_ALTITUDE_FT
+            sim[prp.target_heading_deg] = self.NEW_HEADING_DEG
             self.ALREADY_CHANGE = True
         terminal_step = sim[self.steps_left] <= 0
         sim[self.nb_episodes] += 1
@@ -323,7 +322,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
 
         self.LAST_CONTROL_STATE = [sim[prp.aileron_left], sim[prp.aileron_right], sim[prp.elevator], sim[prp.rudder], sim[prp.throttle]]
 
-        return (heading_r + alt_r + sum_penalty_control_state + reward_nb_episode) / 4.0
+        return (2*heading_r + 2*alt_r + sum_penalty_control_state + reward_nb_episode) / 6.0
     
 
     def _altitude_out_of_bounds(self, sim: Simulation, state: NamedTuple) -> bool:

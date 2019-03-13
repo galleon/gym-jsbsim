@@ -255,7 +255,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
                 new_heading = new_heading - 360
             sim[prp.target_heading_deg] = new_heading
 
-            print(f'New ALT and HEAD:{sim[prp.target_altitude_ft]}, {sim[prp.target_heading_deg])}')
+            print(f'New ALT and HEAD:{sim[prp.target_altitude_ft]}, {sim[prp.target_heading_deg]}')
 
             self.ALREADY_CHANGE = True
         terminal_step = sim[self.steps_left] <= 0

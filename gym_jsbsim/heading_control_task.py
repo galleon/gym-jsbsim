@@ -319,7 +319,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
                 sum_penalty_control_state += self.PENALTY_CONTROL  
         
         #reward if finish the simulation 
-        reward_nb_episode = 1/(sim[self.steps_left] + 1)
+        reward_nb_episode = 1.0 / max(sim[self.steps_left],1.0)
 
         self.LAST_CONTROL_STATE = [sim[prp.aileron_left], sim[prp.aileron_right], sim[prp.elevator], sim[prp.rudder], sim[prp.throttle]]
 

@@ -170,7 +170,7 @@ class HeadingControlTask(BaseFlightTask):
 class ChangeHeadingControlTask(BaseFlightTask):
     """
     A task in which the agent must perform steady, level flight maintaining its
-    initial heading.
+    initial heading and altitude and changint them to another ones in the middle of the simiulation
     """
 
     ### Set config var
@@ -183,6 +183,8 @@ class ChangeHeadingControlTask(BaseFlightTask):
     MAX_ALTITUDE_DEVIATION_FT = 800  # terminate if altitude error exceeds this
     TIME_TO_CHANGE_HEADING_ALT = random.uniform((DEFAULT_EPISODE_TIME_S*5.)*0.33, (DEFAULT_EPISODE_TIME_S*5.)*0.66)
     ALREADY_CHANGE = False
+    THRESHOLD_CONTROL = 0.5
+    PENALTY_CONTROL = -0.2
 
     def __init__(self, step_frequency_hz: float, aircraft: Aircraft,
                  episode_time_s: float = DEFAULT_EPISODE_TIME_S, debug: bool = False) -> None:
@@ -240,10 +242,11 @@ class ChangeHeadingControlTask(BaseFlightTask):
         sim[self.steps_left] -= 1
 
     def _is_terminal(self, sim: Simulation, state: NamedTuple) -> bool:
-        # terminate when time >= max, but use math.isclose() for float equality test
+        # Change target ALT and HEADING
+        print(f'nombre episode: {sim[self.nb_episodes]}, nombre step left: {sim[self.steps_left]}')
         if (sim[self.steps_left] <= self.TIME_TO_CHANGE_HEADING_ALT and not self.ALREADY_CHANGE):
             print(f"Steps left: {sim[self.steps_left]}, Time to Change: {self.TIME_TO_CHANGE_HEADING_ALT}: previous ALT and HEAD: {sim[prp.target_altitude_ft]}, {sim[prp.target_heading_deg]}")
-            sim[prp.target_altitude_ft] = sim[prp.target_altitude_ft] + random.uniform(-2000, 2000)
+            sim[prp.target_altitude_ft] = sim[prp.target_altitude_ft] + random.uniform(-4000, 4000)
 
             new_heading = sim[prp.target_heading_deg] + random.uniform(-90, 90)
             if (new_heading <= 0):
@@ -252,7 +255,8 @@ class ChangeHeadingControlTask(BaseFlightTask):
                 new_heading = new_heading - 360
             sim[prp.target_heading_deg] = new_heading
 
-            print(sim[prp.target_altitude_ft], sim[prp.target_heading_deg])
+            print(f'New ALT and HEAD:{sim[prp.target_altitude_ft]}, {sim[prp.target_heading_deg])}')
+
             self.ALREADY_CHANGE = True
         terminal_step = sim[self.steps_left] <= 0
         #terminal_step = sim[prp.dist_travel_m]  >= 100000
@@ -287,7 +291,32 @@ class ChangeHeadingControlTask(BaseFlightTask):
         # inverse of the proportional absolute value between the initial and current altitude ... 
         alt_r = 1.0/math.sqrt((0.1*last_state.position_delta_altitude_to_target_ft+1))
         #print(" -v- ", self.INITIAL_VELOCITY_U, last_state.velocities_u_fps, vel_r, " -h- ", self.INITIAL_HEADING_DEG, last_state.attitude_psi_deg, heading_r, " -a- ", self.INITIAL_ALTITUDE_FT, last_state.position_h_sl_ft, alt_r, " -r- ", (heading_r + alt_r + vel_r)/3.0)
-        return (heading_r + alt_r)/2.0
+
+        #check to strong manoeuvres
+        delta_left_aileron = math.fabs(last_state.fcs_left_aileron_pos_norm, new_state.fcs_left_aileron_pos_norm)
+        delta_right_aileron = math.fabs(last_state.fcs_right_aileron_pos_norm, new_state.fcs_right_aileron_pos_norm)
+        delta_elevator = math.fabs(last_state.fcs_elevator_pos_norm, new_state.fcs_elevator_pos_norm)
+        delta_rudder = math.fabs(last_state.fcs_rudder_pos_norm, new_state.fcs_rudder_pos_norm)
+        delta_throttle = math.fabs(last_state.fcs_throttle_pos_norm, new_state.fcs_throttle_pos_norm)
+
+        sum_penalty_control_state = 0
+        if delta_left_aileron >= self.THRESHOLD_CONTROL:
+            sum_penalty_control_state += self.PENALTY_CONTROL
+        if delta_right_aileron >= self.THRESHOLD_CONTROL:
+            sum_penalty_control_state += self.PENALTY_CONTROL
+        if delta_elevator >= self.THRESHOLD_CONTROL:
+            sum_penalty_control_state += self.PENALTY_CONTROL 
+        if delta_rudder >= self.THRESHOLD_CONTROL:
+            sum_penalty_control_state += self.PENALTY_CONTROL 
+        if delta_throttle >= self.THRESHOLD_CONTROL:
+            sum_penalty_control_state += self.PENALTY_CONTROL  
+        
+        #reward if finish the simulation 
+        reward_nb_episode = 1/(sim[self.steps_left] + 1)
+
+        
+
+        return (heading_r + alt_r)/2.0 + sum_penalty_control_state + reward_nb_episode
     
 
     def _altitude_out_of_bounds(self, sim: Simulation, state: NamedTuple) -> bool:

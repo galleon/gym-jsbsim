@@ -218,9 +218,9 @@ class ChangeHeadingControlTask(BaseFlightTask):
         self.NEW_ALTITUDE_FT = self.TARGET_ALTITUDE_FT + random.uniform(-4000, 4000)
         new_heading = self.TARGET_HEADING_DEG + random.uniform(-90, 90)
         if (new_heading <= 0):
-                new_heading = 360 - new_heading
-            if (new_heading >= 360):
-                new_heading = new_heading - 360
+            new_heading = 360 - new_heading
+        if (new_heading >= 360):
+            new_heading = new_heading - 360
         self.NEW_HEADING_DEG = new_heading
         
         initial_conditions = {prp.initial_altitude_ft: self.INITIAL_ALTITUDE_FT,

@@ -323,7 +323,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
 
         self.LAST_CONTROL_STATE = [sim[prp.aileron_left], sim[prp.aileron_right], sim[prp.elevator], sim[prp.rudder], sim[prp.throttle]]
 
-        return (heading_r + alt_r)/2.0 + sum_penalty_control_state + reward_nb_episode
+        return (heading_r + alt_r + sum_penalty_control_state + reward_nb_episode) / 4.0
     
 
     def _altitude_out_of_bounds(self, sim: Simulation, state: NamedTuple) -> bool:

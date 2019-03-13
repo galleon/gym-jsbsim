@@ -299,11 +299,11 @@ class ChangeHeadingControlTask(BaseFlightTask):
         sum_penalty_control_state = 0
 
         if (sim[self.nb_episodes]>=1):
-            delta_left_aileron = math.fabs(self.LAST_CONTROL_STATE[0], sim[prp.aileron_left])
-            delta_right_aileron = math.fabs(self.LAST_CONTROL_STATE[1], sim[prp.aileron_right])
-            delta_elevator = math.fabs(self.LAST_CONTROL_STATE[2], sim[prp.elevator])
-            delta_rudder = math.fabs(self.LAST_CONTROL_STATE[3], sim[prp.rudder])
-            delta_throttle = math.fabs(self.LAST_CONTROL_STATE[4], sim[prp.throttle])
+            delta_left_aileron = math.fabs(self.LAST_CONTROL_STATE[0] - sim[prp.aileron_left])
+            delta_right_aileron = math.fabs(self.LAST_CONTROL_STATE[1] - sim[prp.aileron_right])
+            delta_elevator = math.fabs(self.LAST_CONTROL_STATE[2] - sim[prp.elevator])
+            delta_rudder = math.fabs(self.LAST_CONTROL_STATE[3] - sim[prp.rudder])
+            delta_throttle = math.fabs(self.LAST_CONTROL_STATE[4] - sim[prp.throttle])
 
             
             if delta_left_aileron >= self.THRESHOLD_CONTROL:

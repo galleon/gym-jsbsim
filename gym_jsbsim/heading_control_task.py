@@ -246,7 +246,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
 
     def _is_terminal(self, sim: Simulation, state: NamedTuple) -> bool:
         # Change target ALT and HEADING
-        print(f'nombre episode: {sim[self.nb_episodes]}, nombre step left: {sim[self.steps_left]}')
+        #print(f'nombre episode: {sim[self.nb_episodes]}, nombre step left: {sim[self.steps_left]}')
         if (sim[self.steps_left] <= self.TIME_TO_CHANGE_HEADING_ALT and not self.ALREADY_CHANGE):
             print(f"Steps left: {sim[self.steps_left]}, Time to Change: {self.TIME_TO_CHANGE_HEADING_ALT}: previous ALT and HEAD: {sim[prp.target_altitude_ft]}, {sim[prp.target_heading_deg]}")
             sim[prp.target_altitude_ft] = sim[prp.target_altitude_ft] + random.uniform(-4000, 4000)

@@ -15,15 +15,19 @@ class Property(collections.namedtuple('Property', ['name', 'description'])):
 
 # position and attitude
 altitude_sl_ft = BoundedProperty('position/h-sl-ft', 'altitude above mean sea level [ft]', -1400, 85000)
-pitch_rad = BoundedProperty('attitude/pitch-rad', 'pitch [rad]', -0.5 * math.pi, 0.5 * math.pi)
-roll_rad = BoundedProperty('attitude/roll-rad', 'roll [rad]', -math.pi, math.pi)
-heading_deg = BoundedProperty('attitude/psi-deg', 'heading [deg]', 0, 360)
 sideslip_deg = BoundedProperty('aero/beta-deg', 'sideslip [deg]', -180, +180)
 lat_geod_deg = BoundedProperty('position/lat-geod-deg', 'geocentric latitude [deg]', -90, 90)
 lng_geoc_deg = BoundedProperty('position/long-gc-deg', 'geodesic longitude [deg]', -180, 180)
 dist_travel_m = Property('position/distance-from-start-mag-mt', 'distance travelled from starting position [m]')
 delta_heading = BoundedProperty('position/delta-heading-to-target-deg', 'absolute delta heading to target [deg]', 0, 180)
 delta_altitude = BoundedProperty('position/delta-altitude-to-target-ft', 'absolute delta altitude to target [ft]', 0, 40000)
+
+
+# attitude
+pitch_rad = BoundedProperty('attitude/pitch-rad', 'pitch [rad]', -0.5 * math.pi, 0.5 * math.pi)
+roll_rad = BoundedProperty('attitude/roll-rad', 'roll [rad]', -math.pi, math.pi)
+heading_deg = BoundedProperty('attitude/psi-deg', 'heading [deg]', 0, 360)
+heading_true_rad = Property('attitude/heading-true-rad', 'true heading')
 
 # velocities
 u_fps = BoundedProperty('velocities/u-fps', 'body frame x-axis velocity [ft/s]', -2200, 2200)
@@ -36,6 +40,12 @@ p_radps = BoundedProperty('velocities/p-rad_sec', 'roll rate [rad/s]', -2 * math
 q_radps = BoundedProperty('velocities/q-rad_sec', 'pitch rate [rad/s]', -2 * math.pi, 2 * math.pi)
 r_radps = BoundedProperty('velocities/r-rad_sec', 'yaw rate [rad/s]', -2 * math.pi, 2 * math.pi)
 altitude_rate_fps = Property('velocities/h-dot-fps', 'rate of altitude change [ft/s]')
+v_air = Property('velocities/vc-kts', 'airspeed in knots')
+
+# acceleration
+pdot_rps2 = Property('accelerations/pdot-rad_sec2', '')
+qdot_rps2 = Property('accelerations/qdot-rad_sec2', '')
+rdot_rps2 = Property('accelerations/rdot-rad_sec2', '')
 
 # controls state
 aileron_left = BoundedProperty('fcs/left-aileron-pos-norm', 'left aileron position, normalised', -1, 1)
@@ -59,6 +69,7 @@ mixture_cmd = BoundedProperty('fcs/mixture-cmd-norm', 'engine mixture setting, n
 throttle_1_cmd = BoundedProperty('fcs/throttle-cmd-norm[1]', 'throttle 1 commanded position, normalised', 0., 1.)
 mixture_1_cmd = BoundedProperty('fcs/mixture-cmd-norm[1]', 'engine mixture 1 setting, normalised', 0., 1.)
 gear_all_cmd = BoundedProperty('gear/gear-cmd-norm', 'all landing gear commanded position, normalised', 0, 1)
+steer_cmd = BoundedProperty('fcs/steer-cmd-norm', 'Steer command(normalized)', -1., 1.)
 
 # simulation
 sim_dt = Property('simulation/dt', 'JSBSim simulation timestep [s]')
@@ -86,6 +97,7 @@ prp_dict = {"altitude_sl_ft": altitude_sl_ft,
 	"pitch_rad": pitch_rad,
 	"roll_rad": roll_rad,
 	"heading_deg": heading_deg,
+	"heading_true_rad": heading_true_rad,
 	"sideslip_deg": sideslip_deg,
 	"lat_geod_deg": lat_geod_deg,
 	"lng_geoc_deg": lng_geoc_deg,
@@ -102,6 +114,10 @@ prp_dict = {"altitude_sl_ft": altitude_sl_ft,
 	"q_radps": q_radps,
 	"r_radps": r_radps,
 	"altitude_rate_fps": altitude_rate_fps,
+	"v_air": v_air,
+	"pdot_rps2": pdot_rps2,
+	"qdot_rps2": qdot_rps2,
+	"rdot_rps2": rdot_rps2,
 	"aileron_left": aileron_left,
 	"aileron_right": aileron_right,
 	"elevator": elevator,

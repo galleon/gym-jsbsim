@@ -9,6 +9,7 @@ from gym_jsbsim.aircraft import Aircraft
 from typing import Dict, Tuple, Sequence, NamedTuple
 import json
 import configparser
+from .utils import reduce_reflex_angle_deg
 
 
 ### Collect Config Value
@@ -88,7 +89,7 @@ class HeadingControlTask(BaseFlightTask):
                               prp.all_engine_running: -1,
                               prp.initial_heading_deg: self.INITIAL_HEADING_DEG,
                               prp.initial_altitude_ft: self.INITIAL_ALTITUDE_FT,
-                              prp.delta_heading: self.INITIAL_HEADING_DEG - self.TARGET_HEADING_DEG,
+                              prp.delta_heading: reduce_reflex_angle_deg(self.INITIAL_HEADING_DEG - self.TARGET_HEADING_DEG),
                               prp.delta_altitude: self.INITIAL_ALTITUDE_FT - self.TARGET_ALTITUDE_FT,
                               prp.target_altitude_ft: self.TARGET_ALTITUDE_FT,
                               prp.target_heading_deg: self.TARGET_HEADING_DEG,
@@ -236,7 +237,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
                               prp.all_engine_running: -1,
                               prp.initial_heading_deg: self.INITIAL_HEADING_DEG,
                               prp.initial_altitude_ft: self.INITIAL_ALTITUDE_FT,
-                              prp.delta_heading: self.INITIAL_HEADING_DEG - self.TARGET_HEADING_DEG,
+                              prp.delta_heading: reduce_reflex_angle_deg(self.INITIAL_HEADING_DEG - self.TARGET_HEADING_DEG),
                               prp.delta_altitude: self.INITIAL_ALTITUDE_FT - self.TARGET_ALTITUDE_FT,
                               prp.target_altitude_ft: self.TARGET_ALTITUDE_FT,
                               prp.target_heading_deg: self.TARGET_HEADING_DEG,

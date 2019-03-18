@@ -214,6 +214,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
         self.INITIAL_VELOCITY_V = 0
         self.ALREADY_CHANGE = False
         self.LAST_CONTROL_STATE = [0,0,0,0,0]
+        
         self.TIME_TO_CHANGE_HEADING_ALT = random.uniform((self.DEFAULT_EPISODE_TIME_S*5.)*0.33, (self.DEFAULT_EPISODE_TIME_S*5.)*0.66)
         self.NEW_ALTITUDE_FT = self.TARGET_ALTITUDE_FT + random.uniform(-4000, 4000)
         new_heading = self.TARGET_HEADING_DEG + random.uniform(-90, 90)

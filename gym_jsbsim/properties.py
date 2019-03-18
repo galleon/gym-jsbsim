@@ -38,9 +38,7 @@ r_radps = BoundedProperty('velocities/r-rad_sec', 'yaw rate [rad/s]', -2 * math.
 altitude_rate_fps = Property('velocities/h-dot-fps', 'rate of altitude change [ft/s]')
 phi_dot = BoundedProperty('velocities/phidot-rad_sec', 'rad/s', -2 * math.pi, 2 * math.pi)
 theta_dot = BoundedProperty('velocities/thetadot-rad_sec', 'rad/s', -2 * math.pi, 2 * math.pi)
-
-
-
+v_air = BoundedProperty('velocities/vc-fps', 'airspeed in knots', 0, 4400)
 
 # Acceleration
 p_dot = BoundedProperty('accelerations/pdot-rad_sec2', 'rad/s²',  -(8/180) * math.pi, (8/180) * math.pi)
@@ -153,7 +151,8 @@ prp_dict = {"altitude_sl_ft": altitude_sl_ft,
 	"u_dot": u_dot,
 	"v_dot": v_dot,
 	"phi_dot": phi_dot,
-	"theta_dot": theta_dot
+	"theta_dot": theta_dot,
+	"v_air": v_air,
 
 	}
 

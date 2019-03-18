@@ -242,7 +242,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
                               prp.target_heading_deg: self.TARGET_HEADING_DEG,
                               self.nb_episodes: 0
                              }
-        print(f'Time to change: {self.TIME_TO_CHANGE_HEADING_ALT} (Altitude: {self.TARGET_ALTITUDE_FT} -> {self.NEW_ALTITUDE_FT}, Heading: {self.TARGET_HEADING_DEG} -> {self.NEW_HEADING_DEG})')
+        print(f'Time to change INIT: {self.TIME_TO_CHANGE_HEADING_ALT} (Altitude: {self.TARGET_ALTITUDE_FT} -> {self.NEW_ALTITUDE_FT}, Heading: {self.TARGET_HEADING_DEG} -> {self.NEW_HEADING_DEG})')
         return initial_conditions
 
     def _update_custom_properties(self, sim: Simulation) -> None:
@@ -317,8 +317,8 @@ class ChangeHeadingControlTask(BaseFlightTask):
             if delta_throttle >= self.THRESHOLD_CONTROL:
                 sum_penalty_control_state += self.PENALTY_CONTROL  
         
-        #reward if finish the simulation 
-        reward_nb_episode = 1.0 / max(sim[self.steps_left],1.0)
+        #reward if finish the simulation ponderate with the quality of the fly
+        reward_nb_episode = (heading_r + alt_r) / (2.0 * max(sim[self.steps_left],1.0))
 
         self.LAST_CONTROL_STATE = [sim[prp.aileron_left], sim[prp.aileron_right], sim[prp.elevator], sim[prp.rudder], sim[prp.throttle]]
 

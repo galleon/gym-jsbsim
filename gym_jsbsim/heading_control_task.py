@@ -214,7 +214,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
         self.INITIAL_VELOCITY_V = 0
         self.ALREADY_CHANGE = False
         self.LAST_CONTROL_STATE = [0,0,0,0,0]
-        
+
         self.TIME_TO_CHANGE_HEADING_ALT = random.uniform((self.DEFAULT_EPISODE_TIME_S*5.)*0.33, (self.DEFAULT_EPISODE_TIME_S*5.)*0.66)
         self.NEW_ALTITUDE_FT = self.TARGET_ALTITUDE_FT + random.uniform(-4000, 4000)
         new_heading = self.TARGET_HEADING_DEG + random.uniform(-90, 90)
@@ -293,7 +293,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
         #vel_c = math.sqrt(math.pow(last_state.velocities_u_fps,2) + math.pow(last_state.velocities_v_fps,2)) 
         #vel_r = 1.0/math.sqrt((0.1*math.fabs(vel_i - vel_c)+1))
         # inverse of the proportional absolute value between the initial and current altitude ... 
-        alt_r = 1.0/math.sqrt((0.1*last_state.position_delta_altitude_to_target_ft+1))
+        alt_r = 1.0/math.sqrt((0.1*math.fabs(last_state.position_delta_altitude_to_target_ft)+1))
         #print(" -v- ", self.INITIAL_VELOCITY_U, last_state.velocities_u_fps, vel_r, " -h- ", self.INITIAL_HEADING_DEG, last_state.attitude_psi_deg, heading_r, " -a- ", self.INITIAL_ALTITUDE_FT, last_state.position_h_sl_ft, alt_r, " -r- ", (heading_r + alt_r + vel_r)/3.0)
 
         #check to strong manoeuvres

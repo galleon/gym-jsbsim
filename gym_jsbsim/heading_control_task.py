@@ -264,14 +264,18 @@ class ChangeHeadingControlTask(BaseFlightTask):
             sim[prp.target_heading_deg] = self.NEW_HEADING_DEG
             self.ALREADY_CHANGE = True
         '''
-        
+
         if (sim[self.steps_left]%1000==1):
-            sim[prp.target_altitude_ft] = sim[prp.target_altitude_ft] + random.uniform(-4000, 4000)
+            
+            new_alt = sim[prp.target_altitude_ft] + random.uniform(-4000, 4000)
             new_heading = sim[prp.target_heading_deg] + random.uniform(-90, 90)
             if (new_heading <= 0):
                 new_heading = 360 - new_heading
             if (new_heading >= 360):
                 new_heading = new_heading - 360
+            
+            print(f'Time to change: {sim[self.steps_left]} (Altitude: {sim[prp.target_altitude_ft]} -> {new_alt}, Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
+            sim[prp.target_altitude_ft] = new_alt
             sim[prp.target_heading_deg] = new_heading
 
 

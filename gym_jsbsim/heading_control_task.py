@@ -267,8 +267,8 @@ class ChangeHeadingControlTask(BaseFlightTask):
 
         if (sim[self.steps_left]%2000==1):
             
-            new_alt = sim[prp.target_altitude_ft] + random.uniform(-4000, 4000)
-            new_heading = sim[prp.target_heading_deg] + random.uniform(-180, 180)
+            new_alt = sim[prp.target_altitude_ft] + random.uniform(0, 0)
+            new_heading = sim[prp.target_heading_deg] + random.uniform(-135, 135)
             if (new_heading <= 0):
                 new_heading = 360 - new_heading
             if (new_heading >= 360):

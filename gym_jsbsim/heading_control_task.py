@@ -322,7 +322,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
         '''
         if (sim[self.steps_left]== 4000):
             sim[prp.target_heading_deg] = 315.
-            print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
+            print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {315})')
         terminal_step = sim[self.steps_left] <= 0
         sim[self.nb_episodes] += 1
         #terminal_step = sim[prp.dist_travel_m]  >= 100000

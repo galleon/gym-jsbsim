@@ -208,7 +208,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
 
     def get_initial_conditions(self) -> Dict[Property, float]:
         self.INITIAL_ALTITUDE_FT = random.uniform(10000, 20000)
-        self.INITIAL_HEADING_DEG = 270#random.uniform(prp.heading_deg.min, prp.heading_deg.max)
+        self.INITIAL_HEADING_DEG = 0.#random.uniform(prp.heading_deg.min, prp.heading_deg.max)
         self.TARGET_ALTITUDE_FT = self.INITIAL_ALTITUDE_FT
         self.TARGET_HEADING_DEG = self.INITIAL_HEADING_DEG
         self.INITIAL_VELOCITY_U = self.aircraft.get_cruise_speed_fps()
@@ -320,7 +320,9 @@ class ChangeHeadingControlTask(BaseFlightTask):
             print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
         sim[prp.target_heading_deg] = new_heading
         '''
-
+        if (sim[self.steps_left]== 4000):
+            new_heading = 315.
+            print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
         terminal_step = sim[self.steps_left] <= 0
         sim[self.nb_episodes] += 1
         #terminal_step = sim[prp.dist_travel_m]  >= 100000

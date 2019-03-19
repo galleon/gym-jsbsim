@@ -67,6 +67,8 @@ gear = BoundedProperty('gear/gear-pos-norm', 'landing gear position, normalised'
 engine_running = Property('propulsion/engine/set-running', 'engine running (0/1 bool)')
 all_engine_running = Property('propulsion/set-running', 'set engine running (-1 for all engines)')
 engine_thrust_lbs = Property('propulsion/engine/thrust-lbs', 'engine thrust [lb]')
+fuel_contents_lbs_0 = Property('propulsion/tank[0]/contents-lbs', 'Fuel content in selected tank')
+fuel_contents_lbs_1 = Property('propulsion/tank[1]/contents-lbs', 'Fuel content in selected tank')
 
 # controls command
 aileron_cmd = BoundedProperty('fcs/aileron-cmd-norm', 'aileron commanded position, normalised', -1., 1.)
@@ -169,7 +171,8 @@ prp_dict = {"altitude_sl_ft": altitude_sl_ft,
 	"phi_dot": phi_dot,
 	"theta_dot": theta_dot,
 	"v_air": v_air,
-
+	"fuel_contents_lbs_0": fuel_contents_lbs_0,
+	"fuel_contents_lbs_1": fuel_contents_lbs_1
 	}
 
 

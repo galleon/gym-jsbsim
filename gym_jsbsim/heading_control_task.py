@@ -208,7 +208,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
 
     def get_initial_conditions(self) -> Dict[Property, float]:
         self.INITIAL_ALTITUDE_FT = random.uniform(10000, 20000)
-        self.INITIAL_HEADING_DEG = random.uniform(prp.heading_deg.min, prp.heading_deg.max)
+        self.INITIAL_HEADING_DEG = 270#random.uniform(prp.heading_deg.min, prp.heading_deg.max)
         self.TARGET_ALTITUDE_FT = self.INITIAL_ALTITUDE_FT
         self.TARGET_HEADING_DEG = self.INITIAL_HEADING_DEG
         self.INITIAL_VELOCITY_U = self.aircraft.get_cruise_speed_fps()
@@ -278,8 +278,8 @@ class ChangeHeadingControlTask(BaseFlightTask):
             sim[prp.target_altitude_ft] = new_alt
             sim[prp.target_heading_deg] = new_heading
         '''
-        if (sim[self.steps_left]== 8499):
-            sim[prp.target_heading_deg] = 270
+        #if (sim[self.steps_left]== 8499):
+        #    sim[prp.target_heading_deg] = 270
         if (sim[self.steps_left]== 8000):
             sim[prp.target_heading_deg] = 180
         if (sim[self.steps_left]== 7500):

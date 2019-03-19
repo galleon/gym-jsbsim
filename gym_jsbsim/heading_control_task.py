@@ -280,55 +280,44 @@ class ChangeHeadingControlTask(BaseFlightTask):
         '''
         #if (sim[self.steps_left]== 8499):
         #    sim[prp.target_heading_deg] = 270
+        new_heading = sim[prp.target_heading_deg]
         if (sim[self.steps_left]== 8000):
-            new_heading = 180
-            print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
-            sim[prp.target_heading_deg] = 180
+            new_heading = 180.
+            print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading})')           
         if (sim[self.steps_left]== 7500):
-            new_heading = 90
+            new_heading = 90.
             print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
-            sim[prp.target_heading_deg] = 90
         if (sim[self.steps_left]== 7000):
-            new_heading = 270
+            new_heading = 270.
             print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
-            sim[prp.target_heading_deg] = 270
         if (sim[self.steps_left]== 6500):
-            new_heading = 180
+            new_heading = 180.
             print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
-            sim[prp.target_heading_deg] = 180
         if (sim[self.steps_left]== 6000):
-            new_heading = 270
+            new_heading = 270.
             print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
-            sim[prp.target_heading_deg] = 270
         if (sim[self.steps_left]== 4500):
-            new_heading = 0
+            new_heading = 0.
             print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
-            sim[prp.target_heading_deg] = 0
         if (sim[self.steps_left]== 3500):
-            new_heading = 180
+            new_heading = 180.
             print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
-            sim[prp.target_heading_deg] = 180
         if (sim[self.steps_left]== 2500):
-            new_heading = 90
+            new_heading = 90.
             print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
-            sim[prp.target_heading_deg] = 90
         if (sim[self.steps_left]== 2000):
-            new_heading = 0
+            new_heading = 0.
             print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
-            sim[prp.target_heading_deg] = 0
         if (sim[self.steps_left]== 1500):
-            new_heading = 90
+            new_heading = 90.
             print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
-            sim[prp.target_heading_deg] = 90
         if (sim[self.steps_left]== 1000):
-            new_heading = 0
+            new_heading = 0.
             print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
-            sim[prp.target_heading_deg] = 0
         if (sim[self.steps_left]== 500):
-            new_heading = 270
+            new_heading = 270.
             print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
-            sim[prp.target_heading_deg] = 270
-        
+         sim[prp.target_heading_deg] = new_heading
 
 
         terminal_step = sim[self.steps_left] <= 0

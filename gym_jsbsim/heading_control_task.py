@@ -180,7 +180,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
     MIXTURE_CMD = float(config["HEADING_CONTROL_TASK_CONDITION"]["mixture_cmd"])
     INITIAL_LAT = float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_latitude_geod_deg"])
     INITIAL_LONG = float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_longitude_geoc_deg"])
-    DEFAULT_EPISODE_TIME_S = 3800.
+    DEFAULT_EPISODE_TIME_S = 4000.
     ALTITUDE_SCALING_FT = 150
     MAX_ALTITUDE_DEVIATION_FT = 800  # terminate if altitude error exceeds this
     THRESHOLD_CONTROL = 0.5
@@ -207,7 +207,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
         super().__init__(debug)
 
     def get_initial_conditions(self) -> Dict[Property, float]:
-        self.INITIAL_ALTITUDE_FT = random.uniform(10000, 20000)
+        self.INITIAL_ALTITUDE_FT = 20000#random.uniform(10000, 20000)
         self.INITIAL_HEADING_DEG = 100.#random.uniform(prp.heading_deg.min, prp.heading_deg.max)
         self.TARGET_ALTITUDE_FT = self.INITIAL_ALTITUDE_FT
         self.TARGET_HEADING_DEG = self.INITIAL_HEADING_DEG
@@ -264,7 +264,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
             sim[prp.target_heading_deg] = self.NEW_HEADING_DEG
             self.ALREADY_CHANGE = True
         '''
-        
+        '''
         if (sim[self.steps_left]%5000==1):
             
             new_alt = sim[prp.target_altitude_ft] + random.uniform(-8000, 8000)
@@ -278,7 +278,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
             print(f'Time to change: {sim[self.steps_left]} (Altitude: {sim[prp.target_altitude_ft]} -> {new_alt}, Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
             sim[prp.target_altitude_ft] = new_alt
             sim[prp.target_heading_deg] = new_heading
-        
+        '''
         #if (sim[self.steps_left]== 8499):
         #    sim[prp.target_heading_deg] = 270
         '''
@@ -321,17 +321,17 @@ class ChangeHeadingControlTask(BaseFlightTask):
             print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
         sim[prp.target_heading_deg] = new_heading
         '''
-        '''
+        
+        if (sim[self.steps_left]== 15000):
+            sim[prp.target_altitude_ft] = 10000.
+            print(f'Time to change: {sim[self.steps_left]} (Alt: {sim[prp.target_altitude_ft]})')
         if (sim[self.steps_left]== 10000):
-            sim[prp.target_heading_deg] = 315.
-            print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]})')
-        if (sim[self.steps_left]== 20000):
-            sim[prp.target_heading_deg] = 270.
-            print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]})')
-        if (sim[self.steps_left]== 30000):
-            sim[prp.target_heading_deg] = 220.
-            print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]})')
-        '''
+            sim[prp.target_altitude_ft] = 20000.
+            print(f'Time to change: {sim[self.steps_left]} (Alt: {sim[prp.target_altitude_ft]})')
+        if (sim[self.steps_left]== 5000):
+            sim[prp.target_altitude_ft] = 5000.
+            print(f'Time to change: {sim[self.steps_left]} (Alt: {sim[prp.target_altitude_ft]})')
+       
         terminal_step = sim[self.steps_left] <= 0
         sim[self.nb_episodes] += 1
         #terminal_step = sim[prp.dist_travel_m]  >= 100000

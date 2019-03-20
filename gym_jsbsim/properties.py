@@ -46,6 +46,7 @@ q_dot = BoundedProperty('accelerations/qdot-rad_sec2', 'rad/s²',  -(8/180) * ma
 r_dot = BoundedProperty('accelerations/rdot-rad_sec2', 'rad/s²',  -(8/180) * math.pi, (8/180) * math.pi)
 v_dot = BoundedProperty('accelerations/vdot-ft_sec2', 'ft/s²', -4.0, 4.0)
 w_dot = BoundedProperty('accelerations/wdot-ft_sec2', 'ft/s²', -4.0, 4.0)
+u_dot = BoundedProperty('accelerations/wdot-ft_sec2', 'ft/s²', -4.0, 4.0)
 
 # accelerations
 n_pilot_x = Property('accelerations/n-pilot-x-norm', 'pilot body x-axis acceleration, normalised')

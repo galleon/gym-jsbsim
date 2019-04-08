@@ -424,44 +424,9 @@ class TaxiControlTask(BaseFlightTask):
         '''
         Reward with delta and altitude heading directly in the input vector state.
         '''
-        # inverse of the proportional absolute value of the minimal angle between the initial and current heading ... 
-        #heading_r = 1.0/math.sqrt((0.1*math.fabs(last_state.position_delta_heading_to_target_deg)+1))
-        # inverse of the proportional absolute value between the initial and current ground speed ... 
-        #vel_i = math.sqrt(math.pow(self.INITIAL_VELOCITY_U,2) + math.pow(self.INITIAL_VELOCITY_V,2)) 
-        #vel_c = math.sqrt(math.pow(last_state.velocities_u_fps,2) + math.pow(last_state.velocities_v_fps,2)) 
-        #vel_r = 1.0/math.sqrt((0.1*math.fabs(vel_i - vel_c)+1))
-        # inverse of the proportional absolute value between the initial and current altitude ... 
-        #alt_r = 1.0/math.sqrt((0.1*math.fabs(last_state.position_delta_altitude_to_target_ft)+1))
-        #print(" -v- ", self.INITIAL_VELOCITY_U, last_state.velocities_u_fps, vel_r, " -h- ", self.INITIAL_HEADING_DEG, last_state.attitude_psi_deg, heading_r, " -a- ", self.INITIAL_ALTITUDE_FT, last_state.position_h_sl_ft, alt_r, " -r- ", (heading_r + alt_r + vel_r)/3.0)
-
-        #check to strong manoeuvres
-        sum_penalty_control_state = 0
-
-        if (sim[self.nb_episodes]>=1):
-            delta_left_aileron = math.fabs(self.LAST_CONTROL_STATE[0] - sim[prp.aileron_left])
-            delta_right_aileron = math.fabs(self.LAST_CONTROL_STATE[1] - sim[prp.aileron_right])
-            delta_elevator = math.fabs(self.LAST_CONTROL_STATE[2] - sim[prp.elevator])
-            delta_rudder = math.fabs(self.LAST_CONTROL_STATE[3] - sim[prp.rudder])
-            delta_throttle = math.fabs(self.LAST_CONTROL_STATE[4] - sim[prp.throttle])
-
-            
-            if delta_left_aileron >= self.THRESHOLD_CONTROL:
-                sum_penalty_control_state += self.PENALTY_CONTROL
-            if delta_right_aileron >= self.THRESHOLD_CONTROL:
-                sum_penalty_control_state += self.PENALTY_CONTROL
-            if delta_elevator >= self.THRESHOLD_CONTROL:
-                sum_penalty_control_state += self.PENALTY_CONTROL 
-            if delta_rudder >= self.THRESHOLD_CONTROL:
-                sum_penalty_control_state += self.PENALTY_CONTROL 
-            if delta_throttle >= self.THRESHOLD_CONTROL:
-                sum_penalty_control_state += self.PENALTY_CONTROL  
         
-        #reward if finish the simulation ponderate with the quality of the fly
-        reward_nb_episode = (heading_r) / (max(sim[self.steps_left],1.0))
 
-        self.LAST_CONTROL_STATE = [sim[prp.aileron_left], sim[prp.aileron_right], sim[prp.elevator], sim[prp.rudder], sim[prp.throttle]]
-
-        return (sum_penalty_control_state + reward_nb_episode) / 4.0
+        return 1.0
     
 
     def _altitude_out_of_bounds(self, sim: Simulation, state: NamedTuple) -> bool:

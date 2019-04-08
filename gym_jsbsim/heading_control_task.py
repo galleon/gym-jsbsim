@@ -18,13 +18,13 @@ print(config.read('/home/ubuntu/gym-jsbsim/gym_jsbsim/config-state-action.ini'))
 #print(config.sections())
 
 ### collect state var from config file
-state_list = config.get('SA_DEFAULT', 'states').split('\n')
+state_list = config.get('SA_TAXI', 'states').split('\n')
 print("STATE LIST = ", state_list)
 state_var = ()
 for s in state_list:
     state_var = state_var + (prp.prp_dict[s],)
 
-action_list = config.get('SA_DEFAULT', 'actions').split('\n')
+action_list = config.get('SA_TAXI', 'actions').split('\n')
 action_var = ()
 for a in action_list:
     #print(a)
@@ -168,7 +168,6 @@ class HeadingControlTask(BaseFlightTask):
     def get_props_to_output(self, sim: Simulation) -> Tuple:
         return (*self.state_variables, prp.lat_geod_deg, prp.lng_geoc_deg, self.steps_left)
 
-
 class ChangeHeadingControlTask(BaseFlightTask):
     """
     A task in which the agent must perform steady, level flight maintaining its
@@ -256,15 +255,14 @@ class ChangeHeadingControlTask(BaseFlightTask):
     def _is_terminal(self, sim: Simulation, state: NamedTuple) -> bool:
         # Change target ALT and HEADING
         #print(f'nombre episode: {sim[self.nb_episodes]}, nombre step left: {sim[self.steps_left]}')
-
-        '''
         if (sim[self.steps_left] <= self.TIME_TO_CHANGE_HEADING_ALT and not self.ALREADY_CHANGE):
             print(f'Time to change: {self.TIME_TO_CHANGE_HEADING_ALT} (Altitude: {self.TARGET_ALTITUDE_FT} -> {self.NEW_ALTITUDE_FT}, Heading: {self.TARGET_HEADING_DEG} -> {self.NEW_HEADING_DEG})')
             sim[prp.target_altitude_ft] = self.NEW_ALTITUDE_FT
             sim[prp.target_heading_deg] = self.NEW_HEADING_DEG
             self.ALREADY_CHANGE = True
-        '''
         
+        '''
+        # Change alt and heading every 2000 steps
         if (sim[self.steps_left]%2000==1):
             
             new_alt = sim[prp.target_altitude_ft] + random.uniform(-4000, 4000)
@@ -278,59 +276,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
             sim[prp.target_altitude_ft] = new_alt
             sim[prp.target_heading_deg] = new_heading
         
-        #if (sim[self.steps_left]== 8499):
-        #    sim[prp.target_heading_deg] = 270
         '''
-        new_heading = sim[prp.target_heading_deg]
-        if (sim[self.steps_left]== 16000):
-            new_heading = 180.
-            print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading})')           
-        if (sim[self.steps_left]== 15000):
-            new_heading = 90.
-            print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
-        if (sim[self.steps_left]== 14000):
-            new_heading = 270.
-            print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
-        if (sim[self.steps_left]== 13000):
-            new_heading = 180.
-            print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
-        if (sim[self.steps_left]== 12000):
-            new_heading = 270.
-            print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
-        if (sim[self.steps_left]== 9000):
-            new_heading = 0.
-            print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
-        if (sim[self.steps_left]== 7000):
-            new_heading = 180.
-            print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
-        if (sim[self.steps_left]== 5000):
-            new_heading = 90.
-            print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
-        if (sim[self.steps_left]== 4000):
-            new_heading = 0.
-            print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
-        if (sim[self.steps_left]== 3000):
-            new_heading = 90.
-            print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
-        if (sim[self.steps_left]== 2000):
-            new_heading = 0.
-            print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
-        if (sim[self.steps_left]== 1000):
-            new_heading = 270.
-            print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
-        sim[prp.target_heading_deg] = new_heading
-        '''
-        '''
-        if (sim[self.steps_left]== 10000):
-            sim[prp.target_heading_deg] = 315.
-            print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]})')
-        if (sim[self.steps_left]== 20000):
-            sim[prp.target_heading_deg] = 270.
-            print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]})')
-        if (sim[self.steps_left]== 30000):
-            sim[prp.target_heading_deg] = 220.
-            print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]})')
-        '''    
         terminal_step = sim[self.steps_left] <= 0
         sim[self.nb_episodes] += 1
         #terminal_step = sim[prp.dist_travel_m]  >= 100000
@@ -379,6 +325,143 @@ class ChangeHeadingControlTask(BaseFlightTask):
         self.LAST_CONTROL_STATE = [sim[prp.aileron_left], sim[prp.aileron_right], sim[prp.elevator], sim[prp.rudder], sim[prp.throttle]]
 
         return (2*heading_r + 2*alt_r + sum_penalty_control_state + reward_nb_episode) / 6.0
+    
+
+    def _altitude_out_of_bounds(self, sim: Simulation, state: NamedTuple) -> bool:
+        altitude_error_ft = math.fabs(state.position_h_sl_ft - self.INITIAL_ALTITUDE_FT)
+        return abs(altitude_error_ft) > self.MAX_ALTITUDE_DEVIATION_FT
+
+    def _new_episode_init(self, sim: Simulation) -> None:
+        super()._new_episode_init(sim)
+        sim.set_throttle_mixture_controls(self.THROTTLE_CMD, self.MIXTURE_CMD)
+        sim[self.steps_left] = self.steps_left.max
+        sim[self.nb_episodes] += 1
+
+    def get_props_to_output(self, sim: Simulation) -> Tuple:
+        return (*self.state_variables, prp.lat_geod_deg, prp.lng_geoc_deg, self.steps_left)
+
+class TaxiControlTask(BaseFlightTask):
+    """
+    A task in which the agent must perform taxiing phases
+    """
+
+    ### Set config var
+    THROTTLE_CMD = float(config["HEADING_CONTROL_TASK_CONDITION"]["throttle_cmd"])
+    MIXTURE_CMD = float(config["HEADING_CONTROL_TASK_CONDITION"]["mixture_cmd"])
+    INITIAL_LAT = float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_latitude_geod_deg"])
+    INITIAL_LONG = float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_longitude_geoc_deg"])
+    DEFAULT_EPISODE_TIME_S = 1000.
+    THRESHOLD_CONTROL = 0.5
+    PENALTY_CONTROL = -0.2
+
+    def __init__(self, step_frequency_hz: float, aircraft: Aircraft,
+                 episode_time_s: float = DEFAULT_EPISODE_TIME_S, debug: bool = False) -> None:
+        """
+        Constructor.
+
+        :param step_frequency_hz: the number of agent interaction steps per second
+        :param aircraft: the aircraft used in the simulation
+        """
+        self.max_time_s = episode_time_s
+        episode_steps = math.ceil(self.max_time_s * step_frequency_hz)
+        self.steps_left = BoundedProperty('info/steps_left', 'steps remaining in episode', 0,
+                                          episode_steps)
+        self.nb_episodes = Property('info/nb_episodes', 'number of episodes since the beginning')
+        self.aircraft = aircraft
+
+        self.state_variables = state_var
+        self.action_variables = action_var
+
+        super().__init__(debug)
+
+    def get_initial_conditions(self) -> Dict[Property, float]:
+        self.INITIAL_HEADING_DEG = 90
+        self.INITIAL_ALTITUDE_FT = 0
+        self.TARGET_HEADING_DEG = self.INITIAL_HEADING_DEG
+        self.INITIAL_VELOCITY_U = 33.76, #20 knots/sec
+        self.LAST_CONTROL_STATE = [0,0,0,0,0]
+
+        new_heading = self.TARGET_HEADING_DEG + random.uniform(-90, 90)
+        if (new_heading <= 0):
+            new_heading = 360 - new_heading
+        if (new_heading >= 360):
+            new_heading = new_heading - 360
+        self.NEW_HEADING_DEG = new_heading
+        
+        initial_conditions = {prp.initial_altitude_ft: self.INITIAL_ALTITUDE_FT,
+                              prp.initial_u_fps: self.INITIAL_VELOCITY_U
+                              prp.initial_v_fps: 0,
+                              prp.initial_w_fps: 0,
+                              prp.initial_p_radps: 0,
+                              prp.initial_latitude_geod_deg: self.INITIAL_LAT,
+                              prp.initial_longitude_geoc_deg: self.INITIAL_LONG,
+                              prp.initial_q_radps: 0,
+                              prp.initial_r_radps: 0,
+                              prp.initial_roc_fpm: 0,
+                              prp.all_engine_running: -1,
+                              prp.initial_heading_deg: self.INITIAL_HEADING_DEG,
+                              prp.initial_altitude_ft: 0,
+                              prp.delta_heading: reduce_reflex_angle_deg(self.INITIAL_HEADING_DEG - self.TARGET_HEADING_DEG),             
+                              prp.target_heading_deg: self.TARGET_HEADING_DEG,
+                              self.nb_episodes: 0
+                             }
+        return initial_conditions
+
+    def _update_custom_properties(self, sim: Simulation) -> None:
+        self._decrement_steps_left(sim)
+
+    def _decrement_steps_left(self, sim: Simulation):
+        sim[self.steps_left] -= 1
+
+    def _is_terminal(self, sim: Simulation, state: NamedTuple) -> bool:
+        terminal_step = sim[self.steps_left] <= 0
+        sim[self.nb_episodes] += 1
+        #terminal_step = sim[prp.dist_travel_m]  >= 100000
+        return terminal_step
+    
+    
+    def _get_reward(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
+        '''
+        Reward with delta and altitude heading directly in the input vector state.
+        '''
+        # inverse of the proportional absolute value of the minimal angle between the initial and current heading ... 
+        heading_r = 1.0/math.sqrt((0.1*math.fabs(last_state.position_delta_heading_to_target_deg)+1))
+        # inverse of the proportional absolute value between the initial and current ground speed ... 
+        #vel_i = math.sqrt(math.pow(self.INITIAL_VELOCITY_U,2) + math.pow(self.INITIAL_VELOCITY_V,2)) 
+        #vel_c = math.sqrt(math.pow(last_state.velocities_u_fps,2) + math.pow(last_state.velocities_v_fps,2)) 
+        #vel_r = 1.0/math.sqrt((0.1*math.fabs(vel_i - vel_c)+1))
+        # inverse of the proportional absolute value between the initial and current altitude ... 
+        #alt_r = 1.0/math.sqrt((0.1*math.fabs(last_state.position_delta_altitude_to_target_ft)+1))
+        #print(" -v- ", self.INITIAL_VELOCITY_U, last_state.velocities_u_fps, vel_r, " -h- ", self.INITIAL_HEADING_DEG, last_state.attitude_psi_deg, heading_r, " -a- ", self.INITIAL_ALTITUDE_FT, last_state.position_h_sl_ft, alt_r, " -r- ", (heading_r + alt_r + vel_r)/3.0)
+
+        #check to strong manoeuvres
+        sum_penalty_control_state = 0
+
+        if (sim[self.nb_episodes]>=1):
+            delta_left_aileron = math.fabs(self.LAST_CONTROL_STATE[0] - sim[prp.aileron_left])
+            delta_right_aileron = math.fabs(self.LAST_CONTROL_STATE[1] - sim[prp.aileron_right])
+            delta_elevator = math.fabs(self.LAST_CONTROL_STATE[2] - sim[prp.elevator])
+            delta_rudder = math.fabs(self.LAST_CONTROL_STATE[3] - sim[prp.rudder])
+            delta_throttle = math.fabs(self.LAST_CONTROL_STATE[4] - sim[prp.throttle])
+
+            
+            if delta_left_aileron >= self.THRESHOLD_CONTROL:
+                sum_penalty_control_state += self.PENALTY_CONTROL
+            if delta_right_aileron >= self.THRESHOLD_CONTROL:
+                sum_penalty_control_state += self.PENALTY_CONTROL
+            if delta_elevator >= self.THRESHOLD_CONTROL:
+                sum_penalty_control_state += self.PENALTY_CONTROL 
+            if delta_rudder >= self.THRESHOLD_CONTROL:
+                sum_penalty_control_state += self.PENALTY_CONTROL 
+            if delta_throttle >= self.THRESHOLD_CONTROL:
+                sum_penalty_control_state += self.PENALTY_CONTROL  
+        
+        #reward if finish the simulation ponderate with the quality of the fly
+        reward_nb_episode = (heading_r) / (max(sim[self.steps_left],1.0))
+
+        self.LAST_CONTROL_STATE = [sim[prp.aileron_left], sim[prp.aileron_right], sim[prp.elevator], sim[prp.rudder], sim[prp.throttle]]
+
+        return (2*heading_r + sum_penalty_control_state + reward_nb_episode) / 4.0
     
 
     def _altitude_out_of_bounds(self, sim: Simulation, state: NamedTuple) -> bool:
@@ -524,8 +607,6 @@ class HeadingControlTask_1Bis(BaseFlightTask):
 
     def get_props_to_output(self, sim: Simulation) -> Tuple:
         return (*self.state_variables, prp.lat_geod_deg, prp.lng_geoc_deg, self.steps_left)
-
-
 class TurnHeadingChangeLevelControlTask(HeadingControlTask):
     """
     A task in which the agent must make a turn and change its altitude

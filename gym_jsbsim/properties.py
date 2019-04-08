@@ -61,6 +61,9 @@ flap = BoundedProperty('fcs/flap-pos-norm', 'flap position, normalised', 0, 1)
 speedbrake = BoundedProperty('fcs/speedbrake-pos-norm', 'speedbrake position, normalised', 0, 1)
 throttle = BoundedProperty('fcs/throttle-pos-norm', 'throttle position, normalised', 0, 1)
 gear = BoundedProperty('gear/gear-pos-norm', 'landing gear position, normalised', 0, 1)
+left_brake_cmd_norm = BoundedProperty('fcs/left-brake-cmd-norm', 'Left brake command(normalized)', 0, 1)
+right_brake_cmd_norm = BoundedProperty('fcs/right-brake-cmd-norm', 'Right brake command(normalized)', 0, 1)
+steer_cmd_norm = BoundedProperty('fcs/steer-cmd-norm', 'Steer command(normalized)', 0, 1)
 
 # engines
 engine_running = Property('propulsion/engine/set-running', 'engine running (0/1 bool)')
@@ -135,6 +138,9 @@ prp_dict = {"altitude_sl_ft": altitude_sl_ft,
 	"rudder": rudder,
 	"throttle": throttle,
 	"gear": gear,
+	"left_brake_cmd_norm": left_brake_cmd_norm,
+	"right_brake_cmd_norm": right_brake_cmd_norm,
+	"steer_cmd_norm": steer_cmd_norm,
 	"engine_running": engine_running,
 	"all_engine_running": all_engine_running,
 	"engine_thrust_lbs": engine_thrust_lbs,

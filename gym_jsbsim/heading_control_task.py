@@ -18,7 +18,7 @@ print(config.read('/home/ubuntu/gym-jsbsim/gym_jsbsim/config-state-action.ini'))
 #print(config.sections())
 
 ### collect state var from config file
-state_list = config.get('SA_TAXI, 'states').split('\n')
+state_list = config.get('SA_TAXI', 'states').split('\n')
 print("STATE LIST = ", state_list)
 state_var = ()
 for s in state_list:

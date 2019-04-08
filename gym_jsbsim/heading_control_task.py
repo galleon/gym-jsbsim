@@ -18,13 +18,13 @@ print(config.read('/home/ubuntu/gym-jsbsim/gym_jsbsim/config-state-action.ini'))
 #print(config.sections())
 
 ### collect state var from config file
-state_list = config.get('SA_DEFAUT', 'states').split('\n')
+state_list = config.get('SA_DEFAULT', 'states').split('\n')
 print("STATE LIST = ", state_list)
 state_var = ()
 for s in state_list:
     state_var = state_var + (prp.prp_dict[s],)
 
-action_list = config.get('SA_DEFAUT', 'actions').split('\n')
+action_list = config.get('SA_DEFAULT', 'actions').split('\n')
 print("ACTION LIST = ", action_list)
 action_var = ()
 for a in action_list:

@@ -75,6 +75,7 @@ class Simulation(object):
         :param prop: BoundedProperty, the property to be retrieved
         :param value: object?, the value to be set
         """
+        print(prop.name, value)
         self.jsbsim[prop.name] = value
 
     def load_model(self, model_name: str) -> None:

@@ -347,7 +347,7 @@ class TaxiControlTask(BaseFlightTask):
 
     ### Set config var
     THROTTLE_CMD = 0 #float(config["HEADING_CONTROL_TASK_CONDITION"]["throttle_cmd"])
-    MIXTURE_CMD = float(config["HEADING_CONTROL_TASK_CONDITION"]["mixture_cmd"])
+    MIXTURE_CMD = 0 #float(config["HEADING_CONTROL_TASK_CONDITION"]["mixture_cmd"])
     INITIAL_LAT = float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_latitude_geod_deg"])
     INITIAL_LONG = float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_longitude_geoc_deg"])
     DEFAULT_EPISODE_TIME_S = 1000.
@@ -401,6 +401,7 @@ class TaxiControlTask(BaseFlightTask):
                               prp.all_engine_running: -1,
                               prp.initial_heading_deg: self.INITIAL_HEADING_DEG,
                               prp.initial_altitude_ft: 0,
+                              prp.gear_all_cmd: 1,
                               prp.delta_heading: reduce_reflex_angle_deg(self.INITIAL_HEADING_DEG - self.TARGET_HEADING_DEG),             
                               prp.target_heading_deg: self.TARGET_HEADING_DEG,
                               self.nb_episodes: 0

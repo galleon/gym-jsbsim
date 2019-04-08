@@ -25,9 +25,9 @@ for s in state_list:
     state_var = state_var + (prp.prp_dict[s],)
 
 action_list = config.get('SA_TAXI', 'actions').split('\n')
+print("ACTION LIST = ", action_list)
 action_var = ()
 for a in action_list:
-    #print(a)
     action_var = action_var + (prp.prp_dict[a],)
 
 class HeadingControlTask(BaseFlightTask):

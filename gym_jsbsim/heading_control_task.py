@@ -425,7 +425,7 @@ class TaxiControlTask(BaseFlightTask):
         Reward with delta and altitude heading directly in the input vector state.
         '''
         # inverse of the proportional absolute value of the minimal angle between the initial and current heading ... 
-        heading_r = 1.0/math.sqrt((0.1*math.fabs(last_state.position_delta_heading_to_target_deg)+1))
+        #heading_r = 1.0/math.sqrt((0.1*math.fabs(last_state.position_delta_heading_to_target_deg)+1))
         # inverse of the proportional absolute value between the initial and current ground speed ... 
         #vel_i = math.sqrt(math.pow(self.INITIAL_VELOCITY_U,2) + math.pow(self.INITIAL_VELOCITY_V,2)) 
         #vel_c = math.sqrt(math.pow(last_state.velocities_u_fps,2) + math.pow(last_state.velocities_v_fps,2)) 
@@ -461,7 +461,7 @@ class TaxiControlTask(BaseFlightTask):
 
         self.LAST_CONTROL_STATE = [sim[prp.aileron_left], sim[prp.aileron_right], sim[prp.elevator], sim[prp.rudder], sim[prp.throttle]]
 
-        return (2*heading_r + sum_penalty_control_state + reward_nb_episode) / 4.0
+        return (sum_penalty_control_state + reward_nb_episode) / 4.0
     
 
     def _altitude_out_of_bounds(self, sim: Simulation, state: NamedTuple) -> bool:

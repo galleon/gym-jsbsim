@@ -378,7 +378,7 @@ class TaxiControlTask(BaseFlightTask):
         self.INITIAL_HEADING_DEG = 90
         self.INITIAL_ALTITUDE_FT = 0
         self.TARGET_HEADING_DEG = self.INITIAL_HEADING_DEG
-        self.INITIAL_VELOCITY_U = 33.76, #20 knots/sec
+        self.INITIAL_VELOCITY_U = 33.76 #20 knots/sec
         self.LAST_CONTROL_STATE = [0,0,0,0,0]
 
         new_heading = self.TARGET_HEADING_DEG + random.uniform(-90, 90)

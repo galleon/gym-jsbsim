@@ -346,7 +346,7 @@ class TaxiControlTask(BaseFlightTask):
     """
 
     ### Set config var
-    THROTTLE_CMD = float(config["HEADING_CONTROL_TASK_CONDITION"]["throttle_cmd"])
+    THROTTLE_CMD = 0 #float(config["HEADING_CONTROL_TASK_CONDITION"]["throttle_cmd"])
     MIXTURE_CMD = float(config["HEADING_CONTROL_TASK_CONDITION"]["mixture_cmd"])
     INITIAL_LAT = float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_latitude_geod_deg"])
     INITIAL_LONG = float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_longitude_geoc_deg"])
@@ -376,9 +376,9 @@ class TaxiControlTask(BaseFlightTask):
 
     def get_initial_conditions(self) -> Dict[Property, float]:
         self.INITIAL_HEADING_DEG = 90
-        self.INITIAL_ALTITUDE_FT = 0
+        self.INITIAL_ALTITUDE_FT = 19
         self.TARGET_HEADING_DEG = self.INITIAL_HEADING_DEG
-        self.INITIAL_VELOCITY_U = 33.76 #20 knots/sec
+        self.INITIAL_VELOCITY_U = 0.0 #33.76 #20 knots/sec
         self.LAST_CONTROL_STATE = [0,0,0,0,0]
 
         new_heading = self.TARGET_HEADING_DEG + random.uniform(-90, 90)
@@ -389,7 +389,7 @@ class TaxiControlTask(BaseFlightTask):
         self.NEW_HEADING_DEG = new_heading
         
         initial_conditions = {prp.initial_altitude_ft: self.INITIAL_ALTITUDE_FT,
-                              prp.initial_u_fps: self.INITIAL_VELOCITY_U,
+                              prp.initial_u_fps: 33.76,
                               prp.initial_v_fps: 0,
                               prp.initial_w_fps: 0,
                               prp.initial_p_radps: 0,

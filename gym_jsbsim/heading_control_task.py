@@ -389,7 +389,7 @@ class TaxiControlTask(BaseFlightTask):
         self.NEW_HEADING_DEG = new_heading
         
         initial_conditions = {prp.initial_altitude_ft: self.INITIAL_ALTITUDE_FT,
-                              prp.initial_u_fps: 33.76,
+                              prp.initial_u_fps: 0,
                               prp.initial_v_fps: 0,
                               prp.initial_w_fps: 0,
                               prp.initial_p_radps: 0,

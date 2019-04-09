@@ -132,9 +132,9 @@ class Simulation(object):
         """
         if init_conditions is not None:
             # if we are specifying conditions, load a minimal file
-            ic_file = 'reset00.xml'#minimal_ic.xml'
+            ic_file = 'minimal_ic.xml'
         else:
-            ic_file = 'basic_ic.xml'
+            ic_file = 'reset00.xml'#basic_ic.xml'
 
         ic_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ic_file)
         self.jsbsim.load_ic(ic_path, useStoredPath=False)

@@ -12,6 +12,7 @@
   <phi unit="DEG">         0.0  </phi>
   <theta unit="DEG">       0.0  </theta>
   <psi unit="DEG">       225.0  </psi>
-  <altitude unit="IN">    49.0  </altitude>
+  <altitude unit="FT">    49.0  </altitude>
+  <elevation unit="FT">    49.0  </elevation> <!-- bug in JSBSim makes 0 cause NaNs -->
   <trim> 1 </trim>
 </initialize>

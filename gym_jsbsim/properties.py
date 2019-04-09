@@ -62,9 +62,7 @@ flap = BoundedProperty('fcs/flap-pos-norm', 'flap position, normalised', 0, 1)
 speedbrake = BoundedProperty('fcs/speedbrake-pos-norm', 'speedbrake position, normalised', 0, 1)
 throttle = BoundedProperty('fcs/throttle-pos-norm', 'throttle position, normalised', 0, 1)
 gear = BoundedProperty('gear/gear-pos-norm', 'landing gear position, normalised', 0, 1)
-left_brake_cmd_norm = BoundedProperty('fcs/left-brake-cmd-norm', 'Left brake command(normalized)', 0, 1)
-right_brake_cmd_norm = BoundedProperty('fcs/right-brake-cmd-norm', 'Right brake command(normalized)', 0, 1)
-steer_cmd_norm = BoundedProperty('fcs/steer-cmd-norm', 'Steer command(normalized)', 0, 1)
+
 
 # engines
 engine_running = Property('propulsion/engine/set-running', 'engine running (0/1 bool)')
@@ -81,7 +79,10 @@ throttle_cmd = BoundedProperty('fcs/throttle-cmd-norm', 'throttle commanded posi
 mixture_cmd = BoundedProperty('fcs/mixture-cmd-norm', 'engine mixture setting, normalised', 0., 1.)
 throttle_1_cmd = BoundedProperty('fcs/throttle-cmd-norm[1]', 'throttle 1 commanded position, normalised', 0., 1.)
 mixture_1_cmd = BoundedProperty('fcs/mixture-cmd-norm[1]', 'engine mixture 1 setting, normalised', 0., 1.)
-gear_all_cmd = BoundedProperty('gear/gear-cmd-norm', 'all landing gear commanded position, normalised', 0, 1)
+gear_all_cmd = BoundedProperty('gear/gear-cmd-norm', 'all landing gear commanded position, normalised', 0., 1.)
+left_brake_cmd_norm = BoundedProperty('fcs/left-brake-cmd-norm', 'Left brake command(normalized)', 0., 1.)
+right_brake_cmd_norm = BoundedProperty('fcs/right-brake-cmd-norm', 'Right brake command(normalized)', 0., 1.)
+steer_cmd_norm = BoundedProperty('fcs/steer-cmd-norm', 'Steer command(normalized)', -1., 1.)
 
 # trim commands
 pitch_trim = BoundedProperty('fcs/pitch-trim-cmd-norm', 'pitch trim command, normalised', -1, 1)

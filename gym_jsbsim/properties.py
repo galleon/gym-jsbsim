@@ -106,6 +106,8 @@ initial_q_radps = Property('ic/q-rad_sec', 'pitch rate [rad/s]')
 initial_r_radps = Property('ic/r-rad_sec', 'yaw rate [rad/s]')
 initial_roc_fpm = Property('ic/roc-fpm', 'initial rate of climb [ft/min]')
 initial_heading_deg = BoundedProperty('ic/psi-true-deg', 'initial (true) heading [deg]', heading_deg.min, heading_deg.max)
+ic_h_agl_ft = BoundedProperty('ic/h-agl-ft', '', altitude_sl_ft.min, altitude_sl_ft.max)
+h_agl_ft = BoundedProperty('position/h-agl-ft', '', altitude_sl_ft.min, altitude_sl_ft.max)
 
 # target conditions
 target_altitude_ft = BoundedProperty('tc/h-sl-ft', 'target altitude MSL [ft]', altitude_sl_ft.min, altitude_sl_ft.max)
@@ -180,7 +182,9 @@ prp_dict = {"altitude_sl_ft": altitude_sl_ft,
 	"theta_dot": theta_dot,
 	"v_air": v_air,
 	"fuel_contents_lbs_0": fuel_contents_lbs_0,
-	"fuel_contents_lbs_1": fuel_contents_lbs_1
+	"fuel_contents_lbs_1": fuel_contents_lbs_1,
+	"ic_h_agl_ft": ic_h_agl_ft,
+	"h_agl_ft": h_agl_ft
 	}
 
 

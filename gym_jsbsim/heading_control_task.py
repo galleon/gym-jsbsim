@@ -404,9 +404,11 @@ class TaxiControlTask(BaseFlightTask):
                               prp.gear_all_cmd: 1,
                               prp.delta_heading: reduce_reflex_angle_deg(self.INITIAL_HEADING_DEG - self.TARGET_HEADING_DEG),             
                               prp.target_heading_deg: self.TARGET_HEADING_DEG,
-                              self.nb_episodes: 0
+                              self.nb_episodes: 0,
+                              prp.ic_h_agl_ft: 0,
+                              prp.h_agl_ft: 0
                              }
-        return None#initial_conditions
+        return initial_conditions
     
     def _update_custom_properties(self, sim: Simulation) -> None:
         self._decrement_steps_left(sim)

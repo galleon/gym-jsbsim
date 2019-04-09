@@ -405,7 +405,7 @@ class TaxiControlTask(BaseFlightTask):
                               prp.delta_heading: reduce_reflex_angle_deg(self.INITIAL_HEADING_DEG - self.TARGET_HEADING_DEG),             
                               prp.target_heading_deg: self.TARGET_HEADING_DEG,
                               self.nb_episodes: 0,
-                              prp.ic_h_agl_ft: 0
+                              prp.ic_h_agl_ft: 0,
                               prp.h_agl_ft: 11.52
                              }
         return initial_conditions

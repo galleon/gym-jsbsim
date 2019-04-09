@@ -122,7 +122,7 @@ class BaseFlightTask(ABC):
         By default it simply starts the aircraft engines.
         """
         sim.start_engines()
-        sim.raise_landing_gear()
+        #sim.raise_landing_gear()
 
     def get_state_space(self) -> gym.Space:
         """ Get the task's state Space object """

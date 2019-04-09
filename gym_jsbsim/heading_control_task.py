@@ -376,7 +376,7 @@ class TaxiControlTask(BaseFlightTask):
     
     def get_initial_conditions(self) -> Dict[Property, float]:
         self.INITIAL_HEADING_DEG = 90
-        self.INITIAL_ALTITUDE_FT = 19
+        self.INITIAL_ALTITUDE_FT = 11.52
         self.TARGET_HEADING_DEG = self.INITIAL_HEADING_DEG
         self.INITIAL_VELOCITY_U = 0.0 #33.76 #20 knots/sec
         self.LAST_CONTROL_STATE = [0,0,0,0,0]
@@ -405,8 +405,8 @@ class TaxiControlTask(BaseFlightTask):
                               prp.delta_heading: reduce_reflex_angle_deg(self.INITIAL_HEADING_DEG - self.TARGET_HEADING_DEG),             
                               prp.target_heading_deg: self.TARGET_HEADING_DEG,
                               self.nb_episodes: 0,
-                              prp.ic_h_agl_ft: 0,
-                              prp.h_agl_ft: 0
+                              prp.ic_h_agl_ft: 0
+                              prp.h_agl_ft: 11.52
                              }
         return initial_conditions
     

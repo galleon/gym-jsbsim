@@ -400,13 +400,12 @@ class TaxiControlTask(BaseFlightTask):
                               prp.initial_roc_fpm: 0,
                               prp.all_engine_running: -1,
                               prp.initial_heading_deg: self.INITIAL_HEADING_DEG,
-                              prp.initial_altitude_ft: 0,
                               prp.gear_all_cmd: 1,
                               prp.delta_heading: reduce_reflex_angle_deg(self.INITIAL_HEADING_DEG - self.TARGET_HEADING_DEG),             
                               prp.target_heading_deg: self.TARGET_HEADING_DEG,
                               self.nb_episodes: 0,
-                              prp.ic_h_agl_ft: 0,
-                              prp.h_agl_ft: 11.52
+                              prp.ic_h_agl_ft: self.INITIAL_ALTITUDE_FT,
+                              prp.h_agl_ft: self.INITIAL_ALTITUDE_FT
                              }
         return initial_conditions
     

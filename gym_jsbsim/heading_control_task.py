@@ -373,7 +373,7 @@ class TaxiControlTask(BaseFlightTask):
         self.action_variables = action_var
 
         super().__init__(debug)
-
+    '''
     def get_initial_conditions(self) -> Dict[Property, float]:
         self.INITIAL_HEADING_DEG = 90
         self.INITIAL_ALTITUDE_FT = 19
@@ -407,7 +407,7 @@ class TaxiControlTask(BaseFlightTask):
                               self.nb_episodes: 0
                              }
         return initial_conditions
-
+    '''
     def _update_custom_properties(self, sim: Simulation) -> None:
         self._decrement_steps_left(sim)
 

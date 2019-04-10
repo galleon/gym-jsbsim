@@ -429,7 +429,7 @@ class TaxiControlTask(BaseFlightTask):
             if (new_heading >= 360):
                 new_heading = new_heading - 360
             
-            print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading}), GPS Coord: {sim[prp.lng_geoc_deg]} -> {sim[prp.lat_geod_deg]}')
+            print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading}), GPS Coord: {sim[prp.lng_geoc_deg]},{sim[prp.lat_geod_deg]}')
             sim[prp.target_heading_deg] = new_heading
         #terminal_step = sim[prp.dist_travel_m]  >= 100000
         return terminal_step or over_delta_heading

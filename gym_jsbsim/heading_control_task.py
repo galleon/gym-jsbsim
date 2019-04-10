@@ -417,22 +417,37 @@ class TaxiControlTask(BaseFlightTask):
     def _is_terminal(self, sim: Simulation, state: NamedTuple) -> bool:
         terminal_step = sim[self.steps_left] <= 0
         sim[self.nb_episodes] += 1
+
+        over_delta_heading = state.position_delta_heading_to_target_deg > 91
+
+        # Change alt and heading every 2000 steps
+        if (sim[self.steps_left]%200==1):
+            
+            new_heading = sim[prp.target_heading_deg] + random.uniform(-90, 90)
+            if (new_heading <= 0):
+                new_heading = 360 - new_heading
+            if (new_heading >= 360):
+                new_heading = new_heading - 360
+            
+            print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
+            sim[prp.target_heading_deg] = new_heading
         #terminal_step = sim[prp.dist_travel_m]  >= 100000
-        return terminal_step
+        return terminal_step or over_delta_heading
     
     
     def _get_reward(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
         '''
         Reward with delta and altitude heading directly in the input vector state.
         '''
+        # inverse of the proportional absolute value of the minimal angle between the initial and current heading ... 
+        heading_r = 1.0/math.sqrt((0.1*math.fabs(last_state.position_delta_heading_to_target_deg)+1))
+        # inverse of the proportional absolute value between current and target speed
+        speed_r = 1.0/math.sqrt((0.1*math.fabs(last_state.velocities_vc_fps - 33.76)+1))
+        # reward nb episode
+        reward_nb_episode = (heading_r + speed_r) / (2.0 * max(sim[self.steps_left],1.0))
         
+        return (heading_r + speed_r + reward_nb_episode) / 3.
 
-        return 1.0
-    
-
-    def _altitude_out_of_bounds(self, sim: Simulation, state: NamedTuple) -> bool:
-        altitude_error_ft = math.fabs(state.position_h_sl_ft - self.INITIAL_ALTITUDE_FT)
-        return abs(altitude_error_ft) > self.MAX_ALTITUDE_DEVIATION_FT
 
     def _new_episode_init(self, sim: Simulation) -> None:
         super()._new_episode_init(sim)

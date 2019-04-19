@@ -113,6 +113,13 @@ h_agl_ft = BoundedProperty('position/h-agl-ft', '', altitude_sl_ft.min, altitude
 target_altitude_ft = BoundedProperty('tc/h-sl-ft', 'target altitude MSL [ft]', altitude_sl_ft.min, altitude_sl_ft.max)
 target_heading_deg = BoundedProperty('tc/target-heading-deg', 'target heading [deg]', heading_deg.min, heading_deg.max)
 
+# following path
+h1 = BoundedProperty('h1', 'heading1', -180.0, 180.0)
+h2 = BoundedProperty('h2', 'heading1', -180.0, 180.0)
+h3 = BoundedProperty('h3', 'heading1', -180.0, 180.0)
+h4 = BoundedProperty('h4', 'heading1', -180.0, 180.0)
+h5 = BoundedProperty('h5', 'heading1', -180.0, 180.0)
+
 prp_dict = {"altitude_sl_ft": altitude_sl_ft,
 	"pitch_rad": pitch_rad,
 	"roll_rad": roll_rad,
@@ -184,7 +191,12 @@ prp_dict = {"altitude_sl_ft": altitude_sl_ft,
 	"fuel_contents_lbs_0": fuel_contents_lbs_0,
 	"fuel_contents_lbs_1": fuel_contents_lbs_1,
 	"ic_h_agl_ft": ic_h_agl_ft,
-	"h_agl_ft": h_agl_ft
+	"h_agl_ft": h_agl_ft,
+	"h1": h1,
+	"h2": h2,
+	"h3": h3,
+	"h4": h4,
+	"h5": h5
 	}
 
 

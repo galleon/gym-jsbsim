@@ -436,8 +436,9 @@ class TaxiControlTask(BaseFlightTask):
             sim[prp.target_heading_deg] = new_heading
         '''
         # follow path
+        
         lat = sim[prp.lat_geod_deg]
-        lon = sim[prp.lng_geoc_deg]
+        lon = sim[prp.lng_geoc_deg] 
         for i in range(self.ID_NEXT_PATH, len(self.PATH)):    
             if (math.fabs(self.calculate_initial_compass_bearing((lat,lon), self.PATH[i]))<90):
                 self.ID_NEXT_PATH = i

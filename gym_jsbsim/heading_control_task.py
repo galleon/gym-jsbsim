@@ -436,7 +436,7 @@ class TaxiControlTask(BaseFlightTask):
             sim[prp.target_heading_deg] = new_heading
         '''
         # follow path
-        
+
         lat = sim[prp.lat_geod_deg]
         lon = sim[prp.lng_geoc_deg] 
         for i in range(self.ID_NEXT_PATH, len(self.PATH)):    
@@ -471,7 +471,7 @@ class TaxiControlTask(BaseFlightTask):
 
 
 
-        return terminal_step or (h1>91) or (self.ID_NEXT_PATH+4 == len(self.PATH))
+        return terminal_step or (sim[prp.h1]>91) or (self.ID_NEXT_PATH+4 == len(self.PATH))
     
     
     def _get_reward(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:

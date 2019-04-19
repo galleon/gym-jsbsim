@@ -18,13 +18,13 @@ print(config.read('/home/ubuntu/gym-jsbsim/gym_jsbsim/config-state-action.ini'))
 #print(config.sections())
 
 ### collect state var from config file
-state_list = config.get('SA_TAXI', 'states').split('\n')
+state_list = config.get('SA_TAKEOFF', 'states').split('\n')
 print("STATE LIST = ", state_list)
 state_var = ()
 for s in state_list:
     state_var = state_var + (prp.prp_dict[s],)
 
-action_list = config.get('SA_TAXI', 'actions').split('\n')
+action_list = config.get('SA_TAKEOFF', 'actions').split('\n')
 print("ACTION LIST = ", action_list)
 action_var = ()
 for a in action_list:
@@ -498,6 +498,7 @@ class TaxiControlTask(BaseFlightTask):
     def get_props_to_output(self, sim: Simulation) -> Tuple:
         return (*self.state_variables, prp.lat_geod_deg, prp.lng_geoc_deg, self.steps_left)
 
+
     def calculate_initial_compass_bearing(pointA, pointB):
         """
         Calculates the bearing between two points.
@@ -535,6 +536,130 @@ class TaxiControlTask(BaseFlightTask):
         compass_bearing = (initial_bearing + 360) % 360
 
         return initial_bearing#compass_bearing
+
+class TakeoffControlTask(BaseFlightTask):
+    """
+    Take-off scenario.
+    It is assumed that the aircraft is at the beginning of runway correctly aligned.
+
+    Reward function:
+    ---------------
+    for A320
+    q_radps : pitch rate = ~ 2.5 deg/sec i.e. 0.0436 rad/sec
+    V_LOF = v_air(airspeed in knots) @ liftoff
+    V_2   = v_air(airspeed in knots) @ 35 ft alt
+    V_3   = v_air(airspeed in knots) @ 200 - 300 ft = ~ > V_2 + 10
+    max_dist_LOF = 1828m
+    """
+
+    THROTTLE_CMD = 0.2
+    MIXTURE_CMD = 0.0
+    INITIAL_HEADING_DEG = 143.002 #float(config["TAKEOFF_CONTROL_TASK"]["runway_heading"])# -36.984  : for 14L
+    INITIAL_ALTITUDE_FT = 8.48
+    TARGET_HEADING_DEG = INITIAL_HEADING_DEG
+    DEFAULT_EPISODE_TIME_S = 1000.0
+
+
+    def __init__(self,step_frequency_hz: float, aircraft: Aircraft,
+                 episode_time_s: float = DEFAULT_EPISODE_TIME_S, debug: bool = False) -> None:
+        """
+                Constructor.
+
+                :param step_frequency_hz: the number of agent interaction steps per second
+                :param aircraft: the aircraft used in the simulation
+        """
+        self.max_time_s = episode_time_s
+        episode_steps = math.ceil(self.max_time_s * step_frequency_hz)
+        self.steps_left = BoundedProperty('info/steps_left', 'steps remaining in episode', 0,
+                                          episode_steps)
+        self.nb_episodes = Property('info/nb_episodes', 'number of episodes since the beginning')
+        self.aircraft = aircraft
+
+        self.state_variables = state_var
+        self.action_variables = action_var
+
+
+        super().__init__(debug)
+
+
+    def get_initial_conditions(self) -> Dict[Property, float]:
+        self.INITIAL_LAT = 43.6371036997  # float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_latitude_geod_deg"])
+        self.INITIAL_LONG = 1.35789480571
+        self.takeoff_done = False
+        self.INITIAL_ALTITUDE_FT = 8.47
+        self.INITIAL_HEADING_DEG = 143.002
+        self.TARGET_HEADING_DEG = self.INITIAL_HEADING_DEG
+        self.INITIAL_VELOCITY_U = 33.76  # 20 knots/sec
+        initial_conditions = {prp.initial_altitude_ft: self.INITIAL_ALTITUDE_FT,
+                              prp.initial_u_fps: 0,
+                              prp.initial_v_fps: 0,
+                              prp.initial_w_fps: 0,
+                              prp.initial_p_radps: 0,
+                              prp.initial_latitude_geod_deg: self.INITIAL_LAT,
+                              prp.initial_longitude_geoc_deg: self.INITIAL_LONG,
+                              prp.initial_q_radps: 0,
+                              prp.initial_r_radps: 0,
+                              prp.initial_roc_fpm: 0,
+                              prp.all_engine_running: -1,
+                              prp.initial_heading_deg: self.INITIAL_HEADING_DEG,
+                              prp.target_heading_deg: self.TARGET_HEADING_DEG,
+                              prp.delta_heading:reduce_reflex_angle_deg(self.INITIAL_HEADING_DEG - self.TARGET_HEADING_DEG),
+                              prp.gear_all_cmd: 1,
+                              prp.target_altitude_ft: 300.0,   # irrelevant for this task, but needs to be initialized
+                              self.nb_episodes: 0
+                              }
+        return initial_conditions
+
+    def _update_custom_properties(self, sim: Simulation) -> None:
+        self._decrement_steps_left(sim)
+
+    def _decrement_steps_left(self, sim: Simulation):
+        sim[self.steps_left] -= 1
+
+    def _is_terminal(self, sim: Simulation, state: NamedTuple) -> bool:
+        global takeoff_done
+        terminal_step = sim[self.steps_left] <= 0
+        sim[self.nb_episodes] += 1
+
+        over_delta_heading = state.position_delta_heading_to_target_deg > 50
+
+        takeoff_done = state.position_h_agl_ft > 500.0
+
+        return terminal_step or over_delta_heading or takeoff_done
+
+    def _get_reward(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
+        '''
+        Reward with delta and altitude heading directly in the input vector state.
+        '''
+        global takeoff_done
+        task_reward = 0
+        # inverse of the proportional absolute value of the minimal angle between the initial and current heading ...
+        heading_r = 1.0 / math.sqrt((0.1 * math.fabs(last_state.position_delta_heading_to_target_deg) + 1))
+
+
+        # reward nb episode
+
+        if (last_state.position_h_agl_ft > 5+self.INITIAL_ALTITUDE_FT) and (last_state.position_h_agl_ft < 10+self.INITIAL_ALTITUDE_FT):
+            if last_state.position_distance_from_start_mag_mt < 1900:   # max takeoff distance = 1828m
+                task_reward += 1.0
+        if (last_state.position_h_agl_ft > 35+self.INITIAL_ALTITUDE_FT) and (last_state.position_h_agl_ft < 45+self.INITIAL_ALTITUDE_FT):
+            if last_state.velocities_vc_fps > 123:            # minimum V_2 in all conditions
+                task_reward += 1.0
+        if (last_state.position_h_agl_ft > 200+self.INITIAL_ALTITUDE_FT) and (last_state.position_h_agl_ft < 300+self.INITIAL_ALTITUDE_FT):
+            if last_state.velocities_q_rad_sec > 0.0436:       # good pitch rate
+                task_reward += 1.0
+
+        return (heading_r  + task_reward)/4.0
+
+    def _new_episode_init(self, sim: Simulation) -> None:
+        super()._new_episode_init(sim)
+        sim.set_throttle_mixture_controls(self.THROTTLE_CMD, self.MIXTURE_CMD)
+        sim[self.steps_left] = self.steps_left.max
+        sim[self.nb_episodes] += 1
+
+    def get_props_to_output(self, sim: Simulation) -> Tuple:
+        return (*self.state_variables, prp.lat_geod_deg, prp.lng_geoc_deg, self.steps_left)
+
 
 class HeadingControlTask_1Bis(BaseFlightTask):
     """
@@ -666,6 +791,7 @@ class HeadingControlTask_1Bis(BaseFlightTask):
 
     def get_props_to_output(self, sim: Simulation) -> Tuple:
         return (*self.state_variables, prp.lat_geod_deg, prp.lng_geoc_deg, self.steps_left)
+
 class TurnHeadingChangeLevelControlTask(HeadingControlTask):
     """
     A task in which the agent must make a turn and change its altitude

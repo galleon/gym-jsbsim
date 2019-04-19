@@ -439,34 +439,34 @@ class TaxiControlTask(BaseFlightTask):
         lat = sim[prp.lat_geod_deg]
         lon = sim[prp.lng_geoc_deg]
         for i in range(self.ID_NEXT_PATH, len(self.PATH)):    
-            if (math.fabs(calculate_initial_compass_bearing((lat,lon), self.PATH[i]))<90):
+            if (math.fabs(self.calculate_initial_compass_bearing((lat,lon), self.PATH[i]))<90):
                 self.ID_NEXT_PATH = i
                 break
 
         if self.ID_NEXT_PATH > len(self.PATH):
             sim[prp.h1] = 0
         else:
-            sim[prp.h1] = calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH])
+            sim[prp.h1] = self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH])
         
         if self.ID_NEXT_PATH+1 > len(self.PATH):
             sim[prp.h2] = 0
         else:
-            sim[prp.h2] = calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+1])
+            sim[prp.h2] = self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+1])
         
         if self.ID_NEXT_PATH+2 > len(self.PATH):
             sim[prp.h3] = 0
         else:
-            sim[prp.h3] = calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+2])
+            sim[prp.h3] = self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+2])
 
         if self.ID_NEXT_PATH+3 > len(self.PATH):
             sim[prp.h4] = 0
         else:
-            sim[prp.h4] = calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+3])
+            sim[prp.h4] = self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+3])
 
         if self.ID_NEXT_PATH+4 > len(self.PATH):
             sim[prp.h5] = 0
         else:
-            sim[prp.h5] = calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+4])
+            sim[prp.h5] = self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+4])
 
 
 
@@ -499,7 +499,7 @@ class TaxiControlTask(BaseFlightTask):
         return (*self.state_variables, prp.lat_geod_deg, prp.lng_geoc_deg, self.steps_left)
 
 
-    def calculate_initial_compass_bearing(pointA, pointB):
+    def calculate_initial_compass_bearing(self, pointA, pointB):
         """
         Calculates the bearing between two points.
         The formulae used is the following:

@@ -12,29 +12,30 @@ import configparser
 from .utils import reduce_reflex_angle_deg
 
 
-### Collect Config Value
-config = configparser.ConfigParser()
-print(config.read('/home/ubuntu/gym-jsbsim/gym_jsbsim/config-state-action.ini'))
-#print(config.sections())
 
-### collect state var from config file
-state_list = config.get('SA_TAXI', 'states').split('\n')
-print("STATE LIST = ", state_list)
-state_var = ()
-for s in state_list:
-    state_var = state_var + (prp.prp_dict[s],)
-
-action_list = config.get('SA_TAXI', 'actions').split('\n')
-print("ACTION LIST = ", action_list)
-action_var = ()
-for a in action_list:
-    action_var = action_var + (prp.prp_dict[a],)
 
 class HeadingControlTask(BaseFlightTask):
     """
     A task in which the agent must perform steady, level flight maintaining its
     initial heading.
     """
+    ### Collect Config Value
+    config = configparser.ConfigParser()
+    print(config.read('/home/ubuntu/gym-jsbsim/gym_jsbsim/config-state-action.ini'))
+    #print(config.sections())
+
+    ### collect state var from config file
+    state_list = config.get('SA_TAXI', 'states').split('\n')
+    print("STATE LIST = ", state_list)
+    state_var = ()
+    for s in state_list:
+        state_var = state_var + (prp.prp_dict[s],)
+
+    action_list = config.get('SA_TAXI', 'actions').split('\n')
+    print("ACTION LIST = ", action_list)
+    action_var = ()
+    for a in action_list:
+        action_var = action_var + (prp.prp_dict[a],)
 
     ### Set config var
     THROTTLE_CMD = float(config["HEADING_CONTROL_TASK_CONDITION"]["throttle_cmd"])
@@ -174,6 +175,24 @@ class ChangeHeadingControlTask(BaseFlightTask):
     initial heading and altitude and changint them to another ones in the middle of the simiulation
     """
 
+    ### Collect Config Value
+    config = configparser.ConfigParser()
+    print(config.read('/home/ubuntu/gym-jsbsim/gym_jsbsim/config-state-action.ini'))
+    #print(config.sections())
+
+    ### collect state var from config file
+    state_list = config.get('SA_DEFAULT', 'states').split('\n')
+    print("STATE LIST = ", state_list)
+    state_var = ()
+    for s in state_list:
+        state_var = state_var + (prp.prp_dict[s],)
+
+    action_list = config.get('SA_DEFAULT', 'actions').split('\n')
+    print("ACTION LIST = ", action_list)
+    action_var = ()
+    for a in action_list:
+        action_var = action_var + (prp.prp_dict[a],)
+
     ### Set config var
     THROTTLE_CMD = float(config["HEADING_CONTROL_TASK_CONDITION"]["throttle_cmd"])
     MIXTURE_CMD = float(config["HEADING_CONTROL_TASK_CONDITION"]["mixture_cmd"])
@@ -255,17 +274,19 @@ class ChangeHeadingControlTask(BaseFlightTask):
     def _is_terminal(self, sim: Simulation, state: NamedTuple) -> bool:
         # Change target ALT and HEADING
         #print(f'nombre episode: {sim[self.nb_episodes]}, nombre step left: {sim[self.steps_left]}')
+
+        '''
         if (sim[self.steps_left] <= self.TIME_TO_CHANGE_HEADING_ALT and not self.ALREADY_CHANGE):
             print(f'Time to change: {self.TIME_TO_CHANGE_HEADING_ALT} (Altitude: {self.TARGET_ALTITUDE_FT} -> {self.NEW_ALTITUDE_FT}, Heading: {self.TARGET_HEADING_DEG} -> {self.NEW_HEADING_DEG})')
             sim[prp.target_altitude_ft] = self.NEW_ALTITUDE_FT
             sim[prp.target_heading_deg] = self.NEW_HEADING_DEG
             self.ALREADY_CHANGE = True
-        
         '''
+        
         # Change alt and heading every 2000 steps
         if (sim[self.steps_left]%2000==1):
             
-            new_alt = sim[prp.target_altitude_ft] + random.uniform(-4000, 4000)
+            new_alt = sim[prp.target_altitude_ft] + random.uniform(-4000, 500)
             new_heading = sim[prp.target_heading_deg] + random.uniform(-135, 135)
             if (new_heading <= 0):
                 new_heading = 360 - new_heading
@@ -276,7 +297,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
             sim[prp.target_altitude_ft] = new_alt
             sim[prp.target_heading_deg] = new_heading
         
-        '''
+        
         terminal_step = sim[self.steps_left] <= 0
         sim[self.nb_episodes] += 1
         #terminal_step = sim[prp.dist_travel_m]  >= 100000
@@ -344,6 +365,23 @@ class TaxiControlTask(BaseFlightTask):
     """
     A task in which the agent must perform taxiing phases
     """
+    ### Collect Config Value
+    config = configparser.ConfigParser()
+    print(config.read('/home/ubuntu/gym-jsbsim/gym_jsbsim/config-state-action.ini'))
+    #print(config.sections())
+
+    ### collect state var from config file
+    state_list = config.get('SA_TAXI', 'states').split('\n')
+    print("STATE LIST = ", state_list)
+    state_var = ()
+    for s in state_list:
+        state_var = state_var + (prp.prp_dict[s],)
+
+    action_list = config.get('SA_TAXI', 'actions').split('\n')
+    print("ACTION LIST = ", action_list)
+    action_var = ()
+    for a in action_list:
+        action_var = action_var + (prp.prp_dict[a],)
 
     ### Set config var
     THROTTLE_CMD = 0 #float(config["HEADING_CONTROL_TASK_CONDITION"]["throttle_cmd"])
@@ -568,6 +606,24 @@ class TakeoffControlTask(BaseFlightTask):
     V_3   = v_air(airspeed in knots) @ 200 - 300 ft = ~ > V_2 + 10
     max_dist_LOF = 1828m
     """
+
+    ### Collect Config Value
+    config = configparser.ConfigParser()
+    print(config.read('/home/ubuntu/gym-jsbsim/gym_jsbsim/config-state-action.ini'))
+    #print(config.sections())
+
+    ### collect state var from config file
+    state_list = config.get('SA_TAKEOFF', 'states').split('\n')
+    print("STATE LIST = ", state_list)
+    state_var = ()
+    for s in state_list:
+        state_var = state_var + (prp.prp_dict[s],)
+
+    action_list = config.get('SA_TAKEOFF', 'actions').split('\n')
+    print("ACTION LIST = ", action_list)
+    action_var = ()
+    for a in action_list:
+        action_var = action_var + (prp.prp_dict[a],)
 
     THROTTLE_CMD = 0.2
     MIXTURE_CMD = 0.0

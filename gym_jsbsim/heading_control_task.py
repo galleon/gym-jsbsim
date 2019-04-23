@@ -396,8 +396,8 @@ class TaxiControlTask(BaseFlightTask):
                               prp.initial_v_fps: 0,
                               prp.initial_w_fps: 0,
                               prp.initial_p_radps: 0,
-                              prp.initial_latitude_geod_deg: self.PATH[0][0], # start at the first point of the path
-                              prp.initial_longitude_geoc_deg: self.PATH[0][1], # start at the first point of the path
+                              prp.initial_latitude_geod_deg: self.PATH[0][1], # start at the first point of the path
+                              prp.initial_longitude_geoc_deg: self.PATH[0][0], # start at the first point of the path
                               prp.initial_q_radps: 0,
                               prp.initial_r_radps: 0,
                               prp.initial_roc_fpm: 0,
@@ -435,6 +435,15 @@ class TaxiControlTask(BaseFlightTask):
             print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading}), GPS Coord: {sim[prp.lng_geoc_deg]},{sim[prp.lat_geod_deg]}')
             sim[prp.target_heading_deg] = new_heading
         '''
+        
+
+
+
+        return terminal_step or (sim[prp.h1]>91) or (self.ID_NEXT_PATH+4 == len(self.PATH))
+    
+    
+    def _get_reward(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
+        
         # follow path
 
         lat = sim[prp.lat_geod_deg]
@@ -443,38 +452,35 @@ class TaxiControlTask(BaseFlightTask):
             if (math.fabs(self.calculate_initial_compass_bearing((lat,lon), self.PATH[i]))<90):
                 self.ID_NEXT_PATH = i
                 break
+        
+        # aricraft bearing
+        aircraft_bearing = sim[prp.heading_deg]
 
         if self.ID_NEXT_PATH > len(self.PATH):
             sim[prp.h1] = 0
         else:
-            sim[prp.h1] = self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH])
+            sim[prp.h1] = math.fabs(aircraft_bearing - self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH]))
         
         if self.ID_NEXT_PATH+1 > len(self.PATH):
             sim[prp.h2] = 0
         else:
-            sim[prp.h2] = self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+1])
+            sim[prp.h2] = math.fabs(aircraft_bearing - self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+1]))
         
         if self.ID_NEXT_PATH+2 > len(self.PATH):
             sim[prp.h3] = 0
         else:
-            sim[prp.h3] = self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+2])
+            sim[prp.h3] = math.fabs(aircraft_bearing - self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+2]))
 
         if self.ID_NEXT_PATH+3 > len(self.PATH):
             sim[prp.h4] = 0
         else:
-            sim[prp.h4] = self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+3])
+            sim[prp.h4] = math.fabs(aircraft_bearing - self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+3]))
 
         if self.ID_NEXT_PATH+4 > len(self.PATH):
             sim[prp.h5] = 0
         else:
-            sim[prp.h5] = self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+4])
-
-
-
-        return terminal_step or (sim[prp.h1]>91) or (self.ID_NEXT_PATH+4 == len(self.PATH))
-    
-    
-    def _get_reward(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
+            sim[prp.h5] = math.fabs(aircraft_bearing - self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+4]))
+        
         '''
         Reward with delta and altitude heading directly in the input vector state.
         '''
@@ -536,7 +542,7 @@ class TaxiControlTask(BaseFlightTask):
         initial_bearing = math.degrees(initial_bearing)
         compass_bearing = (initial_bearing + 360) % 360
 
-        return initial_bearing#compass_bearing
+        return compass_bearing
 
 class TakeoffControlTask(BaseFlightTask):
     """

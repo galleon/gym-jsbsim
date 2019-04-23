@@ -492,7 +492,8 @@ class TaxiControlTask(BaseFlightTask):
         
         if (last_state.velocities_vc_fps < 33.76/4.0) or last_state.velocities_vc_fps > 33.76:
             vel_r = 0
-        else vel_r = 1
+        else:
+            vel_r = 1
 
         # reward nb episode
         reward_nb_episode = (heading_r) / (1.0 * max(sim[self.steps_left],1.0))

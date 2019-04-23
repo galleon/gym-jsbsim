@@ -529,9 +529,9 @@ class TaxiControlTask(BaseFlightTask):
             raise TypeError("Only tuples are supported as arguments")
 
         lat1 = math.radians(pointA[0])
-        lat2 = math.radians(pointB[0])
+        lat2 = math.radians(pointB[1])
 
-        diffLong = math.radians(pointB[1] - pointA[1])
+        diffLong = math.radians(pointB[0] - pointA[1])
 
         x = math.sin(diffLong) * math.cos(lat2)
         y = math.cos(lat1) * math.sin(lat2) - (math.sin(lat1)

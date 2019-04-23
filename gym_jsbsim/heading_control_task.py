@@ -219,8 +219,8 @@ class ChangeHeadingControlTask(BaseFlightTask):
         self.nb_episodes = Property('info/nb_episodes', 'number of episodes since the beginning')
         self.aircraft = aircraft
 
-        self.state_variables = state_var
-        self.action_variables = action_var
+        self.state_variables = self.state_var
+        self.action_variables = self.action_var
 
         super().__init__(debug)
 
@@ -757,7 +757,7 @@ class HeadingControlTask_1Bis(BaseFlightTask):
     action_var = ()
     for a in action_list:
         action_var = action_var + (prp.prp_dict[a],)
-        
+
     ### Set config var
     THROTTLE_CMD = float(config["HEADING_CONTROL_TASK_CONDITION"]["throttle_cmd"])
     MIXTURE_CMD = float(config["HEADING_CONTROL_TASK_CONDITION"]["mixture_cmd"])

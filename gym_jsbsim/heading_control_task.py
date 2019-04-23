@@ -402,7 +402,7 @@ class TaxiControlTask(BaseFlightTask):
                               prp.initial_r_radps: 0,
                               prp.initial_roc_fpm: 0,
                               prp.all_engine_running: -1,
-                              prp.initial_heading_deg: self.calculate_initial_compass_bearing((prp.initial_latitude_geod_deg,prp.initial_longitude_geoc_deg), self.PATH[self.ID_NEXT_PATH]),
+                              prp.initial_heading_deg: self.calculate_initial_compass_bearing((self.PATH[0][1],self.PATH[0][0]), self.PATH[self.ID_NEXT_PATH]),
                               prp.gear_all_cmd: 1,
                               prp.delta_heading: reduce_reflex_angle_deg(self.INITIAL_HEADING_DEG - self.TARGET_HEADING_DEG),             
                               prp.target_heading_deg: self.TARGET_HEADING_DEG,

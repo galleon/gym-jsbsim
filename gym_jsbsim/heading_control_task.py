@@ -201,7 +201,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
     DEFAULT_EPISODE_TIME_S = 3800.
     ALTITUDE_SCALING_FT = 150
     MAX_ALTITUDE_DEVIATION_FT = 800  # terminate if altitude error exceeds this
-    THRESHOLD_CONTROL = 0.5
+    THRESHOLD_CONTROL = 0.1
     PENALTY_CONTROL = -0.2
 
     def __init__(self, step_frequency_hz: float, aircraft: Aircraft,
@@ -262,7 +262,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
                               prp.target_heading_deg: self.TARGET_HEADING_DEG,
                               self.nb_episodes: 0
                              }
-        print(f'Time to change INIT: {self.TIME_TO_CHANGE_HEADING_ALT} (Altitude: {self.TARGET_ALTITUDE_FT} -> {self.NEW_ALTITUDE_FT}, Heading: {self.TARGET_HEADING_DEG} -> {self.NEW_HEADING_DEG})')
+        #print(f'Time to change INIT: {self.TIME_TO_CHANGE_HEADING_ALT} (Altitude: {self.TARGET_ALTITUDE_FT} -> {self.NEW_ALTITUDE_FT}, Heading: {self.TARGET_HEADING_DEG} -> {self.NEW_HEADING_DEG})')
         return initial_conditions
 
     def _update_custom_properties(self, sim: Simulation) -> None:
@@ -293,7 +293,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
             if (new_heading >= 360):
                 new_heading = new_heading - 360
             
-            print(f'Time to change: {sim[self.steps_left]} (Altitude: {sim[prp.target_altitude_ft]} -> {new_alt}, Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
+            #print(f'Time to change: {sim[self.steps_left]} (Altitude: {sim[prp.target_altitude_ft]} -> {new_alt}, Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
             sim[prp.target_altitude_ft] = new_alt
             sim[prp.target_heading_deg] = new_heading
         

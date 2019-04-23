@@ -481,6 +481,7 @@ class TaxiControlTask(BaseFlightTask):
         else:
             sim[prp.h5] = math.fabs(aircraft_bearing - self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+4]))
         
+
         '''
         Reward with delta and altitude heading directly in the input vector state.
         '''
@@ -493,7 +494,9 @@ class TaxiControlTask(BaseFlightTask):
         time = 0
         if (self._is_terminal(sim, new_state) and self.ID_NEXT_PATH+4 > len(self.PATH)):
             time = 1.0/(math.sqrt((sim[self.nb_episodes]/1000.0)))
-        return (heading_r + time) / 3.
+
+        print(f'a/c bearing = {aircraft_bearing}, (h1, h2, h3, h4, h5) = ({sim[prp.h1]},{sim[prp.h2]},{sim[prp.h3]},{sim[prp.h4]},{sim[prp.h5]}), reward heading = {heading_r}, reward time = {time}')
+        return (2.0 * heading_r + time) / 3.
 
 
     def _new_episode_init(self, sim: Simulation) -> None:

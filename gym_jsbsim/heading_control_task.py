@@ -490,7 +490,7 @@ class TaxiControlTask(BaseFlightTask):
         # inverse of the proportional absolute value between current and target speed
         #speed_r = 1.0/math.sqrt((0.1*math.fabs(last_state.velocities_vc_fps - 33.76)+1))
         
-        if (last_state.velocities_vc_fps < 33.76/4.0) or last_state.velocities_vc_fps > 33.76)
+        if (last_state.velocities_vc_fps < 33.76/4.0) or last_state.velocities_vc_fps > 33.76:
             vel_r = 0
         else vel_r = 1
 

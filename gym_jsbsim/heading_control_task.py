@@ -286,7 +286,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
         # Change alt and heading every 2000 steps
         if (sim[self.steps_left]%2000==1):
             
-            new_alt = sim[prp.target_altitude_ft] + random.uniform(0, 0)
+            new_alt = sim[prp.target_altitude_ft]# + random.uniform(0, 0)
             new_heading = sim[prp.target_heading_deg] + random.uniform(-135, 135)
             if (new_heading <= 0):
                 new_heading = 360 - new_heading
@@ -301,7 +301,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
         terminal_step = sim[self.steps_left] <= 0
         sim[self.nb_episodes] += 1
         #terminal_step = sim[prp.dist_travel_m]  >= 100000
-        return terminal_step or sim[prp.altitude_sl_ft] <= 2000
+        return terminal_step or sim[prp.delta_altitude] > 500
     
     
     def _get_reward(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
@@ -315,7 +315,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
         #vel_c = math.sqrt(math.pow(last_state.velocities_u_fps,2) + math.pow(last_state.velocities_v_fps,2)) 
         #vel_r = 1.0/math.sqrt((0.1*math.fabs(vel_i - vel_c)+1))
         # inverse of the proportional absolute value between the initial and current altitude ... 
-        alt_r = 1.0/math.sqrt((0.1*math.fabs(last_state.position_delta_altitude_to_target_ft)+1))
+        alt_r = 1.0/math.sqrt((1.*math.fabs(last_state.position_delta_altitude_to_target_ft)+1))
         #print(" -v- ", self.INITIAL_VELOCITY_U, last_state.velocities_u_fps, vel_r, " -h- ", self.INITIAL_HEADING_DEG, last_state.attitude_psi_deg, heading_r, " -a- ", self.INITIAL_ALTITUDE_FT, last_state.position_h_sl_ft, alt_r, " -r- ", (heading_r + alt_r + vel_r)/3.0)
 
         #check to strong manoeuvres
@@ -482,47 +482,33 @@ class TaxiControlTask(BaseFlightTask):
     
     def _get_reward(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
         
-        # follow path
-
+        ### follow path
+        # current aircraft lat,long
         lat = sim[prp.lat_geod_deg]
-        lon = sim[prp.lng_geoc_deg] 
-        for i in range(self.ID_NEXT_PATH, len(self.PATH)-5):    
-            if (math.fabs(sim[prp.heading_deg] - self.calculate_initial_compass_bearing((lat,lon), self.PATH[i]))<90):
-                self.ID_NEXT_PATH = i
-                break
-        
-        # aricraft bearing
-        aircraft_bearing = sim[prp.heading_deg]
+        lon = sim[prp.lng_geoc_deg]
 
-        if self.ID_NEXT_PATH > len(self.PATH):
-            sim[prp.h1] = 0
-        else:
-            sim[prp.h1] = math.fabs(aircraft_bearing - self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH]))
-        
-        if self.ID_NEXT_PATH+1 > len(self.PATH):
-            sim[prp.h2] = 0
-        else:
-            sim[prp.h2] = math.fabs(aircraft_bearing - self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+1]))
-        
-        if self.ID_NEXT_PATH+2 > len(self.PATH):
-            sim[prp.h3] = 0
-        else:
-            sim[prp.h3] = math.fabs(aircraft_bearing - self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+2]))
+        # compute intersection point between circle and path  
+        shorter_dist = 99999
+        id_path = 0
+        for i in range(0, len(self.PATH)):
+            # For point that are forehead
+            if (math.fabs(sim[prp.heading_deg] - self.calculate_initial_compass_bearing((lat,lon), self.PATH[i]))<180):
+                # compute shorter distance between path point P(x1,x2) and the circle of center C(h,k) and radius r
+                # abs(sqrt((x1 - h)² + (y1 - k)²) - r)
+                dist = math.fabs(math.sqrt((self.PATH[i][1]) - lat)**2 + (self.PATH[i][0] - long)**2) - new_state.radiusCircle)
+                if (dist < shorter_dist):
+                    shorter_dist = dist
+                    id_path = i
+        # compute heading  between current aircraft trajectory and shortest intersection point
+        delta_heading = ((sim[prp.heading_deg] - self.calculate_initial_compass_bearing((lat,lon), self.PATH[i])) + 380 ) % 380
 
-        if self.ID_NEXT_PATH+3 > len(self.PATH):
-            sim[prp.h4] = 0
-        else:
-            sim[prp.h4] = math.fabs(aircraft_bearing - self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+3]))
-
-        if self.ID_NEXT_PATH+4 > len(self.PATH):
-            sim[prp.h5] = 0
-        else:
-            sim[prp.h5] = math.fabs(aircraft_bearing - self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+4]))
-        
+        # compute new target heading to give to the aircraft 
+        sim[prp.target_heading_deg] = sim[prp.heading_deg] - delta_heading
 
         '''
-        Reward with delta and altitude heading directly in the input vector state.
+        Reward according to the distance to the path.
         '''
+
         # inverse of the proportional absolute value of the minimal angle between the initial and current heading ... 
         heading_r = 1.0/math.sqrt((0.1*math.fabs(last_state.h1)+1))
         # inverse of the proportional absolute value between current and target speed

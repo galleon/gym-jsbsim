@@ -260,6 +260,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
                               prp.delta_altitude: self.INITIAL_ALTITUDE_FT - self.TARGET_ALTITUDE_FT,
                               prp.target_altitude_ft: self.TARGET_ALTITUDE_FT,
                               prp.target_heading_deg: self.TARGET_HEADING_DEG,
+                              prp.gear_all_cmd = 0,
                               self.nb_episodes: 0
                              }
         #print(f'Time to change INIT: {self.TIME_TO_CHANGE_HEADING_ALT} (Altitude: {self.TARGET_ALTITUDE_FT} -> {self.NEW_ALTITUDE_FT}, Heading: {self.TARGET_HEADING_DEG} -> {self.NEW_HEADING_DEG})')
@@ -428,6 +429,8 @@ class TaxiControlTask(BaseFlightTask):
         if (new_heading >= 360):
             new_heading = new_heading - 360
         self.NEW_HEADING_DEG = new_heading
+
+        self.shortest_ac_to_path = 0
         
         initial_conditions = {prp.initial_altitude_ft: self.INITIAL_ALTITUDE_FT,
                               prp.initial_u_fps: self.INITIAL_VELOCITY_U,
@@ -459,25 +462,7 @@ class TaxiControlTask(BaseFlightTask):
         terminal_step = sim[self.steps_left] <= 0
         sim[self.nb_episodes] += 1
 
-        '''
-        # Change  heading every 2000 steps
-        over_delta_heading = state.position_delta_heading_to_target_deg > 91
-        if (sim[self.steps_left]%200==1):
-            
-            new_heading = sim[prp.target_heading_deg] + random.uniform(-90, 90)
-            if (new_heading <= 0):
-                new_heading = 360 - new_heading
-            if (new_heading >= 360):
-                new_heading = new_heading - 360
-            
-            print(f'Time to change: {sim[self.steps_left]} (Heading: {sim[prp.target_heading_deg]} -> {new_heading}), GPS Coord: {sim[prp.lng_geoc_deg]},{sim[prp.lat_geod_deg]}')
-            sim[prp.target_heading_deg] = new_heading
-        '''
-        
-
-
-
-        return terminal_step or (sim[prp.h1]>91) or (self.ID_NEXT_PATH+4 == len(self.PATH))
+        return terminal_step or self.shortest_ac_to_path > 20
     
     
     def _get_reward(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
@@ -490,45 +475,80 @@ class TaxiControlTask(BaseFlightTask):
         # compute intersection point between circle and path  
         shorter_dist = 99999
         id_path = 0
+        id_path_closer_point = 0
+        shortest_point_dist = 9999
         for i in range(0, len(self.PATH)):
-            # For point that are forehead
+            # find the closer point to the aircraft
+            point_dist = math.sqrt((lat - self.PATH[i][1])**2 + (lon - self.PATH[i][0])**2)
+            if (point_dist < shortest_point_dist):
+                shortest_point_dist = point_dist
+                id_path_closer_point = i
+
+            # For point that are forehead (to compute the good intersection of the circle)
             if (math.fabs(sim[prp.heading_deg] - self.calculate_initial_compass_bearing((lat,lon), self.PATH[i]))<180):
                 # compute shorter distance between path point P(x1,x2) and the circle of center C(h,k) and radius r
                 # abs(sqrt((x1 - h)² + (y1 - k)²) - r)
-                radius = 0
-                dist = math.fabs(math.sqrt((self.PATH[i][1] - lat)**2 + (self.PATH[i][0] - long)**2) - radius)
+                dist = math.fabs(math.sqrt((self.PATH[i][1] - lat)**2 + (self.PATH[i][0] - long)**2) - last_state.radius_circle)
                 if (dist < shorter_dist):
                     shorter_dist = dist
                     id_path = i
+
         # compute heading  between current aircraft trajectory and shortest intersection point
         delta_heading = ((sim[prp.heading_deg] - self.calculate_initial_compass_bearing((lat,lon), self.PATH[i])) + 380 ) % 380
 
         # compute new target heading to give to the aircraft 
         sim[prp.target_heading_deg] = sim[prp.heading_deg] - delta_heading
 
-        '''
-        Reward according to the distance to the path.
-        '''
-
-        # inverse of the proportional absolute value of the minimal angle between the initial and current heading ... 
-        heading_r = 1.0/math.sqrt((0.1*math.fabs(last_state.h1)+1))
-        # inverse of the proportional absolute value between current and target speed
-        #speed_r = 1.0/math.sqrt((0.1*math.fabs(last_state.velocities_vc_fps - 33.76)+1))
+        ### Reward according to the distance to the path.
+        # compute the second shortest point to the aircraft (ie: this is the id_path_closer_point +|- 1)
+        if (id_path_closer_point != len(self.PATH)):
+            dist_i_plus_1 = math.sqrt((lat - self.PATH[id_path_closer_point+1][1])**2 + (lon - self.PATH[id_path_closer_point+1][0])**2)
+        else: 
+            dist_i_plus_1 = 99999
+        if (id_path_closer_point != 0):
+            dist_i_minus_1 = math.sqrt((lat - self.PATH[id_path_closer_point-1][1])**2 + (lon - self.PATH[id_path_closer_point-1][0])**2)
+        else:
+            dist_i_minus_1 = 99999
         
+        if (dist_i_plus_1 < dist_i_minus_1):
+            second_id = id_path_closer_point+1
+        else:
+            second_id = id_path_closer_point-1
+
+        # compute shortest distance between aircarft and the line
+        self.shortest_ac_to_path = shortest_ac_dist(lat, lon, self.PATH[id_path_closer_point][1], self.PATH[id_path_closer_point][0], self.PATH[second_id][1], self.PATH[second_id][0])
+
+        # inverse of the proportional absolute value of the minimal distance to the path
+        dist_path_r = 1.0/math.sqrt((0.1*shortest_ac_dist+1))
+
+        # reward if velocity between 5 and 20 knots
         if (last_state.velocities_vc_fps < 33.76/4.0) or last_state.velocities_vc_fps > 33.76:
             vel_r = 0
         else:
             vel_r = 1
 
         # reward nb episode
-        reward_nb_episode = (heading_r) / (1.0 * max(sim[self.steps_left],1.0))
-
-        #time = 0
-        #if (self._is_terminal(sim, new_state) and self.ID_NEXT_PATH+4 > len(self.PATH)):
-        #    time = 1.0/(math.sqrt((sim[self.nb_episodes]/1000.0)))
+        reward_nb_episode = (dist_path_r) / (1.0 * max(sim[self.steps_left],1.0))
 
         #print(f'ID path = {self.ID_NEXT_PATH}, lat,lon = {(lat,lon)}, lat,long path= {self.PATH[self.ID_NEXT_PATH]}, a/c bearing = {aircraft_bearing}, bearing h1,h2,h3,h4,h5 = {self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH])},{self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+1])},{self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+2])},{self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+3])}, {self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+4])},{self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+5])} (h1, h2, h3, h4, h5) = ({sim[prp.h1]},{sim[prp.h2]},{sim[prp.h3]},{sim[prp.h4]},{sim[prp.h5]}), reward heading = {heading_r}, reward time = {time}')
-        return (heading_r + reward_nb_episode + vel_r) / 3.
+        return (dist_path_r + reward_nb_episode + vel_r) / 3.
+
+    def shortest_ac_dist (self, lat, lon, lat1, lon1, lat2, lon2):
+        # equation of line (shortest_point dist_i_plus_1) y = s*x + m
+        # slope
+        s = (lon2 - lon1) / (lat2 - lat1)
+        # find m: m = y - s*x
+        m = lon1 - s * lat1
+        if (lon2 - s * lat2 != m):
+            raise TypeError("Wrong lat, lon value for two shortest aircraft points")
+
+        # coeff of line equation ay + bx + c = 0
+        a = -1
+        b = s
+        c = m
+        # compute shortest distance between aircarft and the line = abs(a*x0 + b*y0 + c) / sqrt(a²+b²))
+        shortest_ac_dist = math.fabs(a*lat + b*lon + c) / math.sqrt(a**2+b**2)
+        return shortest_ac_dist
 
 
     def _new_episode_init(self, sim: Simulation) -> None:

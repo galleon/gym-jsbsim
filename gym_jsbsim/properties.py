@@ -119,6 +119,7 @@ h2 = BoundedProperty('h2', 'heading1', -180.0, 180.0)
 h3 = BoundedProperty('h3', 'heading1', -180.0, 180.0)
 h4 = BoundedProperty('h4', 'heading1', -180.0, 180.0)
 h5 = BoundedProperty('h5', 'heading1', -180.0, 180.0)
+radius_circle = BoundedProperty('radius-circle', 'radius of the circle aim to compute target heading for ground procedure [m]', 0.0, 100.0)
 
 prp_dict = {"altitude_sl_ft": altitude_sl_ft,
 	"pitch_rad": pitch_rad,
@@ -196,7 +197,8 @@ prp_dict = {"altitude_sl_ft": altitude_sl_ft,
 	"h2": h2,
 	"h3": h3,
 	"h4": h4,
-	"h5": h5
+	"h5": h5,
+	"radius_circle": radius_circle
 	}
 
 

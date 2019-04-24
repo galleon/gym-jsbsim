@@ -260,7 +260,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
                               prp.delta_altitude: self.INITIAL_ALTITUDE_FT - self.TARGET_ALTITUDE_FT,
                               prp.target_altitude_ft: self.TARGET_ALTITUDE_FT,
                               prp.target_heading_deg: self.TARGET_HEADING_DEG,
-                              prp.gear_all_cmd = 0,
+                              prp.gear_all_cmd: 0,
                               self.nb_episodes: 0
                              }
         #print(f'Time to change INIT: {self.TIME_TO_CHANGE_HEADING_ALT} (Altitude: {self.TARGET_ALTITUDE_FT} -> {self.NEW_ALTITUDE_FT}, Heading: {self.TARGET_HEADING_DEG} -> {self.NEW_HEADING_DEG})')

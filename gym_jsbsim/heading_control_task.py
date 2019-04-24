@@ -495,7 +495,8 @@ class TaxiControlTask(BaseFlightTask):
             if (math.fabs(sim[prp.heading_deg] - self.calculate_initial_compass_bearing((lat,lon), self.PATH[i]))<180):
                 # compute shorter distance between path point P(x1,x2) and the circle of center C(h,k) and radius r
                 # abs(sqrt((x1 - h)² + (y1 - k)²) - r)
-                dist = math.fabs(math.sqrt((self.PATH[i][1]) - lat)**2 + (self.PATH[i][0] - long)**2) - new_state.radiusCircle)
+                radius = 0
+                dist = math.fabs(math.sqrt((self.PATH[i][1]) - lat)**2 + (self.PATH[i][0] - long)**2) - radius)
                 if (dist < shorter_dist):
                     shorter_dist = dist
                     id_path = i

@@ -201,7 +201,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
     DEFAULT_EPISODE_TIME_S = 3800.
     ALTITUDE_SCALING_FT = 150
     MAX_ALTITUDE_DEVIATION_FT = 800  # terminate if altitude error exceeds this
-    THRESHOLD_CONTROL = 0.1
+    THRESHOLD_CONTROL = 0.01
     PENALTY_CONTROL = -0.2
 
     def __init__(self, step_frequency_hz: float, aircraft: Aircraft,
@@ -345,7 +345,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
 
         self.LAST_CONTROL_STATE = [sim[prp.aileron_left], sim[prp.aileron_right], sim[prp.elevator], sim[prp.rudder], sim[prp.throttle]]
 
-        return (2*heading_r + 2*alt_r + sum_penalty_control_state + reward_nb_episode) / 6.0
+        return (heading_r + alt_r + sum_penalty_control_state + reward_nb_episode) / 4.0
     
 
     def _altitude_out_of_bounds(self, sim: Simulation, state: NamedTuple) -> bool:

@@ -543,11 +543,16 @@ class TaxiControlTask(BaseFlightTask):
         else:
             vel_r = 1
 
-        # reward nb episode
-        reward_nb_episode = (dist_path_r) / (1.0 * max(sim[self.steps_left],1.0))
 
+        # inverse of the proportional absolute value of the minimal angle between the initial and current heading ... 
+        heading_r = 1.0/math.sqrt((0.1*math.fabs(last_state.position_delta_heading_to_target_deg)+1))
+
+        # reward nb episode
+        reward_nb_episode = (dist_path_r + heading_r) / (2.0 * max(sim[self.steps_left],1.0))
+
+    
         #print(f'ID path = {self.ID_NEXT_PATH}, lat,lon = {(lat,lon)}, lat,long path= {self.PATH[self.ID_NEXT_PATH]}, a/c bearing = {aircraft_bearing}, bearing h1,h2,h3,h4,h5 = {self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH])},{self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+1])},{self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+2])},{self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+3])}, {self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+4])},{self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+5])} (h1, h2, h3, h4, h5) = ({sim[prp.h1]},{sim[prp.h2]},{sim[prp.h3]},{sim[prp.h4]},{sim[prp.h5]}), reward heading = {heading_r}, reward time = {time}')
-        return (dist_path_r + reward_nb_episode + vel_r) / 3.
+        return (dist_path_r + heading_r + reward_nb_episode + vel_r) / 4.
 
     
 

@@ -478,8 +478,8 @@ class TaxiControlTask(BaseFlightTask):
         b = s
         c = m
         # compute shortest distance between aircarft and the line = abs(a*x0 + b*y0 + c) / sqrt(a²+b²))
-        shortest_ac_dist = math.fabs(a*lat + b*lon + c) / math.sqrt(a**2+b**2)
-        return shortest_ac_dist
+        s_ac_dist = math.fabs(a*lat + b*lon + c) / math.sqrt(a**2+b**2)
+        return s_ac_dist
 
     def _get_reward(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
         
@@ -532,7 +532,7 @@ class TaxiControlTask(BaseFlightTask):
             second_id = id_path_closer_point-1
 
         # compute shortest distance between aircarft and the line
-        self.shortest_ac_to_path = shortest_ac_dist(lat, lon, self.PATH[id_path_closer_point][1], self.PATH[id_path_closer_point][0], self.PATH[second_id][1], self.PATH[second_id][0])
+        self.shortest_ac_to_path = self.shortest_ac_dist(lat, lon, self.PATH[id_path_closer_point][1], self.PATH[id_path_closer_point][0], self.PATH[second_id][1], self.PATH[second_id][0])
 
         # inverse of the proportional absolute value of the minimal distance to the path
         dist_path_r = 1.0/math.sqrt((0.1*self.shortest_ac_to_path+1))

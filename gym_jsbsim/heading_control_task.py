@@ -517,7 +517,7 @@ class TaxiControlTask(BaseFlightTask):
 
         ### Reward according to the distance to the path.
         # compute the second shortest point to the aircraft (ie: this is the id_path_closer_point +|- 1)
-        if (id_path_closer_point != len(self.PATH)):
+        if (id_path_closer_point != len(self.PATH)-1):
             dist_i_plus_1 = math.sqrt((lat - self.PATH[id_path_closer_point+1][1])**2 + (lon - self.PATH[id_path_closer_point+1][0])**2)
         else: 
             dist_i_plus_1 = 99999
@@ -552,7 +552,7 @@ class TaxiControlTask(BaseFlightTask):
 
     
         #print(f'ID path = {self.ID_NEXT_PATH}, lat,lon = {(lat,lon)}, lat,long path= {self.PATH[self.ID_NEXT_PATH]}, a/c bearing = {aircraft_bearing}, bearing h1,h2,h3,h4,h5 = {self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH])},{self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+1])},{self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+2])},{self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+3])}, {self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+4])},{self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+5])} (h1, h2, h3, h4, h5) = ({sim[prp.h1]},{sim[prp.h2]},{sim[prp.h3]},{sim[prp.h4]},{sim[prp.h5]}), reward heading = {heading_r}, reward time = {time}')
-        return (dist_path_r + heading_r + reward_nb_episode + vel_r) / 4.
+        return (dist_path_r + heading_r + reward_nb_episode + vel_r) / 4    .
 
     
 

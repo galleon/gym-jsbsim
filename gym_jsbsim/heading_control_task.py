@@ -470,7 +470,7 @@ class TaxiControlTask(BaseFlightTask):
         s = (lon2 - lon1) / (lat2 - lat1)
         # find m: m = y - s*x
         m = lon1 - s * lat1
-        if (int(lon2 - s * lat2) != int(m):
+        if int(lon2 - s * lat2) != int(m):
             raise TypeError(f'Wrong lat, lon value for two shortest aircraft points: {m} != {lon2 - s * lat2}')
 
         # coeff of line equation ay + bx + c = 0

@@ -445,7 +445,7 @@ class TaxiControlTask(BaseFlightTask):
                               prp.target_heading_deg: self.TARGET_HEADING_DEG,
                               self.nb_episodes: 0,
                               prp.ic_h_agl_ft: self.INITIAL_ALTITUDE_FT,
-                              prp.shortest_ac_to_path: self.shortest_ac_dist(prp.initial_latitude_geod_deg, prp.initial_longitude_geoc_deg, self.PATH[0][1], self.PATH[0][0], self.PATH[1][1], self.PATH[1][0])
+                              prp.shortest_ac_to_path: 0.0 #self.shortest_ac_dist(prp.initial_latitude_geod_deg, prp.initial_longitude_geoc_deg, self.PATH[0][1], self.PATH[0][0], self.PATH[1][1], self.PATH[1][0])
                              }
         return initial_conditions
     

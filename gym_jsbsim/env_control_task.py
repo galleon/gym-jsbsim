@@ -427,8 +427,6 @@ class TaxiControlTask(BaseFlightTask):
         if (new_heading >= 360):
             new_heading = new_heading - 360
         self.NEW_HEADING_DEG = new_heading
-
-        sim[prp.shortest_ac_to_path] = 0
         
         initial_conditions = {prp.initial_altitude_ft: self.INITIAL_ALTITUDE_FT,
                               prp.initial_u_fps: self.INITIAL_VELOCITY_U,
@@ -446,7 +444,8 @@ class TaxiControlTask(BaseFlightTask):
                               prp.delta_heading: reduce_reflex_angle_deg(self.INITIAL_HEADING_DEG - self.TARGET_HEADING_DEG),             
                               prp.target_heading_deg: self.TARGET_HEADING_DEG,
                               self.nb_episodes: 0,
-                              prp.ic_h_agl_ft: self.INITIAL_ALTITUDE_FT
+                              prp.ic_h_agl_ft: self.INITIAL_ALTITUDE_FT,
+                              prp.shortest_ac_to_path: self.shortest_ac_dist(prp.initial_latitude_geod_deg, prp.initial_longitude_geoc_deg, self.PATH[0][1], self.PATH[0][0], self.PATH[1][1], self.PATH[1][0])
                              }
         return initial_conditions
     

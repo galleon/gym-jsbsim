@@ -428,7 +428,7 @@ class TaxiControlTask(BaseFlightTask):
                               prp.initial_w_fps: 0,
                               prp.initial_p_radps: 0,
                               prp.initial_latitude_geod_deg: self.INIT_LAT,
-                              prp.initial_longitude_geoc_deg: self.INIT_LON
+                              prp.initial_longitude_geoc_deg: self.INIT_LON,
                               prp.initial_q_radps: 0,
                               prp.initial_r_radps: 0,
                               prp.initial_roc_fpm: 0,

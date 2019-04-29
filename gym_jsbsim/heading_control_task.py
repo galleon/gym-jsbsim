@@ -464,7 +464,23 @@ class TaxiControlTask(BaseFlightTask):
 
         return terminal_step or self.shortest_ac_to_path > 20
     
-    
+    def shortest_ac_dist (self, lat, lon, lat1, lon1, lat2, lon2):
+        # equation of line (shortest_point dist_i_plus_1) y = s*x + m
+        # slope
+        s = (lon2 - lon1) / (lat2 - lat1)
+        # find m: m = y - s*x
+        m = lon1 - s * lat1
+        if (lon2 - s * lat2 != m):
+            raise TypeError("Wrong lat, lon value for two shortest aircraft points")
+
+        # coeff of line equation ay + bx + c = 0
+        a = -1
+        b = s
+        c = m
+        # compute shortest distance between aircarft and the line = abs(a*x0 + b*y0 + c) / sqrt(a²+b²))
+        shortest_ac_dist = math.fabs(a*lat + b*lon + c) / math.sqrt(a**2+b**2)
+        return shortest_ac_dist
+
     def _get_reward(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
         
         ### follow path
@@ -519,7 +535,7 @@ class TaxiControlTask(BaseFlightTask):
         self.shortest_ac_to_path = shortest_ac_dist(lat, lon, self.PATH[id_path_closer_point][1], self.PATH[id_path_closer_point][0], self.PATH[second_id][1], self.PATH[second_id][0])
 
         # inverse of the proportional absolute value of the minimal distance to the path
-        dist_path_r = 1.0/math.sqrt((0.1*shortest_ac_dist+1))
+        dist_path_r = 1.0/math.sqrt((0.1*self.shortest_ac_to_path+1))
 
         # reward if velocity between 5 and 20 knots
         if (last_state.velocities_vc_fps < 33.76/4.0) or last_state.velocities_vc_fps > 33.76:
@@ -533,22 +549,7 @@ class TaxiControlTask(BaseFlightTask):
         #print(f'ID path = {self.ID_NEXT_PATH}, lat,lon = {(lat,lon)}, lat,long path= {self.PATH[self.ID_NEXT_PATH]}, a/c bearing = {aircraft_bearing}, bearing h1,h2,h3,h4,h5 = {self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH])},{self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+1])},{self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+2])},{self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+3])}, {self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+4])},{self.calculate_initial_compass_bearing((lat,lon), self.PATH[self.ID_NEXT_PATH+5])} (h1, h2, h3, h4, h5) = ({sim[prp.h1]},{sim[prp.h2]},{sim[prp.h3]},{sim[prp.h4]},{sim[prp.h5]}), reward heading = {heading_r}, reward time = {time}')
         return (dist_path_r + reward_nb_episode + vel_r) / 3.
 
-    def shortest_ac_dist (self, lat, lon, lat1, lon1, lat2, lon2):
-        # equation of line (shortest_point dist_i_plus_1) y = s*x + m
-        # slope
-        s = (lon2 - lon1) / (lat2 - lat1)
-        # find m: m = y - s*x
-        m = lon1 - s * lat1
-        if (lon2 - s * lat2 != m):
-            raise TypeError("Wrong lat, lon value for two shortest aircraft points")
-
-        # coeff of line equation ay + bx + c = 0
-        a = -1
-        b = s
-        c = m
-        # compute shortest distance between aircarft and the line = abs(a*x0 + b*y0 + c) / sqrt(a²+b²))
-        shortest_ac_dist = math.fabs(a*lat + b*lon + c) / math.sqrt(a**2+b**2)
-        return shortest_ac_dist
+    
 
 
     def _new_episode_init(self, sim: Simulation) -> None:

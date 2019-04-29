@@ -410,8 +410,8 @@ class TaxiControlTask(BaseFlightTask):
         self.nb_episodes = Property('info/nb_episodes', 'number of episodes since the beginning')
         self.aircraft = aircraft
 
-        self.state_variables = state_var
-        self.action_variables = action_var
+        self.state_variables = self.state_var
+        self.action_variables = self.action_var
 
         super().__init__(debug)
     
@@ -655,8 +655,8 @@ class TakeoffControlTask(BaseFlightTask):
         self.nb_episodes = Property('info/nb_episodes', 'number of episodes since the beginning')
         self.aircraft = aircraft
 
-        self.state_variables = state_var
-        self.action_variables = action_var
+        self.state_variables = self.state_var
+        self.action_variables = self.action_var
 
 
         super().__init__(debug)

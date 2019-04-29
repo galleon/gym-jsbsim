@@ -41,7 +41,7 @@ def get_env_id_kwargs_map() -> Dict[str, Tuple]:
     from gym_jsbsim.env_control_task import HeadingControlTask, ChangeHeadingControlTask, TaxiControlTask, TakeoffControlTask
 
     map = {}
-    for task_type in (HeadingControlTask, TurnHeadingChangeLevelControlTask,HeadingControlTask_1Bis, ChangeHeadingControlTask, TaxiControlTask,TakeoffControlTask):
+    for task_type in (HeadingControlTask, ChangeHeadingControlTask, TaxiControlTask, TakeoffControlTask):
         for plane in (cessna172P, a320, f15):
             for enable_flightgear in (True, False):
                 id = get_env_id(task_type, plane, enable_flightgear)

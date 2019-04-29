@@ -469,6 +469,7 @@ class TaxiControlTask(BaseFlightTask):
         b = s
         c = m
         # compute shortest distance between aircarft and the line = abs(a*x0 + b*y0 + c) / sqrt(a²+b²))
+        print(lat, lon, lat1, lon1, lat2, lon2)
         s_ac_dist = math.fabs(a*lat + b*lon + c) / math.sqrt(a**2+b**2)
         return s_ac_dist
 

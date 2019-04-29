@@ -114,12 +114,8 @@ target_altitude_ft = BoundedProperty('tc/h-sl-ft', 'target altitude MSL [ft]', a
 target_heading_deg = BoundedProperty('tc/target-heading-deg', 'target heading [deg]', heading_deg.min, heading_deg.max)
 
 # following path
-h1 = BoundedProperty('h1', 'heading1', -180.0, 180.0)
-h2 = BoundedProperty('h2', 'heading1', -180.0, 180.0)
-h3 = BoundedProperty('h3', 'heading1', -180.0, 180.0)
-h4 = BoundedProperty('h4', 'heading1', -180.0, 180.0)
-h5 = BoundedProperty('h5', 'heading1', -180.0, 180.0)
 radius_circle = BoundedProperty('radius-circle', 'radius of the circle aim to compute target heading for ground procedure [m]', 0.0, 100.0)
+shortest_ac_to_path = BoundedProperty('shortest-ac-to-path', 'shortest distance between aircraft and path [m]', 0.0, 100.0)
 
 prp_dict = {"altitude_sl_ft": altitude_sl_ft,
 	"pitch_rad": pitch_rad,
@@ -193,12 +189,8 @@ prp_dict = {"altitude_sl_ft": altitude_sl_ft,
 	"fuel_contents_lbs_1": fuel_contents_lbs_1,
 	"ic_h_agl_ft": ic_h_agl_ft,
 	"h_agl_ft": h_agl_ft,
-	"h1": h1,
-	"h2": h2,
-	"h3": h3,
-	"h4": h4,
-	"h5": h5,
-	"radius_circle": radius_circle
+	"radius_circle": radius_circle,
+	"shortest_ac_to_path": shortest_ac_to_path
 	}
 
 

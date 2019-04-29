@@ -430,7 +430,7 @@ class TaxiControlTask(BaseFlightTask):
             new_heading = new_heading - 360
         self.NEW_HEADING_DEG = new_heading
 
-        self.shortest_ac_to_path = 0
+        sim[prp.shortest_ac_to_path] = 0
         
         initial_conditions = {prp.initial_altitude_ft: self.INITIAL_ALTITUDE_FT,
                               prp.initial_u_fps: self.INITIAL_VELOCITY_U,
@@ -462,7 +462,7 @@ class TaxiControlTask(BaseFlightTask):
         terminal_step = sim[self.steps_left] <= 0
         sim[self.nb_episodes] += 1
 
-        return terminal_step or self.shortest_ac_to_path > 20
+        return terminal_step or sim[prp.shortest_ac_to_path] > 20
     
     def shortest_ac_dist (self, lat, lon, lat1, lon1, lat2, lon2):
         # equation of line (shortest_point dist_i_plus_1) y = s*x + m
@@ -532,10 +532,10 @@ class TaxiControlTask(BaseFlightTask):
             second_id = id_path_closer_point-1
 
         # compute shortest distance between aircarft and the line
-        self.shortest_ac_to_path = self.shortest_ac_dist(lat, lon, self.PATH[id_path_closer_point][1], self.PATH[id_path_closer_point][0], self.PATH[second_id][1], self.PATH[second_id][0])
+        sim[prp.shortest_ac_to_path] = self.shortest_ac_dist(lat, lon, self.PATH[id_path_closer_point][1], self.PATH[id_path_closer_point][0], self.PATH[second_id][1], self.PATH[second_id][0])
 
         # inverse of the proportional absolute value of the minimal distance to the path
-        dist_path_r = 1.0/math.sqrt((0.1*self.shortest_ac_to_path+1))
+        dist_path_r = 1.0/math.sqrt((0.1*sim[prp.shortest_ac_to_path]+1))
 
         # reward if velocity between 5 and 20 knots
         if (last_state.velocities_vc_fps < 33.76/4.0) or last_state.velocities_vc_fps > 33.76:

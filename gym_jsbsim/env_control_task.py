@@ -419,8 +419,8 @@ class TaxiControlTask(BaseFlightTask):
         self.TARGET_HEADING_DEG = self.INITIAL_HEADING_DEG
         self.INITIAL_VELOCITY_U = 33.76/2.0 #20 knots/sec
         self.LAST_CONTROL_STATE = [0,0,0,0,0]
-        self.INIT_LAT = self.PATH[0][1], # start at the first point of the path
-        self.INIT_LON = self.PATH[0][0], # start at the first point of the path
+        self.INIT_LAT = self.PATH[0][1] # start at the first point of the path
+        self.INIT_LON = self.PATH[0][0] # start at the first point of the path
         
         initial_conditions = {prp.initial_altitude_ft: self.INITIAL_ALTITUDE_FT,
                               prp.initial_u_fps: self.INITIAL_VELOCITY_U,
@@ -469,7 +469,6 @@ class TaxiControlTask(BaseFlightTask):
         b = s
         c = m
         # compute shortest distance between aircarft and the line = abs(a*x0 + b*y0 + c) / sqrt(a²+b²))
-        print(lat, lon, lat1, lon1, lat2, lon2)
         s_ac_dist = math.fabs(a*lat + b*lon + c) / math.sqrt(a**2+b**2)
         return s_ac_dist
 

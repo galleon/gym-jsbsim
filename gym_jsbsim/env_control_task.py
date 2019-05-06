@@ -527,7 +527,7 @@ class TaxiControlTask(BaseFlightTask):
                     id_path = i
 
         # compute heading  between current aircraft trajectory and shortest intersection point
-        delta_heading = ((sim[prp.heading_deg] - self.calculate_initial_compass_bearing((lat,lon), self.PATH[i])) + 360 ) % 360
+        delta_heading = ((sim[prp.heading_deg] - self.calculate_initial_compass_bearing((lat,lon), (self.PATH[i][1],self.PATH[i][0]))) + 360 ) % 360
 
         # compute new target heading to give to the aircraft 
         sim[prp.target_heading_deg] = sim[prp.heading_deg] - delta_heading
@@ -550,6 +550,8 @@ class TaxiControlTask(BaseFlightTask):
 
         # compute shortest distance between aircarft and the line
         sim[prp.shortest_ac_to_path] = self.shortest_ac_dist(lat, lon, self.PATH[id_path_closer_point][1], self.PATH[id_path_closer_point][0], self.PATH[second_id][1], self.PATH[second_id][0])
+        print(f'shortest_ac_dist({lat}, {lon}, {self.PATH[id_path_closer_point][1]}, {self.PATH[id_path_closer_point][0]}, {self.PATH[second_id][1]}, {self.PATH[second_id][0]}) = {self.shortest_ac_dist(lat, lon, self.PATH[id_path_closer_point][1], self.PATH[id_path_closer_point][0], self.PATH[second_id][1], self.PATH[second_id][0])}')
+
 
         # inverse of the proportional absolute value of the minimal distance to the path
         dist_path_r = 1.0/math.sqrt((0.1*sim[prp.shortest_ac_to_path]+1))
@@ -606,9 +608,9 @@ class TaxiControlTask(BaseFlightTask):
             raise TypeError("Only tuples are supported as arguments")
 
         lat1 = math.radians(pointA[0])
-        lat2 = math.radians(pointB[1])
+        lat2 = math.radians(pointB[0])
 
-        diffLong = math.radians(pointB[0] - pointA[1])
+        diffLong = math.radians(pointB[1] - pointA[1])
 
         x = math.sin(diffLong) * math.cos(lat2)
         y = math.cos(lat1) * math.sin(lat2) - (math.sin(lat1)

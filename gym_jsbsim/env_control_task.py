@@ -570,7 +570,7 @@ class TaxiControlTask(BaseFlightTask):
         """
         !!!!!!!! GOTO cartesian coord + check closer point and distance + check delta heading .... !!!!!!
         """
-        print(f'1st, 2nd closest point id (lat,lon) = {id_path_closer_point}{(self.PATH[id_path_closer_point][1], self.PATH[id_path_closer_point][0])}, {second_id}{(self.PATH[second_id][1], self.PATH[second_id][0])}, lat,lon = {(lat,lon)}, shortest distance= {sim[prp.shortest_ac_to_path]}, a/c heading = {sim[prp.heading_deg]}, delta heading = {delta_heading}, reward heading = {heading_r}, reward dist = {dist_path_r}, reward step = {reward_nb_episode}, reward vel = {vel_r}')
+        #print(f'1st, 2nd closest point id (lat,lon) = {id_path_closer_point}{(self.PATH[id_path_closer_point][1], self.PATH[id_path_closer_point][0])}, {second_id}{(self.PATH[second_id][1], self.PATH[second_id][0])}, lat,lon = {(lat,lon)}, shortest distance= {sim[prp.shortest_ac_to_path]}, a/c heading = {sim[prp.heading_deg]}, delta heading = {delta_heading}, reward heading = {heading_r}, reward dist = {dist_path_r}, reward step = {reward_nb_episode}, reward vel = {vel_r}')
         return (dist_path_r + heading_r + reward_nb_episode + vel_r) / 4.0
 
     

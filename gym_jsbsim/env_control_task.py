@@ -528,10 +528,9 @@ class TaxiControlTask(BaseFlightTask):
                     id_path = i
             
             # Compute the shortest dist to the path
-            if (i != len(self.PATH)-1):
-                dist_path  = self.shortest_ac_dist(lat, lon, self.PATH[i][1], self.PATH[i][0], self.PATH[i+1][1], self.PATH[i+1][0])
-                if (dist_path < shortest_path_dist):
-                    shortest_path_dist = dist_path
+            #dist_path  = self.shortest_ac_dist(lat, lon, self.PATH[i][1], self.PATH[i][0], self.PATH[i+1][1], self.PATH[i+1][0])
+            #if (dist_path < shortest_path_dist):
+            #    shortest_path_dist = dist_path
 
 
         # compute heading  between current aircraft trajectory and shortest intersection point
@@ -557,7 +556,7 @@ class TaxiControlTask(BaseFlightTask):
             second_id = id_path_closer_point-1
 
         # compute shortest distance between aircarft and the path
-        sim[prp.shortest_ac_to_path] = shortest_path_dist # self.shortest_ac_dist(lat, lon, self.PATH[id_path_closer_point][1], self.PATH[id_path_closer_point][0], self.PATH[second_id][1], self.PATH[second_id][0])
+        sim[prp.shortest_ac_to_path] = shorter_dist #shortest_path_dist # self.shortest_ac_dist(lat, lon, self.PATH[id_path_closer_point][1], self.PATH[id_path_closer_point][0], self.PATH[second_id][1], self.PATH[second_id][0])
 
         print(f'shortest_ac_dist({lat}, {lon}, {self.PATH[id_path_closer_point][1]}, {self.PATH[id_path_closer_point][0]}, {self.PATH[second_id][1]}, {self.PATH[second_id][0]}) = {self.shortest_ac_dist(lat, lon, self.PATH[id_path_closer_point][1], self.PATH[id_path_closer_point][0], self.PATH[second_id][1], self.PATH[second_id][0])}')
 

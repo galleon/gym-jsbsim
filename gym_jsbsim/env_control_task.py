@@ -417,10 +417,10 @@ class TaxiControlTask(BaseFlightTask):
         super().__init__(debug)
     
     def get_initial_conditions(self) -> Dict[Property, float]:
-        self.INITIAL_HEADING_DEG = 324
+        self.INITIAL_HEADING_DEG = self.calculate_initial_compass_bearing((self.PATH[0][1],self.PATH[0][0]), (self.PATH[1][1],self.PATH[1][0]))
         self.INITIAL_ALTITUDE_FT = 11.52
         self.TARGET_HEADING_DEG = self.INITIAL_HEADING_DEG
-        self.INITIAL_VELOCITY_U = 33.76/2.0 #20 knots/sec
+        self.INITIAL_VELOCITY_U = 33.76/3.0 #20 knots/sec
         self.LAST_CONTROL_STATE = [0,0,0,0,0]
         self.INIT_LAT = self.PATH[0][1] # start at the first point of the path
         self.INIT_LON = self.PATH[0][0] # start at the first point of the path
@@ -436,7 +436,7 @@ class TaxiControlTask(BaseFlightTask):
                               prp.initial_r_radps: 0,
                               prp.initial_roc_fpm: 0,
                               prp.all_engine_running: -1,
-                              prp.initial_heading_deg: self.calculate_initial_compass_bearing((self.PATH[0][1],self.PATH[0][0]), (self.PATH[1][1],self.PATH[1][0])),
+                              prp.initial_heading_deg: self.INITIAL_HEADING_DEG,
                               prp.gear_all_cmd: 1,
                               prp.delta_heading: reduce_reflex_angle_deg(self.INITIAL_HEADING_DEG - self.TARGET_HEADING_DEG),             
                               prp.target_heading_deg: self.TARGET_HEADING_DEG,
@@ -502,6 +502,7 @@ class TaxiControlTask(BaseFlightTask):
 
     def _get_reward(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
         
+        sim[prp.v_air] = 33.76/3.0 #20 knots/sec
         ### follow path
         # current aircraft lat,long
         lat = sim[prp.lat_geod_deg]

@@ -538,7 +538,7 @@ class TaxiControlTask(BaseFlightTask):
         delta_heading = ((sim[prp.heading_deg] - self.calculate_initial_compass_bearing((lat,lon), (self.PATH[id_path][1],self.PATH[id_path][0]))) + 360 ) % 360
 
         # compute new target heading to give to the aircraft 
-        sim[prp.target_heading_deg] = ((sim[prp.heading_deg] - delta_heading) + 360 ) % 360
+        sim[prp.target_heading_deg] = ((sim[prp.heading_deg] + delta_heading) + 360 ) % 360
 
         ### Reward according to the distance to the path.
         # compute the second shortest point to the aircraft (ie: this is the id_path_closer_point +|- 1)

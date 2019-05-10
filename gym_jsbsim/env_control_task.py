@@ -576,7 +576,7 @@ class TaxiControlTask(BaseFlightTask):
         heading_r = 1.0/math.sqrt((0.1*math.fabs(last_state.position_delta_heading_to_target_deg)+1))
 
         # reward nb episode
-        reward_nb_episode = 1.0/math.sqrt((0.1*self.steps_left+1)) #(dist_path_r + heading_r) / (2.0 * max(sim[self.steps_left],1.0))
+        reward_nb_episode = 1.0/math.sqrt((0.1*sim[self.steps_left]+1)) #(dist_path_r + heading_r) / (2.0 * max(sim[self.steps_left],1.0))
 
         """
         !!!!!!!! GOTO cartesian coord + check closer point and distance + check delta heading .... !!!!!!

@@ -383,8 +383,8 @@ class TaxiControlTask(BaseFlightTask):
         action_var = action_var + (prp.prp_dict[a],)
 
     ### Set config var
-    THROTTLE_CMD = 0 #float(config["HEADING_CONTROL_TASK_CONDITION"]["throttle_cmd"])
-    MIXTURE_CMD = 0 #float(config["HEADING_CONTROL_TASK_CONDITION"]["mixture_cmd"])
+    THROTTLE_CMD = 0.2 #float(config["HEADING_CONTROL_TASK_CONDITION"]["throttle_cmd"])
+    MIXTURE_CMD = 1 #float(config["HEADING_CONTROL_TASK_CONDITION"]["mixture_cmd"])
     #INITIAL_LAT = 43.621148#float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_latitude_geod_deg"])
     #INITIAL_LONG = 1.374493#float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_longitude_geoc_deg"])
     DEFAULT_EPISODE_TIME_S = 1000.
@@ -502,7 +502,7 @@ class TaxiControlTask(BaseFlightTask):
 
     def _get_reward(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:
         
-        sim[prp.v_air] = 33.76/3.0 #20 knots/sec
+        #sim[prp.v_air] = 33.76/3.0 #20 knots/sec
         ### follow path
         # current aircraft lat,long
         lat = sim[prp.lat_geod_deg]
@@ -538,7 +538,7 @@ class TaxiControlTask(BaseFlightTask):
         delta_heading = ((sim[prp.heading_deg] - self.calculate_initial_compass_bearing((lat,lon), (self.PATH[id_path][1],self.PATH[id_path][0]))) + 360 ) % 360
 
         # compute new target heading to give to the aircraft 
-        sim[prp.target_heading_deg] = sim[prp.heading_deg] - delta_heading
+        sim[prp.target_heading_deg] = ((sim[prp.heading_deg] - delta_heading) + 360 ) % 360
 
         ### Reward according to the distance to the path.
         # compute the second shortest point to the aircraft (ie: this is the id_path_closer_point +|- 1)
@@ -581,8 +581,8 @@ class TaxiControlTask(BaseFlightTask):
         """
         !!!!!!!! GOTO cartesian coord + check closer point and distance + check delta heading .... !!!!!!
         """
-        print(f'Action: {action}, 1st, 2nd closest point id (lat,lon) = {id_path_closer_point}{(self.PATH[id_path_closer_point][1], self.PATH[id_path_closer_point][0])}, {second_id}{(self.PATH[second_id][1], self.PATH[second_id][0])}, lat,lon = {(lat,lon)}, shortest distance= {sim[prp.shortest_ac_to_path]}, a/c heading = {sim[prp.heading_deg]}, delta heading = {delta_heading}, reward heading = {heading_r}, reward dist = {dist_path_r}, reward step = {reward_nb_episode}, reward vel = {vel_r}')
-        return (dist_path_r + heading_r + reward_nb_episode + vel_r) / 4.0
+        #print(f'Action: {action}, 1st, 2nd closest point id (lat,lon) = {id_path_closer_point}{(self.PATH[id_path_closer_point][1], self.PATH[id_path_closer_point][0])}, {second_id}{(self.PATH[second_id][1], self.PATH[second_id][0])}, lat,lon = {(lat,lon)}, shortest distance= {sim[prp.shortest_ac_to_path]}, a/c heading = {sim[prp.heading_deg]}, delta heading = {delta_heading}, reward heading = {heading_r}, reward dist = {dist_path_r}, reward step = {reward_nb_episode}, reward vel = {vel_r}')
+        return (dist_path_r + vel_r) / 2.0
 
     
 

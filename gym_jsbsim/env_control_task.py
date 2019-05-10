@@ -535,10 +535,10 @@ class TaxiControlTask(BaseFlightTask):
 
 
         # compute heading  between current aircraft trajectory and shortest intersection point
-        delta_heading = ((sim[prp.heading_deg] - self.calculate_initial_compass_bearing((lat,lon), (self.PATH[id_path][1],self.PATH[id_path][0]))) + 360 ) % 360
+        #delta_heading = ((sim[prp.heading_deg] - self.calculate_initial_compass_bearing((lat,lon), (self.PATH[id_path][1],self.PATH[id_path][0]))) + 360 ) % 360
 
         # compute new target heading to give to the aircraft 
-        sim[prp.target_heading_deg] = ((sim[prp.heading_deg] + delta_heading) + 360 ) % 360
+        sim[prp.target_heading_deg] = self.calculate_initial_compass_bearing((lat,lon), (self.PATH[id_path][1],self.PATH[id_path][0])) #((sim[prp.heading_deg] + delta_heading) + 360 ) % 360
 
         ### Reward according to the distance to the path.
         # compute the second shortest point to the aircraft (ie: this is the id_path_closer_point +|- 1)
@@ -563,7 +563,7 @@ class TaxiControlTask(BaseFlightTask):
 
 
         # inverse of the proportional absolute value of the minimal distance to the path
-        dist_path_r = 1.0/math.sqrt((0.1*sim[prp.shortest_ac_to_path]+1))
+        dist_path_r = 1.0/(shorter_dist+1) #1.0/math.sqrt((0.1*sim[prp.shortest_ac_to_path]+1))
 
         # reward if velocity between 5 and 20 knots
         if (last_state.velocities_vc_fps < 33.76/4.0) or last_state.velocities_vc_fps > 33.76:
@@ -576,13 +576,13 @@ class TaxiControlTask(BaseFlightTask):
         heading_r = 1.0/math.sqrt((0.1*math.fabs(last_state.position_delta_heading_to_target_deg)+1))
 
         # reward nb episode
-        reward_nb_episode = (dist_path_r + heading_r) / (2.0 * max(sim[self.steps_left],1.0))
+        reward_nb_episode = 1.0/math.sqrt((0.1*self.steps_left+1)) #(dist_path_r + heading_r) / (2.0 * max(sim[self.steps_left],1.0))
 
         """
         !!!!!!!! GOTO cartesian coord + check closer point and distance + check delta heading .... !!!!!!
         """
         #print(f'Action: {action}, 1st, 2nd closest point id (lat,lon) = {id_path_closer_point}{(self.PATH[id_path_closer_point][1], self.PATH[id_path_closer_point][0])}, {second_id}{(self.PATH[second_id][1], self.PATH[second_id][0])}, lat,lon = {(lat,lon)}, shortest distance= {sim[prp.shortest_ac_to_path]}, a/c heading = {sim[prp.heading_deg]}, delta heading = {delta_heading}, reward heading = {heading_r}, reward dist = {dist_path_r}, reward step = {reward_nb_episode}, reward vel = {vel_r}')
-        return (dist_path_r + vel_r) / 2.0
+        return (2.0*dist_path_r + vel_r + reward_nb_episode) / 4.0
 
     
 

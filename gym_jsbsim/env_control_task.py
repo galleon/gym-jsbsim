@@ -485,7 +485,7 @@ class TaxiControlTask(BaseFlightTask):
         >>> round(dist_points(40.758492, -73.975105, 40.759752, -73.974215))
         15
         '''
-        return math.sqrt((lat2 - lat1)**2 + (lon2 - lon1)**2)*10000
+        return math.sqrt((lat2 - lat1)**2 + (lon2 - lon1)**2)*100000
 
     
     def shorter_dist_point_circle(self, p_lat, p_lon, c_lat, c_lon, c_radius):

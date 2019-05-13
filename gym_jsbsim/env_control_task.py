@@ -456,7 +456,7 @@ class TaxiControlTask(BaseFlightTask):
         terminal_step = sim[self.steps_left] <= 0
         sim[self.nb_episodes] += 1
 
-        return terminal_step or sim[prp.shortest_ac_to_path] > 20
+        return terminal_step or sim[prp.shortest_ac_to_path] > 10
     
     def shortest_ac_dist (self, lat, lon, lat1, lon1, lat2, lon2):
         '''

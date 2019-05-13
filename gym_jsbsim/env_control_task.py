@@ -559,7 +559,7 @@ class TaxiControlTask(BaseFlightTask):
         # compute shortest distance between aircarft and the path
         sim[prp.shortest_ac_to_path] = shorter_dist #shortest_path_dist # self.shortest_ac_dist(lat, lon, self.PATH[id_path_closer_point][1], self.PATH[id_path_closer_point][0], self.PATH[second_id][1], self.PATH[second_id][0])
 
-        #print(f'shortest_ac_dist({lat}, {lon}, {self.PATH[id_path_closer_point][1]}, {self.PATH[id_path_closer_point][0]}, {self.PATH[second_id][1]}, {self.PATH[second_id][0]}) = {self.shortest_ac_dist(lat, lon, self.PATH[id_path_closer_point][1], self.PATH[id_path_closer_point][0], self.PATH[second_id][1], self.PATH[second_id][0])}')
+        print(f'heading: {sim[prp.attitude_psi_deg]}, target heading: {sim[prp.target_heading_deg]}, delta_heading: {sim[prp.position_delta_heading_to_target_deg]}, radius: {action.radius_circle}')
 
 
         # inverse of the proportional absolute value of the minimal distance to the path

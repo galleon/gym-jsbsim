@@ -551,7 +551,7 @@ class TaxiControlTask(BaseFlightTask):
                 id_path_closer_point = i
 
             # For point that are forehead (to compute the good intersection of the circle)
-            if (sim[prp.heading_deg] - self.calculate_initial_compass_bearing((lat,lon), (self.PATH[i][1],self.PATH[i][0])) + 360 ) % 360 <=91:
+            if (math.fabs(sim[prp.heading_deg] - self.calculate_initial_compass_bearing((lat,lon), (self.PATH[i][1],self.PATH[i][0]))) + 360 ) % 360 <=91:
                 dist = self.shorter_dist_point_circle(self.PATH[i][1], self.PATH[i][0], lat, lon, action.radius_circle)
                 if dist > 0 and dist < shorter_dist:
                     shorter_dist = dist
@@ -580,9 +580,9 @@ class TaxiControlTask(BaseFlightTask):
             sim[prp.target_heading_deg] = self.calculate_initial_compass_bearing((lat,lon), point_intersection[0])
         else:
             #two intersaction point, we keep the on that is forhead the aircraft
-            if (sim[prp.heading_deg] - self.calculate_initial_compass_bearing((lat,lon), point_intersection[0]) + 360 ) % 360 <=91:
+            if (math.fabs(sim[prp.heading_deg] - self.calculate_initial_compass_bearing((lat,lon), point_intersection[0])) + 360 ) % 360 <=91:
                 sim[prp.target_heading_deg] = self.calculate_initial_compass_bearing((lat,lon), point_intersection[0])
-            elif (sim[prp.heading_deg] - self.calculate_initial_compass_bearing((lat,lon), point_intersection[1]) + 360 ) % 360 <=91:
+            elif (math.fabs(sim[prp.heading_deg] - self.calculate_initial_compass_bearing((lat,lon), point_intersection[1])) + 360 ) % 360 <=91:
                 sim[prp.target_heading_deg] = self.calculate_initial_compass_bearing((lat,lon), point_intersection[1])
             else:
                 raise TypeError(f'No forhead intersection point between aircraft {(lat,lon)} heading = {sim[prp.target_heading_deg]} and the path: {point_intersection}')

@@ -116,6 +116,11 @@ target_heading_deg = BoundedProperty('tc/target-heading-deg', 'target heading [d
 # following path
 radius_circle = BoundedProperty('radius-circle', 'radius of the circle aim to compute target heading for ground procedure [m]', 0.0, 100.0)
 shortest_ac_to_path = BoundedProperty('shortest-ac-to-path', 'shortest distance between aircraft and path [m]', 0.0, 100.0)
+closest_path_point_lat = BoundedProperty('closest_path_point_lat', 'geocentric latitude [deg]', -90, 90)
+closest_path_point_lon = BoundedProperty('closest_path_point_lon', 'geodesic longitude [deg]', -180, 180)
+intersectio_point_lat = BoundedProperty('intersectio_point_lat', 'geocentric latitude [deg]', -90, 90)
+intersectio_point_lon = BoundedProperty('intersectio_point_lon', 'geodesic longitude [deg]', -180, 180)
+
 
 prp_dict = {"altitude_sl_ft": altitude_sl_ft,
 	"pitch_rad": pitch_rad,
@@ -190,7 +195,11 @@ prp_dict = {"altitude_sl_ft": altitude_sl_ft,
 	"ic_h_agl_ft": ic_h_agl_ft,
 	"h_agl_ft": h_agl_ft,
 	"radius_circle": radius_circle,
-	"shortest_ac_to_path": shortest_ac_to_path
+	"shortest_ac_to_path": shortest_ac_to_path,
+	"closest_path_point_lat": closest_path_point_lat,
+	"closest_path_point_lon": closest_path_point_lon,
+	"intersectio_point_lat": intersectio_point_lat,
+	"intersectio_point_lon": intersectio_point_lon
 	}
 
 

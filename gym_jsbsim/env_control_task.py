@@ -567,10 +567,14 @@ class TaxiControlTask(BaseFlightTask):
                          self.shortest_ac_dist(lat, lon, self.PATH[id_path_closer_point][1], self.PATH[id_path_closer_point][0], self.PATH[id_path_closer_point-1][1], self.PATH[id_path_closer_point-1][0]))
         
         sim[prp.shortest_ac_to_path] = dist_path
+        sim[prp.closest_path_point_lat] = self.PATH[id_path_closer_point][1]
+        sim[prp.closest_path_point_lon] = self.PATH[id_path_closer_point][0]
  
         # compute intersection point between circle and line
         point_intersection = self.intersection_circle_line(self.PATH[id_path][1],self.PATH[id_path][0], self.PATH[id_path-1][1],self.PATH[id_path-1][0], lat, lon, action.radius_circle)
-        
+        sim[prp.intersectio_point_lat] = point_intersection[0]
+        sim[prp.intersectio_point_lon] = point_intersection[1]
+
         # compute new target heading to give to the aircraft
         if len(point_intersection)==0:
             # no intersection point, we target the closest path point

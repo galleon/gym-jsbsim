@@ -572,8 +572,6 @@ class TaxiControlTask(BaseFlightTask):
  
         # compute intersection point between circle and line
         point_intersection = self.intersection_circle_line(self.PATH[id_path][1],self.PATH[id_path][0], self.PATH[id_path-1][1],self.PATH[id_path-1][0], lat, lon, action.radius_circle)
-        sim[prp.intersectio_point_lat] = point_intersection[0]
-        sim[prp.intersectio_point_lon] = point_intersection[1]
 
         # compute new target heading to give to the aircraft
         if len(point_intersection)==0:
@@ -586,14 +584,22 @@ class TaxiControlTask(BaseFlightTask):
             #two intersaction point, we keep the on that is forhead the aircraft
             if math.fabs(((math.fabs(sim[prp.heading_deg] - self.calculate_initial_compass_bearing((lat,lon), point_intersection[0])) - 180 ) % 360) - 180) <=90:
                 sim[prp.target_heading_deg] = self.calculate_initial_compass_bearing((lat,lon), point_intersection[0])
+                sim[prp.intersectio_point_lat] = point_intersection[0][0]
+                sim[prp.intersectio_point_lon] = point_intersection[0][1]
             elif math.fabs(((math.fabs(sim[prp.heading_deg] - self.calculate_initial_compass_bearing((lat,lon), point_intersection[1])) - 180 ) % 360) -180) <=90:
                 sim[prp.target_heading_deg] = self.calculate_initial_compass_bearing((lat,lon), point_intersection[1])
+                sim[prp.intersectio_point_lat] = point_intersection[1][0]
+                sim[prp.intersectio_point_lon] = point_intersection[1][1]
             else:
                 if (math.fabs(((math.fabs(sim[prp.heading_deg] - self.calculate_initial_compass_bearing((lat,lon), point_intersection[0])) - 180 ) % 360) - 180) < 
                     math.fabs(((math.fabs(sim[prp.heading_deg] - self.calculate_initial_compass_bearing((lat,lon), point_intersection[1])) - 180 ) % 360) -180)):
                     sim[prp.target_heading_deg] = self.calculate_initial_compass_bearing((lat,lon), point_intersection[0])
+                    sim[prp.intersectio_point_lat] = point_intersection[0][0]
+                    sim[prp.intersectio_point_lon] = point_intersection[0][1]
                 else:
                     sim[prp.target_heading_deg] = self.calculate_initial_compass_bearing((lat,lon), point_intersection[1])
+                    sim[prp.intersectio_point_lat] = point_intersection[1][0]
+                    sim[prp.intersectio_point_lon] = point_intersection[1][1]
                 #raise TypeError(f'No forhead intersection point between aircraft {(lat,lon)} heading = {sim[prp.target_heading_deg]} and the path: {point_intersection}')
 
         # inverse of the proportional absolute value of the minimal distance to the path

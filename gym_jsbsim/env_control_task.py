@@ -518,7 +518,7 @@ class TaxiControlTask(BaseFlightTask):
             y = a * x + b
             lst.append((x, y))
                  
-            x = (-B + math.Sqrt(delta)) / (2 * A)
+            x = (-B + math.sqrt(delta)) / (2 * A)
             y = a * x + b
             lst.append((x, y))
         elif (delta == 0):

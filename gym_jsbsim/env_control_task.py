@@ -585,7 +585,12 @@ class TaxiControlTask(BaseFlightTask):
             elif math.fabs(((math.fabs(sim[prp.heading_deg] - self.calculate_initial_compass_bearing((lat,lon), point_intersection[1])) - 180 ) % 360) -180) <=90:
                 sim[prp.target_heading_deg] = self.calculate_initial_compass_bearing((lat,lon), point_intersection[1])
             else:
-                raise TypeError(f'No forhead intersection point between aircraft {(lat,lon)} heading = {sim[prp.target_heading_deg]} and the path: {point_intersection}')
+                if (math.fabs(((math.fabs(sim[prp.heading_deg] - self.calculate_initial_compass_bearing((lat,lon), point_intersection[0])) - 180 ) % 360) - 180) < 
+                    math.fabs(((math.fabs(sim[prp.heading_deg] - self.calculate_initial_compass_bearing((lat,lon), point_intersection[1])) - 180 ) % 360) -180)):
+                    sim[prp.target_heading_deg] = self.calculate_initial_compass_bearing((lat,lon), point_intersection[0])
+                else:
+                    sim[prp.target_heading_deg] = self.calculate_initial_compass_bearing((lat,lon), point_intersection[1])
+                #raise TypeError(f'No forhead intersection point between aircraft {(lat,lon)} heading = {sim[prp.target_heading_deg]} and the path: {point_intersection}')
 
         # inverse of the proportional absolute value of the minimal distance to the path
         dist_path_r = 1.0/(dist_path+1)

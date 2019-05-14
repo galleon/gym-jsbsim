@@ -501,7 +501,7 @@ class TaxiControlTask(BaseFlightTask):
         return math.fabs(self.dist_points(c_lat,c_lon,p_lat,p_lon) - c_radius)
     
     
-    def intersection_circle_line(x1, y1, x2, y2, cx, cy, r):
+    def intersection_circle_line(self, x1, y1, x2, y2, cx, cy, r):
         # equation of line x1,y1 => x2,y2: y = a*x + b
         a = (y2 - y1) / (x2 - x1)
         # find b: b = y - a*x

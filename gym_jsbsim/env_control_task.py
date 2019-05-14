@@ -571,10 +571,10 @@ class TaxiControlTask(BaseFlightTask):
         point_intersection = self.intersection_circle_line(self.PATH[id_path][1],self.PATH[id_path][0], self.PATH[id_path-1][1],self.PATH[id_path-1][0], lat, lon, action.radius_circle)
         
         # compute new target heading to give to the aircraft
-        if len(point_intersection==0):
+        if len(point_intersection)==0:
             # no intersection point, we target the closest path point
             sim[prp.target_heading_deg] = self.calculate_initial_compass_bearing((lat,lon), (self.PATH[id_path_closer_point][1],self.PATH[id_path_closer_point][0]))
-        elif len(point_intersection==1):
+        elif len(point_intersection)==1:
             # only one intersection point (ie: the tangente), we target that point
             sim[prp.target_heading_deg] = self.calculate_initial_compass_bearing((lat,lon), point_intersection[0])
         else:

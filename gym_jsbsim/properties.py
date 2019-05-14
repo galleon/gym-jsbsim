@@ -114,7 +114,7 @@ target_altitude_ft = BoundedProperty('tc/h-sl-ft', 'target altitude MSL [ft]', a
 target_heading_deg = BoundedProperty('tc/target-heading-deg', 'target heading [deg]', heading_deg.min, heading_deg.max)
 
 # following path
-radius_circle = BoundedProperty('radius-circle', 'radius of the circle aim to compute target heading for ground procedure [m]', 0.0, 100.0)
+radius_circle = BoundedProperty('radius-circle', 'radius of the circle aim to compute target heading for ground procedure [m]', 2.0, 100.0)
 shortest_ac_to_path = BoundedProperty('shortest-ac-to-path', 'shortest distance between aircraft and path [m]', 0.0, 100.0)
 closest_path_point_lat = BoundedProperty('closest_path_point_lat', 'geocentric latitude [deg]', -90, 90)
 closest_path_point_lon = BoundedProperty('closest_path_point_lon', 'geodesic longitude [deg]', -180, 180)

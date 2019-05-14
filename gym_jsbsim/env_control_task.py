@@ -551,11 +551,11 @@ class TaxiControlTask(BaseFlightTask):
                 id_path_closer_point = i
 
             # For point that are forehead (to compute the good intersection of the circle)
-            if math.fabs(((math.fabs(sim[prp.heading_deg] - self.calculate_initial_compass_bearing((lat,lon), (self.PATH[i][1],self.PATH[i][0]))) - 180 ) % 360) - 180) <=90:
-                dist = self.shorter_dist_point_circle(self.PATH[i][1], self.PATH[i][0], lat, lon, action.radius_circle)
-                if dist > 0 and dist < shorter_dist:
-                    shorter_dist = dist
-                    id_path = i
+            #if math.fabs(((math.fabs(sim[prp.heading_deg] - self.calculate_initial_compass_bearing((lat,lon), (self.PATH[i][1],self.PATH[i][0]))) - 180 ) % 360) - 180) <=90:
+            dist = self.shorter_dist_point_circle(self.PATH[i][1], self.PATH[i][0], lat, lon, action.radius_circle)
+            if dist > 0 and dist < shorter_dist and i >= id_path_closer_point:
+                shorter_dist = dist
+                id_path = i
             
         # Compute the shortest dist to the path
         if id_path_closer_point == 0:

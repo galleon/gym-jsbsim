@@ -502,6 +502,7 @@ class TaxiControlTask(BaseFlightTask):
     
     
     def intersection_circle_line(self, x1, y1, x2, y2, cx, cy, r):
+        r = r / 100000.0
         # equation of line x1,y1 => x2,y2: y = a*x + b
         a = (y2 - y1) / (x2 - x1)
         # find b: b = y - a*x

@@ -223,8 +223,8 @@ class ChangeHeadingControlTask(BaseFlightTask):
         super().__init__(debug)
 
     def get_initial_conditions(self) -> Dict[Property, float]:
-        self.INITIAL_ALTITUDE_FT = random.uniform(10000, 20000)
-        self.INITIAL_HEADING_DEG = random.uniform(0, 360)
+        self.INITIAL_ALTITUDE_FT = 10000
+        self.INITIAL_HEADING_DEG = 270
         self.TARGET_ALTITUDE_FT = self.INITIAL_ALTITUDE_FT
         self.TARGET_HEADING_DEG = self.INITIAL_HEADING_DEG
         self.INITIAL_VELOCITY_U = self.aircraft.get_cruise_speed_fps()
@@ -259,6 +259,8 @@ class ChangeHeadingControlTask(BaseFlightTask):
                               prp.target_altitude_ft: self.TARGET_ALTITUDE_FT,
                               prp.target_heading_deg: self.TARGET_HEADING_DEG,
                               prp.gear_all_cmd: 0,
+                              prp.gear: 0,
+                              prp.ic_h_agl_ft: 10.0,
                               self.nb_episodes: 0
                              }
         #print(f'Time to change INIT: {self.TIME_TO_CHANGE_HEADING_ALT} (Altitude: {self.TARGET_ALTITUDE_FT} -> {self.NEW_ALTITUDE_FT}, Heading: {self.TARGET_HEADING_DEG} -> {self.NEW_HEADING_DEG})')
@@ -274,13 +276,13 @@ class ChangeHeadingControlTask(BaseFlightTask):
         # Change target ALT and HEADING
         #print(f'nombre episode: {sim[self.nb_episodes]}, nombre step left: {sim[self.steps_left]}')
 
-        '''
+        
         if (sim[self.steps_left] <= self.TIME_TO_CHANGE_HEADING_ALT and not self.ALREADY_CHANGE):
             print(f'Time to change: {self.TIME_TO_CHANGE_HEADING_ALT} (Altitude: {self.TARGET_ALTITUDE_FT} -> {self.NEW_ALTITUDE_FT}, Heading: {self.TARGET_HEADING_DEG} -> {self.NEW_HEADING_DEG})')
             sim[prp.target_altitude_ft] = self.NEW_ALTITUDE_FT
             sim[prp.target_heading_deg] = self.NEW_HEADING_DEG
             self.ALREADY_CHANGE = True
-        '''
+        
         
         # Change alt and heading every 2000 steps
         if (sim[self.steps_left]%1000==1):

@@ -199,7 +199,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
     DEFAULT_EPISODE_TIME_S = 2000.
     ALTITUDE_SCALING_FT = 150
     MAX_ALTITUDE_DEVIATION_FT = 800  # terminate if altitude error exceeds this
-    THRESHOLD_CONTROL = 0.01
+    THRESHOLD_CONTROL = 0.1
     PENALTY_CONTROL = -0.2
 
     def __init__(self, step_frequency_hz: float, aircraft: Aircraft,

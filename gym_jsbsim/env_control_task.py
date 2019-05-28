@@ -196,7 +196,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
     MIXTURE_CMD = float(config["HEADING_CONTROL_TASK_CONDITION"]["mixture_cmd"])
     INITIAL_LAT = float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_latitude_geod_deg"])
     INITIAL_LONG = float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_longitude_geoc_deg"])
-    DEFAULT_EPISODE_TIME_S = 3800.
+    DEFAULT_EPISODE_TIME_S = 2000.
     ALTITUDE_SCALING_FT = 150
     MAX_ALTITUDE_DEVIATION_FT = 800  # terminate if altitude error exceeds this
     THRESHOLD_CONTROL = 0.01
@@ -224,7 +224,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
 
     def get_initial_conditions(self) -> Dict[Property, float]:
         self.INITIAL_ALTITUDE_FT = random.uniform(10000, 20000)
-        self.INITIAL_HEADING_DEG = 90#random.uniform(prp.heading_deg.min, prp.heading_deg.max)
+        self.INITIAL_HEADING_DEG = random.uniform(-135, 135)
         self.TARGET_ALTITUDE_FT = self.INITIAL_ALTITUDE_FT
         self.TARGET_HEADING_DEG = self.INITIAL_HEADING_DEG
         self.INITIAL_VELOCITY_U = self.aircraft.get_cruise_speed_fps()
@@ -283,7 +283,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
         '''
         
         # Change alt and heading every 2000 steps
-        if (sim[self.steps_left]%2000==1):
+        if (sim[self.steps_left]%1000==1):
             
             new_alt = sim[prp.target_altitude_ft]# + random.uniform(0, 0)
             new_heading = sim[prp.target_heading_deg] + random.uniform(-135, 135)
@@ -606,6 +606,7 @@ class TaxiControlTask(BaseFlightTask):
         dist_path_r = 1.0/(dist_path+1)
 
         # reward if velocity between 5 and 20 knots
+        # TODO: SET AUTOPILOT TO FIX THE VELOCITY
         if last_state.velocities_vc_fps < 33.76/4.0 or last_state.velocities_vc_fps > 33.76:
             vel_r = 0
         else:

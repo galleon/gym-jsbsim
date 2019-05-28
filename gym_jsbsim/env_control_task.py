@@ -233,7 +233,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
         self.LAST_CONTROL_STATE = [0,0,0,0,0]
 
         self.TIME_TO_CHANGE_HEADING_ALT = random.uniform((self.DEFAULT_EPISODE_TIME_S*5.)*0.33, (self.DEFAULT_EPISODE_TIME_S*5.)*0.66)
-        self.NEW_ALTITUDE_FT = self.TARGET_ALTITUDE_FT + random.uniform(-4000, 4000)
+        self.NEW_ALTITUDE_FT = self.TARGET_ALTITUDE_FT
         new_heading = self.TARGET_HEADING_DEG + random.uniform(-90, 90)
         if (new_heading <= 0):
             new_heading = 360 - new_heading
@@ -283,7 +283,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
             sim[prp.target_heading_deg] = self.NEW_HEADING_DEG
             self.ALREADY_CHANGE = True
         
-        
+        '''
         # Change alt and heading every 2000 steps
         if (sim[self.steps_left]%1000==1):
             
@@ -298,7 +298,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
             sim[prp.target_altitude_ft] = new_alt
             sim[prp.target_heading_deg] = new_heading
         
-        
+        '''
         terminal_step = sim[self.steps_left] <= 0
         sim[self.nb_episodes] += 1
         #terminal_step = sim[prp.dist_travel_m]  >= 100000

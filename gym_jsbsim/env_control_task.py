@@ -308,15 +308,14 @@ class ChangeHeadingControlTask(BaseFlightTask):
         Reward with delta and altitude heading directly in the input vector state.
         '''
         # inverse of the proportional absolute value of the minimal angle between the initial and current heading ... 
-        heading_r = 1.0/math.sqrt((0.1*math.fabs(last_state.position_delta_heading_to_target_deg)+1))
-        # inverse of the proportional absolute value between the initial and current ground speed ... 
-        #vel_i = math.sqrt(math.pow(self.INITIAL_VELOCITY_U,2) + math.pow(self.INITIAL_VELOCITY_V,2)) 
-        #vel_c = math.sqrt(math.pow(last_state.velocities_u_fps,2) + math.pow(last_state.velocities_v_fps,2)) 
-        #vel_r = 1.0/math.sqrt((0.1*math.fabs(vel_i - vel_c)+1))
+        heading_r = 1.0/math.sqrt(math.fabs(last_state.position_delta_heading_to_target_deg)+1)
+        
         # inverse of the proportional absolute value between the initial and current altitude ... 
-        alt_r = 1.0/math.sqrt((1.*math.fabs(last_state.position_delta_altitude_to_target_ft)+1))
-        #print(" -v- ", self.INITIAL_VELOCITY_U, last_state.velocities_u_fps, vel_r, " -h- ", self.INITIAL_HEADING_DEG, last_state.attitude_psi_deg, heading_r, " -a- ", self.INITIAL_ALTITUDE_FT, last_state.position_h_sl_ft, alt_r, " -r- ", (heading_r + alt_r + vel_r)/3.0)
+        alt_r = 1.0/math.sqrt(math.fabs(last_state.position_delta_altitude_to_target_ft)+1)
 
+        # inverse of the normalised value of q, r, p acceleartion
+        angle_speed_r = 1.0/math.sqrt((math.fabs(last_state.accelerations_pdot_rad_sec2) + math.fabs(last_state.accelerations_qdot_rad_sec2) + math.fabs(last_state.accelerations_rdot_rad_sec2) + math.fabs(last_state.velocities_v_down_fps)) / 4.0 + 1)
+        
         #check to strong manoeuvres
         sum_penalty_control_state = 0
 
@@ -345,11 +344,11 @@ class ChangeHeadingControlTask(BaseFlightTask):
         self.LAST_CONTROL_STATE = [sim[prp.aileron_left], sim[prp.aileron_right], sim[prp.elevator], sim[prp.rudder], sim[prp.throttle]]
 
         # Get negative reward proportional to normalised speed angles and vertical speed
-        normalised_angle_speed = min((math.fabs(last_state.accelerations_pdot_rad_sec2) + math.fabs(last_state.accelerations_qdot_rad_sec2) + math.fabs(last_state.accelerations_rdot_rad_sec2)) / (3*(4./45.)*math.pi), 1.0)
+        normalised_angle_speed = 1.0/math.sqrt((0.1*math.fabs(last_state.position_delta_heading_to_target_deg)+1))   min((math.fabs(last_state.accelerations_pdot_rad_sec2) + math.fabs(last_state.accelerations_qdot_rad_sec2) + math.fabs(last_state.accelerations_rdot_rad_sec2)) / (3*(4./45.)*math.pi), 1.0)
         normalised_vertical_speed = min(math.fabs(last_state.velocities_v_down_fps) / 3.0, 1.0)
         stabilisation_reward = - math.exp(- sim[self.nb_episodes] / 100) * (normalised_angle_speed + normalised_vertical_speed)
 
-        return (heading_r + alt_r + stabilisation_reward) / 3.0
+        return (heading_r + alt_r + angle_speed_r) / 3.0
     
 
     def _altitude_out_of_bounds(self, sim: Simulation, state: NamedTuple) -> bool:

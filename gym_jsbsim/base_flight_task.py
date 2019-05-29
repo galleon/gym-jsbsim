@@ -74,7 +74,7 @@ class BaseFlightTask(ABC):
         except KeyError:
             pass  # must be single-control aircraft     
 
-        print(f'past heading = {sim[prp.heading_deg]}, target = {sim[prp.target_heading_deg]}, past delta heading = {sim[prp.delta_heading]}')
+        #print(f'past heading = {sim[prp.heading_deg]}, target = {sim[prp.target_heading_deg]}, past delta heading = {sim[prp.delta_heading]}')
 
         # run simulation
         for _ in range(sim_steps):
@@ -97,7 +97,7 @@ class BaseFlightTask(ABC):
         self.last_state = state
         info = {'reward': reward}
 
-        print(f'new heading = {sim[prp.heading_deg]}, target = {sim[prp.target_heading_deg]}, new delta heading = {state.position_delta_heading_to_target_deg} (from sim: {sim[prp.delta_heading]}')
+        #print(f'new heading = {sim[prp.heading_deg]}, target = {sim[prp.target_heading_deg]}, new delta heading = {state.position_delta_heading_to_target_deg} (from sim: {sim[prp.delta_heading]}')
         return state, reward, done, info
 
     def observe_first_state(self, sim: Simulation) -> np.ndarray:

@@ -343,10 +343,6 @@ class ChangeHeadingControlTask(BaseFlightTask):
 
         self.LAST_CONTROL_STATE = [sim[prp.aileron_left], sim[prp.aileron_right], sim[prp.elevator], sim[prp.rudder], sim[prp.throttle]]
 
-        # Get negative reward proportional to normalised speed angles and vertical speed
-        normalised_angle_speed = 1.0/math.sqrt((0.1*math.fabs(last_state.position_delta_heading_to_target_deg)+1))   min((math.fabs(last_state.accelerations_pdot_rad_sec2) + math.fabs(last_state.accelerations_qdot_rad_sec2) + math.fabs(last_state.accelerations_rdot_rad_sec2)) / (3*(4./45.)*math.pi), 1.0)
-        normalised_vertical_speed = min(math.fabs(last_state.velocities_v_down_fps) / 3.0, 1.0)
-        stabilisation_reward = - math.exp(- sim[self.nb_episodes] / 100) * (normalised_angle_speed + normalised_vertical_speed)
 
         return (heading_r + alt_r + angle_speed_r) / 3.0
     

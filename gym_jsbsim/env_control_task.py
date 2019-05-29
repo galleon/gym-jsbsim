@@ -176,7 +176,6 @@ class ChangeHeadingControlTask(BaseFlightTask):
     ### Collect Config Value
     config = configparser.ConfigParser()
     print(config.read('/home/ubuntu/gym-jsbsim/gym_jsbsim/config-state-action.ini'))
-    #print(config.sections())
 
     ### collect state var from config file
     state_list = config.get('SA_DEFAULT', 'states').split('\n')
@@ -192,13 +191,13 @@ class ChangeHeadingControlTask(BaseFlightTask):
         action_var = action_var + (prp.prp_dict[a],)
 
     ### Set config var
-    THROTTLE_CMD = float(config["HEADING_CONTROL_TASK_CONDITION"]["throttle_cmd"])
-    MIXTURE_CMD = float(config["HEADING_CONTROL_TASK_CONDITION"]["mixture_cmd"])
+    THROTTLE_CMD = 0.8 #float(config["HEADING_CONTROL_TASK_CONDITION"]["throttle_cmd"])
+    MIXTURE_CMD = 1.0 #float(config["HEADING_CONTROL_TASK_CONDITION"]["mixture_cmd"])
     INITIAL_LAT = float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_latitude_geod_deg"])
     INITIAL_LONG = float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_longitude_geoc_deg"])
-    DEFAULT_EPISODE_TIME_S = 2000.
+    DEFAULT_EPISODE_TIME_S = 1000.
     ALTITUDE_SCALING_FT = 150
-    MAX_ALTITUDE_DEVIATION_FT = 800  # terminate if altitude error exceeds this
+    MAX_ALTITUDE_DEVIATION_FT = 600  # terminate if altitude error exceeds this
     THRESHOLD_CONTROL = 0.1
     PENALTY_CONTROL = -0.2
 
@@ -260,7 +259,6 @@ class ChangeHeadingControlTask(BaseFlightTask):
                               prp.target_heading_deg: self.TARGET_HEADING_DEG,
                               prp.gear_all_cmd: 0,
                               prp.gear: 0,
-                              prp.ic_h_agl_ft: 10.0,
                               self.nb_episodes: 0
                              }
         #print(f'Time to change INIT: {self.TIME_TO_CHANGE_HEADING_ALT} (Altitude: {self.TARGET_ALTITUDE_FT} -> {self.NEW_ALTITUDE_FT}, Heading: {self.TARGET_HEADING_DEG} -> {self.NEW_HEADING_DEG})')
@@ -302,7 +300,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
         terminal_step = sim[self.steps_left] <= 0
         sim[self.nb_episodes] += 1
         #terminal_step = sim[prp.dist_travel_m]  >= 100000
-        return terminal_step or sim[prp.delta_altitude] > 500
+        return terminal_step or math.fabs(sim[prp.delta_altitude]) >= self.MAX_ALTITUDE_DEVIATION_FT
     
     
     def _get_reward(self, sim: Simulation, last_state: NamedTuple, action: NamedTuple, new_state: NamedTuple) -> float:

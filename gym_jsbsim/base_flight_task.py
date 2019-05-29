@@ -69,12 +69,12 @@ class BaseFlightTask(ABC):
         
         # set throttle1 in case of more than 1 engine (ie: A320)
         try:
-            sim[prp.all_engine_running] = -1
+            #sim[prp.all_engine_running] = -1
             sim[prp.throttle_1_cmd] = sim[prp.throttle_cmd]
         except KeyError:
             pass  # must be single-control aircraft     
 
-        #print(f'past heading = {sim[prp.heading_deg]}, target = {sim[prp.target_heading_deg]}, past delta heading = {sim[prp.delta_heading]}')
+        print(f'past heading = {sim[prp.heading_deg]}, target = {sim[prp.target_heading_deg]}, past delta heading = {sim[prp.delta_heading]}')
 
         # run simulation
         for _ in range(sim_steps):
@@ -86,7 +86,7 @@ class BaseFlightTask(ABC):
         # update delta heading and altitude according to the new heading and altitude
         sim[prp.delta_heading] = reduce_reflex_angle_deg(sim[prp.heading_deg] - sim[prp.target_heading_deg]) 
         sim[prp.delta_altitude] = sim[prp.altitude_sl_ft] - sim[prp.target_altitude_ft]
-        #print(f'new heading = {sim[prp.heading_deg]}, target = {sim[prp.target_heading_deg]}, new delta heading = {state.position_delta_heading_to_target_deg} (from sim: {sim[prp.delta_heading]}')
+        print(f'new heading = {sim[prp.heading_deg]}, target = {sim[prp.target_heading_deg]}, new delta heading = {state.position_delta_heading_to_target_deg} (from sim: {sim[prp.delta_heading]}')
 
         state = self.State(*(sim[prop] for prop in self.state_variables))
         action = self.Action(*(sim[prop] for prop in self.action_variables))

@@ -86,7 +86,7 @@ class BaseFlightTask(ABC):
         # update delta heading and altitude according to the new heading and altitude
         sim[prp.delta_heading] = reduce_reflex_angle_deg(sim[prp.heading_deg] - sim[prp.target_heading_deg]) 
         sim[prp.delta_altitude] = sim[prp.altitude_sl_ft] - sim[prp.target_altitude_ft]
-        print(f'new heading = {sim[prp.heading_deg]}, target = {sim[prp.target_heading_deg]}, new delta heading = {state.position_delta_heading_to_target_deg} (from sim: {sim[prp.delta_heading]}')
+        
 
         state = self.State(*(sim[prop] for prop in self.state_variables))
         action = self.Action(*(sim[prop] for prop in self.action_variables))
@@ -97,7 +97,7 @@ class BaseFlightTask(ABC):
         self.last_state = state
         info = {'reward': reward}
 
-        
+        print(f'new heading = {sim[prp.heading_deg]}, target = {sim[prp.target_heading_deg]}, new delta heading = {state.position_delta_heading_to_target_deg} (from sim: {sim[prp.delta_heading]}')
         return state, reward, done, info
 
     def observe_first_state(self, sim: Simulation) -> np.ndarray:

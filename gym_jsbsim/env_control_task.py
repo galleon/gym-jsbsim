@@ -344,7 +344,12 @@ class ChangeHeadingControlTask(BaseFlightTask):
 
         self.LAST_CONTROL_STATE = [sim[prp.aileron_left], sim[prp.aileron_right], sim[prp.elevator], sim[prp.rudder], sim[prp.throttle]]
 
-        return (heading_r + alt_r + reward_nb_episode) / 3.0
+        # Get negative reward proportional to normalised speed angles and vertical speed
+        normalised_angle_speed = min((math.fabs(last_state.accelerations/pdot-rad_sec2) + math.fabs(last_state.accelerations/qdot-rad_sec2) + math.fabs(last_state.accelerations/rdot-rad_sec2)) / (3*(4./45.)*math.pi), 1.0)
+        normalised_vertical_speed = min(math.fabs(last_state.velocities_v_down_fps) / 3.0, 1.0)
+        stabilisation_reward = - math.exp(- sim[self.nb_episodes] / 100) * (normalised_angle_speed + normalised_vertical_speed)
+
+        return (heading_r + alt_r + stabilisation_reward) / 3.0
     
 
     def _altitude_out_of_bounds(self, sim: Simulation, state: NamedTuple) -> bool:

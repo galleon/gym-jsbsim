@@ -195,7 +195,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
     MIXTURE_CMD = 1.0 #float(config["HEADING_CONTROL_TASK_CONDITION"]["mixture_cmd"])
     INITIAL_LAT = float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_latitude_geod_deg"])
     INITIAL_LONG = float(config["HEADING_CONTROL_TASK_CONDITION"]["initial_longitude_geoc_deg"])
-    DEFAULT_EPISODE_TIME_S = 1000.
+    DEFAULT_EPISODE_TIME_S = 2000.
     ALTITUDE_SCALING_FT = 150
     MAX_ALTITUDE_DEVIATION_FT = 600  # terminate if altitude error exceeds this
     THRESHOLD_CONTROL = 0.1
@@ -274,13 +274,13 @@ class ChangeHeadingControlTask(BaseFlightTask):
         # Change target ALT and HEADING
         #print(f'nombre episode: {sim[self.nb_episodes]}, nombre step left: {sim[self.steps_left]}')
 
-        
+        '''
         if (sim[self.steps_left] <= self.TIME_TO_CHANGE_HEADING_ALT and not self.ALREADY_CHANGE):
             print(f'Time to change: {self.TIME_TO_CHANGE_HEADING_ALT} (Altitude: {self.TARGET_ALTITUDE_FT} -> {self.NEW_ALTITUDE_FT}, Heading: {self.TARGET_HEADING_DEG} -> {self.NEW_HEADING_DEG})')
             sim[prp.target_altitude_ft] = self.NEW_ALTITUDE_FT
             sim[prp.target_heading_deg] = self.NEW_HEADING_DEG
             self.ALREADY_CHANGE = True
-        
+    
         '''
         # Change alt and heading every 2000 steps
         if (sim[self.steps_left]%1000==1):
@@ -292,11 +292,10 @@ class ChangeHeadingControlTask(BaseFlightTask):
             if (new_heading >= 360):
                 new_heading = new_heading - 360
             
-            #print(f'Time to change: {sim[self.steps_left]} (Altitude: {sim[prp.target_altitude_ft]} -> {new_alt}, Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
+            print(f'Time to change: {sim[self.steps_left]} (Altitude: {sim[prp.target_altitude_ft]} -> {new_alt}, Heading: {sim[prp.target_heading_deg]} -> {new_heading})')
             sim[prp.target_altitude_ft] = new_alt
             sim[prp.target_heading_deg] = new_heading
         
-        '''
         terminal_step = sim[self.steps_left] <= 0
         sim[self.nb_episodes] += 1
         #terminal_step = sim[prp.dist_travel_m]  >= 100000

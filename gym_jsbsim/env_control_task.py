@@ -314,7 +314,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
         alt_r = 1.0/math.sqrt(math.fabs(last_state.position_delta_altitude_to_target_ft)+1)
 
         # inverse of the normalised value of q, r, p acceleartion
-        angle_speed_r = 1.0/math.sqrt((math.fabs(last_state.accelerations_pdot_rad_sec2) + math.fabs(last_state.accelerations_qdot_rad_sec2) + math.fabs(last_state.accelerations_rdot_rad_sec2) + math.fabs(last_state.velocities_v_down_fps)) / 4.0 + 1)
+        #angle_speed_r = 1.0/math.sqrt((math.fabs(last_state.accelerations_pdot_rad_sec2) + math.fabs(last_state.accelerations_qdot_rad_sec2) + math.fabs(last_state.accelerations_rdot_rad_sec2) + math.fabs(last_state.velocities_v_down_fps)) / 4.0 + 1)
         
         #check to strong manoeuvres
         sum_penalty_control_state = 0
@@ -344,7 +344,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
         self.LAST_CONTROL_STATE = [sim[prp.aileron_left], sim[prp.aileron_right], sim[prp.elevator], sim[prp.rudder], sim[prp.throttle]]
 
 
-        return (heading_r + alt_r + angle_speed_r) / 3.0
+        return (heading_r + alt_r '''+ angle_speed_r''') / 3.0
     
 
     def _altitude_out_of_bounds(self, sim: Simulation, state: NamedTuple) -> bool:

@@ -8,7 +8,7 @@
 
 
 
-ROOT_DIR = "H:/git/Git_projects/jsbsim-code" # the root directory where JSBSim starts looking for its system directories.
+ROOT_DIR = "H:/jsbsim-code" # the root directory where JSBSim starts looking for its system directories.
 AircraftPath = "aircraft" # the relative path to the aircraft config file directories.
 EnginePath = "engine"    # the path relative to the engine config file directories.
 SystemPath = "systems"   # the path relative to the systems config file directories.

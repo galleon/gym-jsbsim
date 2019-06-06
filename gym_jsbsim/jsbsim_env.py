@@ -42,7 +42,7 @@ class JSBSimEnv(gym.Env):
 
 
 
-        :param task_type: the Task subclass for the task agent is to perform
+        :param task the Task for the task agent is to perform
 
         :param aircraft_name: the name of the JSBSim aircraft to be used.
 
@@ -86,7 +86,7 @@ class JSBSimEnv(gym.Env):
             info: auxiliary information
 
         """
-        if action != None:
+        if action is not None:
             assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
 
         self.state = self.make_step(action)
@@ -110,7 +110,7 @@ class JSBSimEnv(gym.Env):
 
         """
         #take actions
-        if action != None:
+        if action is not None:
             self.sim.set_property_values(self.task.get_action_var(),action)
         
         # run simulation

@@ -4,7 +4,58 @@ import math
 from collections import namedtuple
 
 
-Property = namedtuple('Property', ['name','name_jsbsim', 'description', 'min', 'max'],defaults = (None,)*5)
+class Property(namedtuple('Property', ['name','name_jsbsim', 'description', 'min', 'max'],defaults = (None,)*5)):
+
+    #define operations for custom properties expressions
+    def __sub__(self, other):
+        def sub(sim):
+            return sim.get_property_value(self) - sim.get_property_value(other)
+
+        return sub
+
+    def __rsub__(self, other):
+        def rsub(sim):
+            return other(sim) - sim.get_property_value(self)
+
+        return rsub
+
+    def __add__(self, other):
+        def add(sim):
+            return sim.get_property_value(self) + sim.get_property_value(other)
+
+        return add
+
+    def __radd__(self, other):
+        def radd(sim):
+            return sim.get_property_value(self) + other(sim)
+
+        return radd
+
+    def __truediv__(self, other):
+        def div(sim):
+            return sim.get_property_value(self)/sim.get_property_value(other)
+
+        return div
+
+    def __rtruediv__(self, other):
+        def rdiv(sim):
+            return other(sim)/sim.get_property_value(self)
+
+        return rdiv
+
+    def __mul__(self, other):
+        def mul(sim):
+            return sim.get_property_value(self)*sim.get_property_value(other)
+
+        return mul
+
+    def __rmul__(self,other):
+        def rmul(sim):
+            return other(sim)*sim.get_property_value(other)
+
+        return rmul
+
+
 
 # position and attitude
 
@@ -226,3 +277,13 @@ closest_path_point_lon = Property('closest_path_point_lon','closest_path_point_l
 intersectio_point_lat = Property('intersectio_point_lat','intersectio_point_lat', 'geocentric latitude [deg]', -90, 90)
 
 intersectio_point_lon = Property('intersectio_point_lon','intersectio_point_lon', 'geodesic longitude [deg]', -180, 180)
+
+
+
+# define expressions of properties not implemented in JSBSim
+
+custom_properties = { delta_altitude : altitude_sl_ft - target_altitude_ft,
+
+                    delta_heading : heading_deg - target_heading_deg
+}
+

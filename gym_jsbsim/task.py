@@ -32,6 +32,8 @@ class Task(object):
         self.init_conditions = init_conditions
         if output == None:
             self.output = observation_var
+        else:
+            self.ouput = output
 
         
     def get_observation_var(self):
@@ -67,8 +69,6 @@ class Task(object):
 
          return gym.spaces.Box(low=action_lows, high=action_highs, dtype='float')
      
-    
-    def get_props_output(self):
-        return self.output
+
 
     

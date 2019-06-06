@@ -3,9 +3,7 @@
 import jsbsim
 import gym_jsbsim.simulation_parameters as param
 from collections import namedtuple
-from gym_jsbsim.properties import gear
-
-
+from gym_jsbsim.properties import custom_properties
 
 class Simulation(object):
     """
@@ -29,7 +27,9 @@ class Simulation(object):
 
             Defaults to None, causing a default set of initial props to be used.
           
-        :param num_engine: number of the engine to be run. All engines if -1.  
+        :param num_engine: number of the engine to be run.
+
+            Defaults to -1 causing all engines to be run.
             
         """
         
@@ -41,21 +41,19 @@ class Simulation(object):
         self.jsbsim_exec.set_aircraft_path(param.AircraftPath)
         self.jsbsim_exec.set_engine_path(param.EnginePath)
         self.jsbsim_exec.set_systems_path(param.SystemPath)
-        
-        self.jsbsim_exec.load_model(self.aircraft_name)
-        self.jsbsim_exec.load_ic(param.IC_FILE,param.useStoredPath)
-        
+
         dt = 1/param.jsbsim_freq
         self.jsbsim_exec.set_dt(dt)
-        
+
         self.initialise(init_conditions,num_engine)
+
         
 
         
     def initialise(self, init_conditions = None, num_engine = -1):
         """
 
-        Loads an aircraft and initialises simulation conditions.
+         Initialises simulation conditions.
 
 
         JSBSim creates an InitialConditions object internally when given an
@@ -69,18 +67,22 @@ class Simulation(object):
         :param num_engine: number of the engine to be run. All engines if -1.
         
         """
-        
+
+        self.jsbsim_exec.load_model(self.aircraft_name)
+        self.jsbsim_exec.load_ic(param.IC_FILE, param.useStoredPath)
+
         self.set_initial_conditions(init_conditions)
-        
-        
-        #self.jsbsim_exec.propulsion_init_running(num_engine)
+
         success = self.jsbsim_exec.run_ic()
+        self.update_custom_properties()
 
         if not success:
             raise RuntimeError('JSBSim failed to init simulation conditions.')
-            
-        self.jsbsim_exec.propulsion_init_running(-1)
-            
+
+        self.jsbsim_exec.propulsion_init_running(num_engine)
+
+
+
         
         
     def set_initial_conditions(self, init_conditions = None):
@@ -89,13 +91,14 @@ class Simulation(object):
         
         :param init_conditions: dict mapping properties to their initial values
         """
-        if init_conditions != None:
+        if init_conditions is not None:
             for prop,value in init_conditions.items():
                 self.jsbsim_exec.set_property_value(prop.name_jsbsim,value)
-        self.jsbsim_exec.set_property_value(gear.name_jsbsim,1)
-        
-        
-    def run(self) -> bool:
+
+
+
+
+    def run(self):
 
         """
 
@@ -115,9 +118,10 @@ class Simulation(object):
 
         """
         success = self.jsbsim_exec.run()
-        
+        self.update_custom_properties()
         if not success:
             raise RuntimeError('JSBSim failed to init simulation conditions.')
+
 
     def get_sim_time(self):
         """ Gets the simulation time from JSBSim, a float. """
@@ -130,8 +134,8 @@ class Simulation(object):
         """ Closes the simulation and any plots. """
 
         if self.jsbsim_exec:
+            self.jsbsim_exec = None
 
-            self.jsbsim_exec = None 
             
             
     def get_property_values(self,props):
@@ -143,7 +147,7 @@ class Simulation(object):
         : return: NamedTuple with properties name and their values
         """
         Props = namedtuple("NamedTuple",[prop.name for prop in props])
-        return Props(*[self.jsbsim_exec.get_property_value(prop.name_jsbsim) for prop in props])
+        return Props(*[self.get_property_value(prop) for prop in props])
     
     
     def set_property_values(self,props,values):
@@ -158,6 +162,18 @@ class Simulation(object):
         if not (len(props) == len(values)):
             raise ValueError('mismatch between properties and values size')
         for i in range(len(props)):
-            self.jsbsim_exec.set_property_value(props[i].name_jsbsim,values[i])
-        
-        
+            self.set_property_value(props[i],values[i])
+
+
+    def get_property_value(self,prop):
+        return self.jsbsim_exec.get_property_value(prop.name_jsbsim)
+
+    def set_property_value(self,prop,value):
+        return self.jsbsim_exec.set_property_value(prop.name_jsbsim,value)
+
+    def update_custom_property(self,prop):
+        self.set_property_value(prop,custom_properties[prop](self))
+
+    def update_custom_properties(self):
+        for prop in custom_properties:
+            self.update_custom_property(prop)

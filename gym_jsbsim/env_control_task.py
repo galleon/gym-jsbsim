@@ -10,7 +10,6 @@ from typing import Dict, Tuple, Sequence, NamedTuple
 import json
 import configparser
 from .utils import reduce_reflex_angle_deg
-import os
 
 
 class HeadingControlTask(BaseFlightTask):
@@ -20,7 +19,7 @@ class HeadingControlTask(BaseFlightTask):
     """
     ### Collect Config Value
     config = configparser.ConfigParser()
-    config.read(os.path.abspath(os.environ['JSBSIM_ROOT_DIR'])+'gym_jsbsim/config-state-action.ini')
+    print(config.read(os.path.abspath(os.environ['GYM_JSBSIM'])+'/gym_jsbsim/config-state-action.ini'))
     #print(config.sections())
 
     ### collect state var from config file
@@ -176,7 +175,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
 
     ### Collect Config Value
     config = configparser.ConfigParser()
-    config.read(os.path.abspath(os.environ['JSBSIM_ROOT_DIR'])+'gym_jsbsim/config-state-action.ini')
+    print(config.read(os.path.abspath(os.environ['GYM_JSBSIM'])+'/gym_jsbsim/config-state-action.ini'))
 
     ### collect state var from config file
     state_list = config.get('SA_DEFAULT', 'states').split('\n')
@@ -366,7 +365,7 @@ class TaxiControlTask(BaseFlightTask):
     """
     ### Collect Config Value
     config = configparser.ConfigParser()
-    config.read(os.path.abspath(os.environ['JSBSIM_ROOT_DIR'])+'gym_jsbsim/config-state-action.ini')
+    print(config.read(os.path.abspath(os.environ['GYM_JSBSIM'])+'/gym_jsbsim/config-state-action.ini'))
     #print(config.sections())
 
     ### collect state var from config file
@@ -692,7 +691,7 @@ class TakeoffControlTask(BaseFlightTask):
 
     ### Collect Config Value
     config = configparser.ConfigParser()
-    config.read(os.path.abspath(os.environ['JSBSIM_ROOT_DIR'])+'gym_jsbsim/config-state-action.ini')
+    print(config.read(os.path.abspath(os.environ['GYM_JSBSIM'])+'/gym_jsbsim/config-state-action.ini'))
     #print(config.sections())
 
     ### collect state var from config file

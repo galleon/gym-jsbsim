@@ -4,7 +4,7 @@ import math
 from collections import namedtuple
 
 
-class Property(namedtuple('Property', ['name','name_jsbsim', 'description', 'min', 'max'],defaults = (None,)*5)):
+class Property(namedtuple('Property', ['name','name_jsbsim', 'description', 'min', 'max'],defaults = (None,None,None,float('-inf'),float('inf')))):
 
     #define operations for custom properties expressions
     def __sub__(self, other):

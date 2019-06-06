@@ -19,7 +19,7 @@ class HeadingControlTask(BaseFlightTask):
     """
     ### Collect Config Value
     config = configparser.ConfigParser()
-    print(config.read('/home/ubuntu/gym-jsbsim/gym_jsbsim/config-state-action.ini'))
+    print(config.read('./config-state-action.ini'))
     #print(config.sections())
 
     ### collect state var from config file
@@ -175,7 +175,7 @@ class ChangeHeadingControlTask(BaseFlightTask):
 
     ### Collect Config Value
     config = configparser.ConfigParser()
-    print(config.read('/home/ubuntu/gym-jsbsim/gym_jsbsim/config-state-action.ini'))
+    print(config.read('./config-state-action.ini'))
 
     ### collect state var from config file
     state_list = config.get('SA_DEFAULT', 'states').split('\n')
@@ -365,7 +365,7 @@ class TaxiControlTask(BaseFlightTask):
     """
     ### Collect Config Value
     config = configparser.ConfigParser()
-    print(config.read('/home/ubuntu/gym-jsbsim/gym_jsbsim/config-state-action.ini'))
+    print(config.read('./config-state-action.ini'))
     #print(config.sections())
 
     ### collect state var from config file
@@ -691,7 +691,7 @@ class TakeoffControlTask(BaseFlightTask):
 
     ### Collect Config Value
     config = configparser.ConfigParser()
-    print(config.read('/home/ubuntu/gym-jsbsim/gym_jsbsim/config-state-action.ini'))
+    print(config.read('./config-state-action.ini'))
     #print(config.sections())
 
     ### collect state var from config file

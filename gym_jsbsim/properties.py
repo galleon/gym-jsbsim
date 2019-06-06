@@ -4,7 +4,7 @@ import math
 from collections import namedtuple
 
 
-class Property(namedtuple('Property', ['name','name_jsbsim', 'description', 'min', 'max'],defaults = (None,None,None,float('-inf'),float('inf')))):
+class Property(namedtuple('Property', ['name','name_jsbsim', 'description', 'min', 'max'],defaults = (None,None,None,float('-inf'),float('+inf')))):
 
     #define operations for custom properties expressions
     def __sub__(self, other):
@@ -89,11 +89,11 @@ v_fps = Property('v_fps','velocities/v-fps', 'body frame y-axis velocity [ft/s]'
 
 w_fps = Property('w_fps','velocities/w-fps', 'body frame z-axis velocity [ft/s]', -2200, 2200)
 
-v_north_fps = Property('v_north_fps','velocities/v-north-fps', 'velocity true north [ft/s]', float('-inf'), float('+inf'))
+v_north_fps = Property('v_north_fps','velocities/v-north-fps', 'velocity true north [ft/s]')
 
-v_east_fps = Property('v_east_fps','velocities/v-east-fps', 'velocity east [ft/s]', float('-inf'), float('+inf'))
+v_east_fps = Property('v_east_fps','velocities/v-east-fps', 'velocity east [ft/s]')
 
-v_down_fps = Property('v_down_fps','velocities/v-down-fps', 'velocity downwards [ft/s]', float('-inf'), float('+inf'))
+v_down_fps = Property('v_down_fps','velocities/v-down-fps', 'velocity downwards [ft/s]')
 
 p_radps = Property('p_radps','velocities/p-rad_sec', 'roll rate [rad/s]', -2 * math.pi, 2 * math.pi)
 

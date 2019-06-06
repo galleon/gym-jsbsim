@@ -10,6 +10,7 @@ from typing import Dict, Tuple, Sequence, NamedTuple
 import json
 import configparser
 from .utils import reduce_reflex_angle_deg
+import os
 
 
 class HeadingControlTask(BaseFlightTask):

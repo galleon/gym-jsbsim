@@ -2,60 +2,9 @@
 
 import math
 from collections import namedtuple
+from gym.spaces import Box, Discrete
 
-
-class Property(namedtuple('Property', ['name','name_jsbsim', 'description', 'min', 'max'],defaults = (None,None,None,float('-inf'),float('+inf')))):
-
-    #define operations for custom properties expressions
-    def __sub__(self, other):
-        def sub(sim):
-            return sim.get_property_value(self) - sim.get_property_value(other)
-
-        return sub
-
-    def __rsub__(self, other):
-        def rsub(sim):
-            return other(sim) - sim.get_property_value(self)
-
-        return rsub
-
-    def __add__(self, other):
-        def add(sim):
-            return sim.get_property_value(self) + sim.get_property_value(other)
-
-        return add
-
-    def __radd__(self, other):
-        def radd(sim):
-            return sim.get_property_value(self) + other(sim)
-
-        return radd
-
-    def __truediv__(self, other):
-        def div(sim):
-            return sim.get_property_value(self)/sim.get_property_value(other)
-
-        return div
-
-    def __rtruediv__(self, other):
-        def rdiv(sim):
-            return other(sim)/sim.get_property_value(self)
-
-        return rdiv
-
-    def __mul__(self, other):
-        def mul(sim):
-            return sim.get_property_value(self)*sim.get_property_value(other)
-
-        return mul
-
-    def __rmul__(self,other):
-        def rmul(sim):
-            return other(sim)*sim.get_property_value(other)
-
-        return rmul
-
-
+Property = namedtuple('Property', ['name','name_jsbsim', 'description', 'min', 'max','spaces'],defaults = (None,None,None,float('-inf'),float('+inf'),Box))
 
 # position and attitude
 
@@ -199,6 +148,14 @@ right_brake_cmd_norm = Property('right_brake_cmd_norm','fcs/right-brake-cmd-norm
 
 steer_cmd_norm = Property('steer_cmd_norm','fcs/steer-cmd-norm', 'Steer command(normalized)', -1., 1.)
 
+throttle_cmd_dir = Property('throttle_cmd_dir','fcs/throttle-cmd-dir','direction to move the throttle',0 ,2, Discrete)
+
+aileron_cmd_dir = Property('aileron_cmd_dir','fcs/aileron-cmd-dir', 'direction to move the aileron', 0, 2, Discrete)
+
+elevator_cmd_dir = Property('elevator_cmd_dir','fcs/elevator-cmd-dir', 'direction to move the elevator', 0, 2, Discrete)
+
+rudder_cmd_dir = Property('rudder_cmd_dir','fcs/rudder-cmd-dir', 'direction to move the rudder', 0, 2, Discrete)
+
 
 
 # trim commands
@@ -280,10 +237,74 @@ intersectio_point_lon = Property('intersectio_point_lon','intersectio_point_lon'
 
 
 
-# define expressions of properties not implemented in JSBSim
+# define custom properties not implemented in JSBSim
 
-custom_properties = { delta_altitude : altitude_sl_ft - target_altitude_ft,
+def update_delta_altitude(sim):
+    value = sim.get_property_value(altitude_sl_ft) - sim.get_property_value(target_altitude_ft)
+    sim.set_property_value(delta_altitude,value)
 
-                    delta_heading : heading_deg - target_heading_deg
+def update_delta_heading(sim):
+    value = reduce_reflex_angle_deg(sim.get_property_value(heading_deg)-sim.get_property_value(target_heading_deg))
+    sim.set_property_value(delta_heading,value)
+
+incr = 0.002
+
+def update_throttle_cmd_dir(sim):
+    value = sim.get_property_value(throttle_cmd_dir)
+    if value == 1:
+        sim.set_property_value(throttle_cmd, sim.get_property_value(throttle_cmd) - incr)
+    elif value == 2:
+        sim.set_property_value(throttle_cmd, sim.get_property_value(throttle_cmd) + incr)
+    sim.set_property_value(throttle_cmd_dir,0)
+
+def update_aileron_cmd_dir(sim):
+    value = sim.get_property_value(aileron_cmd_dir)
+    if value == 1:
+        sim.set_property_value(aileron_cmd, sim.get_property_value(aileron_cmd) - incr)
+    elif value == 2:
+        sim.set_property_value(aileron_cmd, sim.get_property_value(aileron_cmd) + incr)
+    sim.set_property_value(aileron_cmd_dir,0)
+
+def update_elevator_cmd_dir(sim):
+    value = sim.get_property_value(elevator_cmd_dir)
+    if value == 1:
+        sim.set_property_value(elevator_cmd, sim.get_property_value(elevator_cmd) - incr)
+    elif value == 2:
+        sim.set_property_value(elevator_cmd, sim.get_property_value(elevator_cmd) + incr)
+    sim.set_property_value(elevator_cmd_dir,0)
+
+def update_rudder_cmd_dir(sim):
+    value = sim.get_property_value(rudder_cmd_dir)
+    if value == 1:
+        sim.set_property_value(rudder_cmd,sim.get_property_value(rudder_cmd) - incr)
+    elif value == 2 :
+        sim.set_property_value(rudder_cmd, sim.get_property_value(rudder_cmd) + incr)
+    sim.set_property_value(rudder_cmd_dir,0)
+
+
+custom_properties = { delta_altitude : update_delta_altitude,
+
+                    delta_heading : update_delta_heading,
+
+                    throttle_cmd_dir : update_throttle_cmd_dir,
+
+                    aileron_cmd_dir : update_aileron_cmd_dir,
+
+                    elevator_cmd_dir : update_elevator_cmd_dir,
+
+                    rudder_cmd_dir : update_rudder_cmd_dir
 }
+
+
+def reduce_reflex_angle_deg(angle):
+
+    """ Given an angle in degrees, normalises in [-179, 180] """
+
+    new_angle = angle % 360
+
+    if new_angle > 180:
+
+        new_angle -= 360
+
+    return new_angle
 

@@ -3,7 +3,7 @@
 import jsbsim
 import gym_jsbsim.simulation_parameters as param
 from collections import namedtuple
-from gym_jsbsim.properties import custom_properties
+from gym_jsbsim.properties import custom_properties, throttle_cmd, mixture_cmd
 
 class Simulation(object):
     """
@@ -12,7 +12,7 @@ class Simulation(object):
 
     """
     
-    def __init__(self, aircraft_name = "A320", init_conditions = None, num_engine =-1):
+    def __init__(self, aircraft_name = "A320", init_conditions = None ):
         """
 
         Constructor. Creates an instance of JSBSim and sets initial conditions.
@@ -26,10 +26,6 @@ class Simulation(object):
         :param init_conditions: dict mapping properties to their initial values.
 
             Defaults to None, causing a default set of initial props to be used.
-          
-        :param num_engine: number of the engine to be run.
-
-            Defaults to -1 causing all engines to be run.
             
         """
         
@@ -45,15 +41,15 @@ class Simulation(object):
         dt = 1/param.jsbsim_freq
         self.jsbsim_exec.set_dt(dt)
 
-        self.initialise(init_conditions,num_engine)
+        self.initialise(init_conditions)
 
         
 
         
-    def initialise(self, init_conditions = None, num_engine = -1):
+    def initialise(self, init_conditions = None):
         """
 
-         Initialises simulation conditions.
+         Loads an aircraft and initialises simulation conditions.
 
 
         JSBSim creates an InitialConditions object internally when given an
@@ -63,9 +59,7 @@ class Simulation(object):
         XML file, and then the dictionary values are fed in.
 
         :param init_conditions: dict mapping properties to their initial values
-        
-        :param num_engine: number of the engine to be run. All engines if -1.
-        
+
         """
 
         self.jsbsim_exec.load_model(self.aircraft_name)
@@ -73,15 +67,13 @@ class Simulation(object):
 
         self.set_initial_conditions(init_conditions)
 
+        self.update_custom_properties()
         success = self.jsbsim_exec.run_ic()
+        self.jsbsim_exec.propulsion_init_running(-1)
         self.update_custom_properties()
 
         if not success:
             raise RuntimeError('JSBSim failed to init simulation conditions.')
-
-        self.jsbsim_exec.propulsion_init_running(num_engine)
-
-
 
         
         
@@ -93,7 +85,7 @@ class Simulation(object):
         """
         if init_conditions is not None:
             for prop,value in init_conditions.items():
-                self.jsbsim_exec.set_property_value(prop.name_jsbsim,value)
+                self.set_property_value(prop,value)
 
 
 
@@ -102,8 +94,7 @@ class Simulation(object):
 
         """
 
-        Runs a single timestep in the JSBSim simulation.
-
+        Runs JSBSim simulation until the agent interacts and update custom properties.
 
 
         JSBSim monitors the simulation and detects whether it thinks it should
@@ -117,10 +108,13 @@ class Simulation(object):
         :return: bool, False if sim has met JSBSim termination criteria else True.
 
         """
-        success = self.jsbsim_exec.run()
         self.update_custom_properties()
-        if not success:
-            raise RuntimeError('JSBSim failed to init simulation conditions.')
+        for _ in range(param.agent_interaction_steps):
+            result = self.jsbsim_exec.run()
+            if not result:
+                raise RuntimeError('JSBSim failed.')
+        self.update_custom_properties()
+        return result
 
 
     def get_sim_time(self):
@@ -169,11 +163,28 @@ class Simulation(object):
         return self.jsbsim_exec.get_property_value(prop.name_jsbsim)
 
     def set_property_value(self,prop,value):
-        return self.jsbsim_exec.set_property_value(prop.name_jsbsim,value)
+        #set value in bounds property
+        if value < prop.min :
+            value = prop.min
+        elif value > prop.max :
+            value = prop.max
+
+        # set all throttles
+        if prop == throttle_cmd :
+            for i in range(self.jsbsim_exec.propulsion_get_num_engines()):
+                self.jsbsim_exec.set_property_value("fcs/throttle-cmd-norm["+str(i)+"]", value)
+        #set all mixtures
+        if prop == mixture_cmd :
+            for i in range(self.jsbsim_exec.propulsion_get_num_engines()):
+                self.jsbsim_exec.set_property_value("fcs/mixture-cmd-norm[" + str(i) + "]", value)
+
+        else :
+            self.jsbsim_exec.set_property_value(prop.name_jsbsim, value)
+
 
     def update_custom_property(self,prop):
-        self.set_property_value(prop,custom_properties[prop](self))
+        custom_properties[prop](self)
 
     def update_custom_properties(self):
         for prop in custom_properties:
-            self.update_custom_property(prop)
+           self.update_custom_property(prop)

@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from gym_jsbsim.simulation import Simulation
-import gym_jsbsim.simulation_parameters as param
 import gym
 import numpy as np
-
 
 
 class JSBSimEnv(gym.Env):
@@ -48,16 +46,16 @@ class JSBSimEnv(gym.Env):
 
         """
         
-        self.sim: Simulation = None
+        self.sim = None
         self.aircraft_name = aircraft_name
         self.task = task
         
         # set Space objects
-        self.observation_space: gym.spaces.Box = self.task.get_observation_space()
-        self.action_space: gym.spaces.Box = self.task.get_action_space()
+        self.observation_space = self.task.get_observation_space()
+        self.action_space = self.task.get_action_space()
         
         self.state = None
-        
+
         
         
     def step(self, action = None):
@@ -86,8 +84,12 @@ class JSBSimEnv(gym.Env):
             info: auxiliary information
 
         """
+
         if action is not None:
-            assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
+            if not (len(action) == len(self.action_space)):
+                raise ValueError('mismatch between action and action space size')
+
+
 
         self.state = self.make_step(action)
         
@@ -114,33 +116,25 @@ class JSBSimEnv(gym.Env):
             self.sim.set_property_values(self.task.get_action_var(),action)
         
         # run simulation
-        for _ in range(param.agent_interaction_steps):
-            self.sim.run()
+        self.sim.run()
             
         return self.get_observation()
 
 
-    
-    def reset(self,num_engine = -1):
+    def reset(self):
         """
 
         Resets the state of the environment and returns an initial observation.
-
-        :param num_engine: number of the engine to be run. All engines if -1.
         
         :return: array, the initial observation of the space.
 
         """
-        
+        if self.sim :
+            self.sim.close()
+
         init_conditions = self.task.get_initial_conditions()
 
-        if self.sim:
-
-            self.sim.initialise(init_conditions,num_engine)
-
-        else:
-
-            self.sim = Simulation(self.aircraft_name, init_conditions,num_engine)
+        self.sim = Simulation(self.aircraft_name, init_conditions)
             
         self.state = self.get_observation()
         
@@ -245,7 +239,3 @@ class JSBSimEnv(gym.Env):
         """ Gets the simulation time from sim, a float. """
         
         return self.sim.get_sim_time()
-        
-    
-        
-        

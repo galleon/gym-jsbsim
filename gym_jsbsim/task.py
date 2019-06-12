@@ -2,6 +2,7 @@
 
 import numpy as np
 import gym
+from gym.spaces import Box,Discrete
 
 class Task(object):
     """
@@ -30,6 +31,8 @@ class Task(object):
         self.get_reward = get_reward
         self.is_terminal = is_terminal
         self.init_conditions = init_conditions
+
+        #set default output to observation_var
         if output == None:
             self.output = observation_var
         else:
@@ -53,22 +56,33 @@ class Task(object):
 
 
     def get_observation_space(self):
-         """ Get the task's observation Space object """
-         observation_lows = np.array([prop.min for prop in self.observation_var])
+         """
+         Get the task's observation Space object
 
-         observation_highs = np.array([prop.max for prop in self.observation_var])
+         :return : spaces.Tuple composed by spaces of each property.
+         """
 
-         return gym.spaces.Box(low=observation_lows, high=observation_highs, dtype='float')
+         space_tuple = ()
+
+         for prop in self.observation_var:
+             if prop.spaces is Box:
+                 space_tuple += (Box(low=np.array([prop.min]), high=np.array([prop.max]), dtype='float'),)
+             elif prop.spaces is Discrete:
+                 space_tuple += (Discrete(prop.max - prop.min + 1),)
+         return gym.spaces.Tuple(space_tuple)
      
     
     def get_action_space(self):
-         """ Get the task's observation Space object """
-         action_lows = np.array([prop.min for prop in self.action_var])
+         """
+         Get the task's action Space object
 
-         action_highs = np.array([prop.max for prop in self.action_var])
+         :return : spaces.Tuple composed by spaces of each property.
+         """
+         space_tuple = ()
 
-         return gym.spaces.Box(low=action_lows, high=action_highs, dtype='float')
-     
-
-
-    
+         for prop in self.action_var:
+             if prop.spaces is Box:
+                 space_tuple += (Box(low=np.array([prop.min]), high=np.array([prop.max]), dtype='float'),)
+             elif prop.spaces is Discrete:
+                 space_tuple += (Discrete(prop.max - prop.min + 1),)
+         return gym.spaces.Tuple(space_tuple)

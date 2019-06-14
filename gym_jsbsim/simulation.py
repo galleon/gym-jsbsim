@@ -51,19 +51,11 @@ class Simulation(object):
 
          Loads an aircraft and initialises simulation conditions.
 
-
-        JSBSim creates an InitialConditions object internally when given an
-
-        XML config file. This method loads a minimal IC
-
-        XML file, and then the dictionary values are fed in.
-
         :param init_conditions: dict mapping properties to their initial values
 
         """
 
         self.jsbsim_exec.load_model(self.aircraft_name)
-        self.jsbsim_exec.load_ic(param.IC_FILE, param.useStoredPath)
 
         self.set_initial_conditions(init_conditions)
 

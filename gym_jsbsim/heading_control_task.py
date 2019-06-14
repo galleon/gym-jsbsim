@@ -28,13 +28,13 @@ state_var = [ delta_altitude,
              r_dot,
              ]
 
-action_var = [ aileron_cmd,
+action_var = [ aileron_cmd_dir,
 
-              elevator_cmd,
+              elevator_cmd_dir,
 
-              rudder_cmd,
+              rudder_cmd_dir,
 
-              throttle_cmd,
+              throttle_cmd_dir,
 
             ]
 
@@ -118,10 +118,10 @@ init_conditions = { #'ic/h-sl-ft', 'initial altitude MSL [ft]')
 
         }
 
-def get_reward(state):
+def get_reward(state,sim):
     return 1
 
-def is_terminal(state):
+def is_terminal(state,sim):
     return False
 
 HeadingControlTask = Task(state_var,action_var,init_conditions,get_reward,is_terminal)

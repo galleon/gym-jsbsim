@@ -247,7 +247,7 @@ def update_delta_heading(sim):
     value = reduce_reflex_angle_deg(sim.get_property_value(heading_deg)-sim.get_property_value(target_heading_deg))
     sim.set_property_value(delta_heading,value)
 
-incr = 0.002
+incr = 0.05
 
 def update_throttle_cmd_dir(sim):
     value = sim.get_property_value(throttle_cmd_dir)

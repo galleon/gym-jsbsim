@@ -28,7 +28,7 @@ class JSBSimEnv(gym.Env):
     docstrings have been adapted or copied from the OpenAI Gym source code.
 
     """
-    metadata = {'render.modes': ['human', 'cvs']}
+    metadata = {'render.modes': ['human', 'csv']}
     
     
     def __init__(self, task, aircraft_name):
@@ -93,7 +93,7 @@ class JSBSimEnv(gym.Env):
 
         self.state = self.make_step(action)
         
-        reward, done, info = self.task.get_reward(self.state), self.task.is_terminal(self.state), {}
+        reward, done, info = self.task.get_reward(self.state,self.sim), self.task.is_terminal(self.state,self.sim), {}
 
         return np.array(self.state), reward, done, info
     
@@ -153,7 +153,7 @@ class JSBSimEnv(gym.Env):
         if mode is:
 
         - human: print on the terminal
-        - cvs: output to cvs files
+        - csv: output to cvs files
 
         Note:
 
@@ -167,10 +167,11 @@ class JSBSimEnv(gym.Env):
 
         :param mode: str, the mode to render with
         """
-        
+        output = self.task.get_props_output()
+
         if mode == 'human':
             pass
-        elif mode == 'cvs':
+        elif mode == 'csv':
             pass
         else:
             pass

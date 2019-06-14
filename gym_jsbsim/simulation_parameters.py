@@ -5,8 +5,6 @@
     Parameter file to configure JSBSim simulation
 
 """
-from os import path
-
 
 ROOT_DIR = "H:/jsbsim-code" # the root directory where JSBSim starts looking for its system directories.
 AircraftPath = "aircraft" # the relative path to the aircraft config file directories.

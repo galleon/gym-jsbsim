@@ -2,6 +2,7 @@
 
 from gym.envs.registration import registry, register, make, spec
 from gym_jsbsim.heading_control_task import HeadingControlTask
+from gym_jsbsim.simulation_parameters import ROOT_DIR, AircraftPath
 
 """
 
@@ -14,17 +15,28 @@ with OpenAI Gym so that they can be instantiated with a gym.make(id,task,aircraf
 
  To use do:
 
-       env = gym.make('GymJsbsim-v0',task,aircraft_name)
+       env = gym.make('GymJsbsim-{task}-{aircraft_name}-v0')
 
 """
 
+from os import listdir
+from os.path import isdir, join
 
-register(
+aircraft_path = join(ROOT_DIR,AircraftPath)
 
-    id='GymJsbsim-HeadingControlTask-A320-v0',
+aircraft_names = [d for d in listdir(aircraft_path) if isdir(join(aircraft_path, d))]
+tasks = dict(HeadingControlTask = HeadingControlTask)
 
-    entry_point='gym_jsbsim.jsbsim_env:JSBSimEnv',
 
-    kwargs = dict(task = HeadingControlTask, aircraft_name = "A320")
 
-)
+for aircraft_name in aircraft_names :
+    for task in tasks :
+        register(
+
+            id=f'GymJsbsim-{task}-{aircraft_name}-v0',
+
+            entry_point='gym_jsbsim.jsbsim_env:JSBSimEnv',
+
+            kwargs = dict(task = tasks[task], aircraft_name = aircraft_name)
+
+        )

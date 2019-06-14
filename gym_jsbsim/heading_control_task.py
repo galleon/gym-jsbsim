@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from gym_jsbsim.properties import*
 from gym_jsbsim.task import Task
 
@@ -11,7 +9,7 @@ from gym_jsbsim.task import Task
 """
 
 
-state_var = [ delta_altitude,
+state_var = [delta_altitude,
 
              altitude_sl_ft,
 
@@ -28,7 +26,7 @@ state_var = [ delta_altitude,
              r_dot,
              ]
 
-action_var = [ aileron_cmd_dir,
+action_var = [aileron_cmd_dir,
 
               elevator_cmd_dir,
 
@@ -36,92 +34,95 @@ action_var = [ aileron_cmd_dir,
 
               throttle_cmd_dir,
 
-            ]
+              ]
 
-init_conditions = { #'ic/h-sl-ft', 'initial altitude MSL [ft]')
+init_conditions = {  # 'ic/h-sl-ft', 'initial altitude MSL [ft]'
 
-                    initial_altitude_ft : 5000,
+    initial_altitude_ft: 5000,
 
-                    #'ic/terrain-elevation-ft', 'initial terrain alt [ft]')
+    #'ic/terrain-elevation-ft', 'initial terrain alt [ft]'
 
-                    initial_terrain_altitude_ft : 0,
+    initial_terrain_altitude_ft: 0,
 
-                    #'ic/long-gc-deg', 'initial geocentric longitude [deg]')
+    #'ic/long-gc-deg', 'initial geocentric longitude [deg]'
 
-                    initial_longitude_geoc_deg : 1.442031,
+    initial_longitude_geoc_deg: 1.442031,
 
-                    #'ic/lat-geod-deg', 'initial geodesic latitude [deg]')
+    #'ic/lat-geod-deg', 'initial geodesic latitude [deg]'
 
-                    initial_latitude_geod_deg : 43.607181,
+    initial_latitude_geod_deg: 43.607181,
 
-                    #'ic/u-fps', 'body frame x-axis velocity; positive forward [ft/s]')
+    #'ic/u-fps', 'body frame x-axis velocity; positive forward [ft/s]'
 
-                    initial_u_fps : 0,
+    initial_u_fps: 0,
 
-                    #'ic/v-fps', 'body frame y-axis velocity; positive right [ft/s]')
+    #'ic/v-fps', 'body frame y-axis velocity; positive right [ft/s]'
 
-                    initial_v_fps : 0,
+    initial_v_fps: 0,
 
-                    #'ic/w-fps', 'body frame z-axis velocity; positive down [ft/s]')
+    #'ic/w-fps', 'body frame z-axis velocity; positive down [ft/s]'
 
-                    initial_w_fps :  0,
+    initial_w_fps: 0,
 
-                    #'ic/p-rad_sec', 'roll rate [rad/s]')
+    #'ic/p-rad_sec', 'roll rate [rad/s]'
 
-                    initial_p_radps : 0,
+    initial_p_radps: 0,
 
-                    #'ic/q-rad_sec', 'pitch rate [rad/s]')
+    #'ic/q-rad_sec', 'pitch rate [rad/s]'
 
-                    initial_q_radps : 0,
+    initial_q_radps: 0,
 
-                    #'ic/r-rad_sec', 'yaw rate [rad/s]')
+    #'ic/r-rad_sec', 'yaw rate [rad/s]'
 
-                    initial_r_radps : 0,
+    initial_r_radps: 0,
 
-                    #'ic/roc-fpm', 'initial rate of climb [ft/min]')
+    #'ic/roc-fpm', 'initial rate of climb [ft/min]'
 
-                    initial_roc_fpm : 0,
+    initial_roc_fpm: 0,
 
-                    #'ic/psi-true-deg', 'initial (true) heading [deg]')
+    #'ic/psi-true-deg', 'initial (true) heading [deg]'
 
-                    initial_heading_deg : 100,
+    initial_heading_deg: 100,
 
-                    # target heading deg
+    # target heading deg
 
-                    target_heading_deg : 100,
+    target_heading_deg: 100,
 
-                    # target heading deg
+    # target heading deg
 
-                    target_altitude_ft : 100,
+    target_altitude_ft: 100,
 
-                    # controls command
+    # controls command
 
-                    #'fcs/throttle-cmd-norm', 'throttle commanded position, normalised', 0., 1.)
+    #'fcs/throttle-cmd-norm', 'throttle commanded position, normalised', 0., 1.
 
-                    throttle_cmd : 0.8,
+    throttle_cmd: 0.8,
 
-                    #'fcs/mixture-cmd-norm', 'engine mixture setting, normalised', 0., 1.)
+    #'fcs/mixture-cmd-norm', 'engine mixture setting, normalised', 0., 1.
 
-                    mixture_cmd : 0.8,
+    mixture_cmd: 0.8,
 
-                    #target time
+    # target time
 
-                    target_time : 400,
+    target_time: 400,
 
-                    #target waypoint latitude
+    # target waypoint latitude
 
-                    target_latitude_geod_deg : 49.0447,
+    target_latitude_geod_deg: 49.0447,
 
-                    #target waypoint longitude
+    # target waypoint longitude
 
-                    target_longitude_geod_deg : -120.3206,
+    target_longitude_geod_deg: -120.3206,
 
-        }
+}
 
-def get_reward(state,sim):
+
+def get_reward(state, sim):
     return 1
 
-def is_terminal(state,sim):
+
+def is_terminal(state, sim):
     return False
 
-HeadingControlTask = Task(state_var,action_var,init_conditions,get_reward,is_terminal)
+
+HeadingControlTask = Task(state_var, action_var, init_conditions, get_reward, is_terminal)

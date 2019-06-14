@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-
-from gym_jsbsim.simulation import Simulation
 import gym
 import numpy as np
+from gym_jsbsim.simulation import Simulation
 
 
 class JSBSimEnv(gym.Env):
@@ -14,7 +12,7 @@ class JSBSimEnv(gym.Env):
     aircraft as an RL environment conforming to the OpenAI Gym Env
 
     interface.
-    
+
     An JsbSimEnv is instantiated with a Task that implements a specific
 
     aircraft control task with its own specific observation/action space and
@@ -28,9 +26,10 @@ class JSBSimEnv(gym.Env):
     docstrings have been adapted or copied from the OpenAI Gym source code.
 
     """
+
     metadata = {'render.modes': ['human', 'csv']}
-    
-    
+
+
     def __init__(self, task, aircraft_name):
         """
 
@@ -45,20 +44,19 @@ class JSBSimEnv(gym.Env):
         :param aircraft_name: the name of the JSBSim aircraft to be used.
 
         """
-        
+
         self.sim = None
         self.aircraft_name = aircraft_name
         self.task = task
-        
+
         # set Space objects
         self.observation_space = self.task.get_observation_space()
         self.action_space = self.task.get_action_space()
-        
+
         self.state = None
 
-        
-        
-    def step(self, action = None):
+
+    def step(self, action=None):
         """
 
         Run one timestep of the environment's dynamics. When end of
@@ -86,20 +84,18 @@ class JSBSimEnv(gym.Env):
         """
 
         if action is not None:
-            if not (len(action) == len(self.action_space)):
-                raise ValueError('mismatch between action and action space size')
-
-
+            if not len(action) == len(self.action_space):
+                raise ValueError(
+                    'mismatch between action and action space size')
 
         self.state = self.make_step(action)
-        
-        reward, done, info = self.task.get_reward(self.state,self.sim), self.task.is_terminal(self.state,self.sim), {}
+
+        reward, done, info = self.task.get_reward(self.state, self.sim), self.task.is_terminal(self.state, self.sim), {}
 
         return np.array(self.state), reward, done, info
-    
-    
-    
-    def make_step(self,action=None):
+
+
+    def make_step(self, action=None):
         """
 
         Calculates new state.
@@ -111,13 +107,13 @@ class JSBSimEnv(gym.Env):
 
 
         """
-        #take actions
+        # take actions
         if action is not None:
-            self.sim.set_property_values(self.task.get_action_var(),action)
-        
+            self.sim.set_property_values(self.task.get_action_var(), action)
+
         # run simulation
         self.sim.run()
-            
+
         return self.get_observation()
 
 
@@ -125,25 +121,23 @@ class JSBSimEnv(gym.Env):
         """
 
         Resets the state of the environment and returns an initial observation.
-        
+
         :return: array, the initial observation of the space.
 
         """
-        if self.sim :
+        if self.sim:
             self.sim.close()
 
         init_conditions = self.task.get_initial_conditions()
 
         self.sim = Simulation(self.aircraft_name, init_conditions)
-            
+
         self.state = self.get_observation()
-        
+
         return np.array(self.state)
-    
-    
-    
-       
-    def render(self,mode='human'):
+
+
+    def render(self, mode='human'):
         """Renders the environment.
 
         The set of supported modes varies per environment. (And some
@@ -175,10 +169,9 @@ class JSBSimEnv(gym.Env):
             pass
         else:
             pass
-        
 
 
-    def seed(self,seed=None):
+    def seed(self, seed=None):
         """
 
         Sets the seed for this env's random number generator(s).
@@ -207,8 +200,6 @@ class JSBSimEnv(gym.Env):
         return
 
 
-
-    
     def close(self):
         """ Cleans up this environment's objects
 
@@ -221,22 +212,20 @@ class JSBSimEnv(gym.Env):
         """
         if self.sim:
             self.sim.close()
-            
-            
 
 
-    
+
     def get_observation(self):
         """
         get state observation from sim.
-         
+
         :return: NamedTuple, the first state observation of the episode
-        
+
         """
         return self.sim.get_property_values(self.task.get_observation_var())
-        
-        
+
+
     def get_sim_time(self):
         """ Gets the simulation time from sim, a float. """
-        
+
         return self.sim.get_sim_time()

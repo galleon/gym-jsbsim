@@ -21,8 +21,10 @@ with OpenAI Gym so that they can be instantiated with a gym.make(id,task,aircraf
 
 register(
 
-    id='GymJsbsim-v0',
+    id='GymJsbsim-HeadingControlTask-A320-v0',
 
     entry_point='gym_jsbsim.jsbsim_env:JSBSimEnv',
+
+    kwargs = dict(task = HeadingControlTask, aircraft_name = "A320")
 
 )

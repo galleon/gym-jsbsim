@@ -29,11 +29,8 @@ TASKS = dict(HeadingControlTask=HeadingControlTask)
 for aircraft_name in AIRCRAFT_NAMES:
     for task in TASKS:
         register(
-
             id=f'GymJsbsim-{task}-{aircraft_name}-v0',
-
             entry_point='gym_jsbsim.jsbsim_env:JSBSimEnv',
-
             kwargs=dict(task=TASKS[task], aircraft_name=aircraft_name)
 
         )

@@ -26,10 +26,10 @@ wget https://raw.githubusercontent.com/galleon/gym-jsbsim/new/install-docker.sh 
 sh install-docker.sh
 ```
 
-Your working env is under $HOME/Docker-Gym-JSBSim. All modifications will be directly synchronise with the docker.
+Your working env is under ```$HOME/Docker-Gym-JSBSim```. All modifications will be directly synchronise with the docker.
 You could have acces to your docker (without rebuild it) using:
 ```
-docker run -v $HOME/Docker-Gym-JSBSim:/home/nico -it gym-jsbsim
+docker run -v $HOME/Docker-Gym-JSBSim:/home/GJsim -it gym-jsbsim
 ```
 
 ## Test

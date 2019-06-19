@@ -17,12 +17,12 @@ So far, is available:
  
  The following script will setup and download prerequisities for the docker instalation
 ```
-curl https://raw.githubusercontent.com/galleon/gym-jsbsim/new/install-working-env.sh > install-working-env.sh
+wget https://raw.githubusercontent.com/galleon/gym-jsbsim/new/install-working-env.sh -O install-working-env.sh
 sh install-working-env.sh
 ```
 Once the first script run, you could launch the second script to build and run the docker
 ```
-curl https://raw.githubusercontent.com/galleon/gym-jsbsim/new/install-docker.sh > install-docker.sh
+wget https://raw.githubusercontent.com/galleon/gym-jsbsim/new/install-docker.sh -O install-docker.sh
 sh install-docker.sh
 ```
 

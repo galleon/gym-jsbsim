@@ -19,7 +19,7 @@ So far, is available:
 ```
 sh install-working-env.sh
 ```
-Once the first script run, you could lauch the second script to build and run the docker
+Once the first script run, you could launch the second script to build and run the docker
 ```
 sh install-docker.sh
 ```

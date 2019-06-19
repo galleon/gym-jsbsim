@@ -33,6 +33,7 @@ Your working env is under $HOME/Docker-Gym-JSBSim. All modifications will be dir
 You could run a random agent with 
 ```
 python $HOME/Docker-Gym-JSBSim/clean-gym-jsbsim/test.py
+```
 
 
 

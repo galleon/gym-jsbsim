@@ -1,5 +1,6 @@
-from gym_jsbsim.properties as prp
+from gym_jsbsim.properties import*
 from gym_jsbsim.task import Task
+import random
 
 """
     A task in which the agent must perform steady, level flight maintaining its initial heading.
@@ -9,20 +10,20 @@ from gym_jsbsim.task import Task
 state_var = [delta_altitude,
              delta_heading,
              v_down_fps,
-             v_air,
-             p_dot,
-             q_dot,
-             r_dot
+             v_air
+             #p_dot,
+             #q_dot,
+             #r_dot
 ]
 
-action_var = [aileron_cmd_dir,
-              elevator_cmd_dir,
-              rudder_cmd_dir,
-              throttle_cmd_dir
+action_var = [aileron_cmd,
+              elevator_cmd,
+              rudder_cmd,
+              throttle_cmd
 ]
 
 init_conditions = { # 'ic/h-sl-ft', 'initial altitude MSL [ft]'
-                    initial_altitude_ft: 5000,
+                    initial_altitude_ft: 10000,
                     #'ic/terrain-elevation-ft', 'initial terrain alt [ft]'
                     initial_terrain_altitude_ft: 0,
                     #'ic/long-gc-deg', 'initial geocentric longitude [deg]'
@@ -30,7 +31,7 @@ init_conditions = { # 'ic/h-sl-ft', 'initial altitude MSL [ft]'
                     #'ic/lat-geod-deg', 'initial geodesic latitude [deg]'
                     initial_latitude_geod_deg: 43.607181,
                     #'ic/u-fps', 'body frame x-axis velocity; positive forward [ft/s]'
-                    initial_u_fps: 0,
+                    initial_u_fps: 800,
                     #'ic/v-fps', 'body frame y-axis velocity; positive right [ft/s]'
                     initial_v_fps: 0,
                     #'ic/w-fps', 'body frame z-axis velocity; positive down [ft/s]'
@@ -48,18 +49,18 @@ init_conditions = { # 'ic/h-sl-ft', 'initial altitude MSL [ft]'
                     # target heading deg
                     target_heading_deg: 100,
                     # target heading deg
-                    target_altitude_ft: 100,
+                    target_altitude_ft: 10000,
                     # controls command
                     #'fcs/throttle-cmd-norm', 'throttle commanded position, normalised', 0., 1.
                     throttle_cmd: 0.8,
                     #'fcs/mixture-cmd-norm', 'engine mixture setting, normalised', 0., 1.
-                    mixture_cmd: 0.8,
-                    # target time
-                    target_time: 400,
-                    # target waypoint latitude
-                    target_latitude_geod_deg: 49.0447,
-                    # target waypoint longitude
-                    target_longitude_geod_deg: -120.3206
+                    mixture_cmd: 1,
+                    # all engine running
+                    all_engine_running: -1,
+                    engine_running: 1,
+                    # gear up
+                    gear_all_cmd: 0,
+                    gear:0
 }
 
 
@@ -76,18 +77,21 @@ def get_reward(state, sim):
     # inverse of the normalised value of q, r, p acceleartion
     #angle_speed_r = 1.0/math.sqrt((math.fabs(last_state.accelerations_pdot_rad_sec2) + math.fabs(last_state.accelerations_qdot_rad_sec2) + math.fabs(last_state.accelerations_rdot_rad_sec2) + math.fabs(last_state.velocities_v_down_fps)) / 4.0 + 1)
 
-    # reward if finish the simulation ponderate with the quality of the fly
-    #reward_nb_episode = (heading_r + alt_r) / (2.0 * max(sim[self.steps_left],1.0))
-
-    return (heading_r + alt_r) / 2.0
+    # Add selective pressure to model that end up the simulation earlier
+    reward = (heading_r + alt_r) / 2.0
+    if sim.get_property_value(sim_time_s) < 300:
+        reward = reward / 3.0
+    if sim.get_property_value(sim_time_s) >= 300 and sim.get_property_value(sim_time_s) < 1000:
+        reward = reward / 2.0
+    return reward   
 
 
 def is_terminal(state, sim):
-    # Change alt and heading every 300 seconds
-    if (sim.get_property_value(sim_time_s)%300==1):
+    # Change heading every 300 seconds
+    if (int(sim.get_property_value(sim_time_s))%300==1 and int(sim.get_property_value(sim_time_s))!=1):
 
-        new_alt = sim[prp.target_altitude_ft]# + random.uniform(-1000, 1000)
-        new_heading = sim[prp.target_heading_deg] + random.uniform(-135, 135)
+        new_alt = sim.get_property_value(target_altitude_ft)# + random.uniform(-1000, 1000)
+        new_heading = sim.get_property_value(target_heading_deg) + random.uniform(-135, 135)
         if (new_heading <= 0):
             new_heading = 360 - new_heading
         if (new_heading >= 360):
@@ -97,6 +101,7 @@ def is_terminal(state, sim):
         sim.set_property_value(target_altitude_ft, new_alt)
         sim.set_property_value(target_heading_deg, new_heading)
 
+    # End up the simulation after 1200 secondes or if the aircraft is under or above 500 feet of its target altitude
     return sim.get_property_value(sim_time_s)>=1200 or math.fabs(sim.get_property_value(delta_altitude)) >= 500
 
 

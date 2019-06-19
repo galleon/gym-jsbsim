@@ -36,7 +36,7 @@ docker run -v $HOME/Docker-Gym-JSBSim:/home/nico -it gym-jsbsim
 
 You could run a random agent with 
 ```
-python $HOME/Docker-Gym-JSBSim/clean-gym-jsbsim/test.py
+python $HOME/Docker-Gym-JSBSim/clean-gym-jsbsim/test_agent.py
 ```
 
 

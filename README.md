@@ -5,7 +5,7 @@ This repo allows a full acess to JSBSim properties and provide GYM environments 
 So far, is available:
 
  * [x] Heading Task: *GymJsbsim-HeadingControlTask-A320-v0*: The aircraft should maintain its initial heading and altitude. during the simulation, the aircraft should turn to reach a new random heading.
- * [ ] Altitude and Heading Task: *GymJsbsim-AltitudeHeadingControlTask-A320-v0*: The aircraft should maintain its initial heading and altitude. during the simulation, the aircraft should reach a new random heading AND and new random altitude.
+ * [ ] Altitude and Heading Task: *GymJsbsim-AltitudeHeadingControlTask-A320-v0*: The aircraft should maintain its initial heading and altitude. During the simulation, the aircraft should reach a new random heading AND and new random altitude.
  * [ ] Path plan task: *GymJsbsim-PathPlanTask-A320-v0*: The aircraft should change heading and altitude during the simulation to follow a path plan trajectory.
  * [ ] Taxi task: *GymJsbsim-TaxiTask-A320-v0*: The aircraft should follow a predifined trajectory on the runaway
  * [ ] Take Off Task: *GymJsbsim-TakeOffTask-A320-v0*: The aircraft should take off and reach a selected altitude.

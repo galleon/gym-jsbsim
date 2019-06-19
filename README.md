@@ -17,16 +17,22 @@ So far, is available:
  
  The following script will setup and download prerequisities for the docker instalation
 ```
+curl https://raw.githubusercontent.com/galleon/gym-jsbsim/new/install-working-env.sh > install-working-env.sh
 sh install-working-env.sh
 ```
 Once the first script run, you could launch the second script to build and run the docker
 ```
+curl https://raw.githubusercontent.com/galleon/gym-jsbsim/new/install-docker.sh > install-docker.sh
 sh install-docker.sh
 ```
 
 Your working env is under $HOME/Docker-Gym-JSBSim. All modifications will be directly synchronise with the docker.
 
 ## Test
+
+You could run a random agent with 
+```
+python $HOME/Docker-Gym-JSBSim/clean-gym-jsbsim/test.py
 
 
 

@@ -146,7 +146,6 @@ def get_reward(state, sim):
     return reward
 
 
-
 def is_terminal(state, sim):
     # Change heading every 300 seconds
     if (int(sim.get_property_value(c.simulation_sim_time_sec))%300==1 and int(sim.get_property_value(c.simulation_sim_time_sec))!=1):

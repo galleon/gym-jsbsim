@@ -1,7 +1,9 @@
 from collections import namedtuple
+import re
 import jsbsim
 import gym_jsbsim.simulation_parameters as param
-from gym_jsbsim.properties import custom_properties, throttle_cmd, mixture_cmd
+from gym_jsbsim.catalogs.jsbsim_catalog import JsbsimCatalog
+from gym_jsbsim.catalogs.my_catalog import MyCatalog
 
 
 class Simulation:
@@ -58,10 +60,10 @@ class Simulation:
 
         self.set_initial_conditions(init_conditions)
 
-        self.update_custom_properties()
+        MyCatalog.update_custom_properties(self)
         success = self.jsbsim_exec.run_ic()
         self.jsbsim_exec.propulsion_init_running(-1)
-        self.update_custom_properties()
+        MyCatalog.update_custom_properties(self)
 
         if not success:
             raise RuntimeError('JSBSim failed to init simulation conditions.')
@@ -100,12 +102,12 @@ class Simulation:
         :return: bool, False if sim has met JSBSim termination criteria else True.
 
         """
-        self.update_custom_properties()
+        MyCatalog.update_custom_properties(self)
         for _ in range(param.AGENT_INTERACTION_STEPS):
             result = self.jsbsim_exec.run()
             if not result:
                 raise RuntimeError('JSBSim failed.')
-        self.update_custom_properties()
+        MyCatalog.update_custom_properties(self)
         return result
 
 
@@ -179,39 +181,72 @@ class Simulation:
 
         """
 
-        # set value in bounds property
+        # set value in property bounds
         if value < prop.min:
             value = prop.min
         elif value > prop.max:
             value = prop.max
 
-        # set all throttles
-        if prop == throttle_cmd:
-            for i in range(self.jsbsim_exec.propulsion_get_num_engines()):
-                self.jsbsim_exec.set_property_value("fcs/throttle-cmd-norm[" + str(i) + "]", value)
+        equal_engine_properties = [JsbsimCatalog.fcs_throttle_cmd_norm,
+                                   JsbsimCatalog.fcs_throttle_pos_norm,
+                                   JsbsimCatalog.fcs_mixture_cmd_norm,
+                                   JsbsimCatalog.fcs_mixture_pos_norm,
+                                   JsbsimCatalog.fcs_advance_pos_norm,
+                                   JsbsimCatalog.fcs_advance_cmd_norm,
+                                   JsbsimCatalog.fcs_feather_pos_norm,
+                                   JsbsimCatalog.fcs_feather_cmd_norm ]
 
-        # set all mixtures
-        if prop == mixture_cmd:
+        if prop in equal_engine_properties :
             for i in range(self.jsbsim_exec.propulsion_get_num_engines()):
-                self.jsbsim_exec.set_property_value("fcs/mixture-cmd-norm[" + str(i) + "]", value)
+                self.jsbsim_exec.set_property_value(prop.name_jsbsim + "[" + str(i) + "]", value)
 
         else:
-            self.jsbsim_exec.set_property_value(prop.name_jsbsim, value)
+            try:
+                self.jsbsim_exec.set_property_value(prop.name_jsbsim, value)
+            except:
+                print(prop,'value',value,'ok')
 
+    def get_full_state(self):
+        full_jsbsim_state = self.jsbsim_exec.get_property_catalog('')
+        full_state = dict()
+        for prop_jsbsim,value in full_jsbsim_state.items():
+            prop_name = re.sub(r"[\-/\]\[]+",'_',prop_jsbsim)
+            try:
+                full_state[JsbsimCatalog[prop_name]] = value
+            except KeyError:
+                pass
+        return full_state
 
+    def get_init_conditions_from_state(self,state):
+        init_conditions = {}
 
-    def update_custom_property(self, prop):
-        """
-        Update the custom property with its function given in the custom_properties dict.
+        state_to_ic = {JsbsimCatalog.position_lat_gc_deg: JsbsimCatalog.ic_lat_gc_deg,
+                       JsbsimCatalog.position_long_gc_deg:  JsbsimCatalog.ic_long_gc_deg,
+                       JsbsimCatalog.position_h_sl_ft: JsbsimCatalog.ic_h_sl_ft,
+                       JsbsimCatalog.position_h_agl_ft:  JsbsimCatalog.ic_h_agl_ft,
+                       JsbsimCatalog.position_terrain_elevation_asl_ft: JsbsimCatalog.ic_terrain_elevation_ft,
+                       JsbsimCatalog.attitude_psi_deg: JsbsimCatalog.ic_psi_true_deg,
+                       JsbsimCatalog.attitude_theta_deg: JsbsimCatalog.ic_theta_deg,
+                       JsbsimCatalog.attitude_phi_deg: JsbsimCatalog.ic_phi_deg,
+                       JsbsimCatalog.velocities_u_fps: JsbsimCatalog.ic_u_fps,
+                       JsbsimCatalog.velocities_v_fps: JsbsimCatalog.ic_v_fps,
+                       JsbsimCatalog.velocities_w_fps: JsbsimCatalog.ic_w_fps,
+                       JsbsimCatalog.velocities_p_rad_sec: JsbsimCatalog.ic_p_rad_sec,
+                       JsbsimCatalog.velocities_q_rad_sec: JsbsimCatalog.ic_q_rad_sec,
+                       JsbsimCatalog.velocities_r_rad_sec: JsbsimCatalog.ic_r_rad_sec,
+                    }
 
-        :param prop: Property
-        """
-        custom_properties[prop](self)
+        for prop,value in state.items():
+            if not re.match(r'^ic_', prop.name):
+                if prop in state_to_ic:
+                    init_conditions[state_to_ic[prop]] = value
 
+                query_prop =  self.jsbsim_exec.query_property_catalog(prop.name_jsbsim)
+                while query_prop[0].split()[0] != prop.name_jsbsim :
+                    query_prop.pop(0)
 
+                status =query_prop[0].split()[1]
+                if 'RW' in status:
+                    init_conditions[prop] = value
 
-    def update_custom_properties(self):
-        """   Update all custom properties defined in the custom_properties dict.   """
-
-        for prop in custom_properties:
-            self.update_custom_property(prop)
+        return init_conditions

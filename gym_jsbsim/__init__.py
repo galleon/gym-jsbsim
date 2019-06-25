@@ -2,8 +2,9 @@ from os import listdir
 from os.path import isdir, join
 
 from gym.envs.registration import registry, register, make, spec
-from gym_jsbsim.heading_control_task import HeadingControlTask
+from gym_jsbsim.envs.heading_control_task import HeadingControlTask
 from gym_jsbsim.simulation_parameters import ROOT_DIR, AIRCRAFT_PATH
+from gym_jsbsim.catalogs import Catalog
 
 """
 

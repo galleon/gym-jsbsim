@@ -49,9 +49,8 @@ class JSBSimEnv(gym.Env):
         self.aircraft_name = aircraft_name
         self.task = task
 
-        # set Space objects
-        self.observation_space = self.task.get_observation_space()
-        self.action_space = self.task.get_action_space()
+        self.observation_space = None
+        self.action_space = None
 
         self.state = None
 
@@ -134,7 +133,24 @@ class JSBSimEnv(gym.Env):
 
         self.state = self.get_observation()
 
+        self.observation_space = self.task.get_observation_space()
+
+        self.action_space = self.task.get_action_space()
+
         return np.array(self.state)
+
+
+    def define_state(self,states):
+        self.task.observation_var = states
+
+    def define_actions(self,actions):
+        self.task.action_var = actions
+
+    def define_reward(self,get_reward):
+        self.task.get_reward = get_reward
+
+    def define_init_conditions(self,init_conditions):
+        self.task.init_conditions=init_conditions
 
 
     def render(self, mode='human'):
@@ -229,3 +245,11 @@ class JSBSimEnv(gym.Env):
         """ Gets the simulation time from sim, a float. """
 
         return self.sim.get_sim_time()
+
+    def get_full_state(self):
+        return self.sim.get_full_state()
+
+    def set_full_state(self,state):
+        init_conditions = self.sim.get_init_conditions_from_state(state)
+        self.define_init_conditions(init_conditions)
+        self.reset()

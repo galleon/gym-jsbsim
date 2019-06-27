@@ -11,7 +11,7 @@ RUN pip install --upgrade pip
 RUN apt-get -y install git vim
 
 # PIP pyGRN gym_jsbsim
-RUN pip install keras numpy PyYAML tensorflow tqdm Pillow jsbsim keras-rl gym matplotlib
+RUN pip install keras numpy PyYAML tensorflow tqdm Pillow jsbsim keras-rl gym matplotlib geopandas pyshp
 
 # Rllib
 RUN pip install ray[rllib]

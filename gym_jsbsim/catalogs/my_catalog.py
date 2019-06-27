@@ -32,12 +32,49 @@ class MyCatalog(Property, Enum):
 
     # following path
 
-    radius_circle = Property('radius-circle', 'radius of the circle aim to compute target heading for ground procedure [m]', 2.0, 100.0)
-    shortest_ac_to_path = Property('shortest-ac-to-path', 'shortest distance between aircraft and path [m]', 0.0, 100.0)
-    closest_path_point_lat = Property('closest_path_point_lat', 'geocentric latitude [deg]', -90, 90)
-    closest_path_point_lon = Property('closest_path_point_lon', 'geodesic longitude [deg]', -180, 180)
-    intersectio_point_lat = Property('intersectio_point_lat', 'geocentric latitude [deg]', -90, 90)
-    intersectio_point_lon = Property('intersectio_point_lon', 'geodesic longitude [deg]', -180, 180)
+    steady_flight = Property('steady_flight', 'steady_flight', 'steady flight mode', 0, 1)
+    turn_flight = Property('turn_flight', 'turn_flight', 'turn flight mode', 0, 1)
+
+    #dist_heading_centerline_matrix = Property('dist_heading_centerline_matrix', 'dist_heading_centerline_matrix', '2D matrix with dist,angle of the next point from the aircraft to 1km (max 10 points)', [0, -45, 0, -45, 0, -45, 0, -45, 0, -45, 0, -45, 0, -45, 0, -45], [1000, 45, 1000, 45, 1000, 45, 1000, 45, 1000, 45, 1000, 45, 1000, 45, 1000, 45])
+    d1 = Property('d1', 'd1', 'd1', 0, 1000) 
+    d2 = Property('d2', 'd2', 'd2', 0, 1000) 
+    d3 = Property('d3', 'd3', 'd3', 0, 1000) 
+    d4 = Property('d4', 'd4', 'd4', 0, 1000) 
+    d5 = Property('d5', 'd5', 'd5', 0, 1000) 
+    d6 = Property('d6', 'd6', 'd6', 0, 1000) 
+    d7 = Property('d7', 'd7', 'd7', 0, 1000) 
+    d8 = Property('d8', 'd8', 'd8', 0, 1000)
+    a1 = Property('a1', 'a1', 'a1', -180, 180)  
+    a2 = Property('a2', 'a2', 'a2', -180, 180)  
+    a3 = Property('a3', 'a3', 'a3', -180, 180)   
+    a4 = Property('a4', 'a4', 'a4', -180, 180)  
+    a5 = Property('a5', 'a5', 'a5', -180, 180)  
+    a6 = Property('a6', 'a6', 'a6', -180, 180)  
+    a7 = Property('a7', 'a7', 'a7', -180, 180)  
+    a8 = Property('a8', 'a8', 'a8', -180, 180)
+
+    shortest_dist = Property('shortest_dist', 'shortest_dist', 'shortest distance between aircraft and path [m]', 0.0, 1000.0)
+    taxi_freq_state = 5
+    nb_step = Property('nb_step', 'nb_step', 'shortest distance between aircraft and path [m]')
+
+    dict_da = {
+        "d1": d1,
+        "d2": d2,
+        "d3": d3,
+        "d4": d4,
+        "d5": d5,
+        "d6": d6,
+        "d7": d7,
+        "d8": d8,
+        "a1": a1,
+        "a2": a2,
+        "a3": a3,
+        "a4": a4,
+        "a5": a5,
+        "a6": a6,
+        "a7": a7,
+        "a8": a8
+    }
 
     # functions updating custom properties
 
@@ -79,6 +116,33 @@ class MyCatalog(Property, Enum):
     def update_rudder_cmd_dir(cls, sim):
         cls.update_property_incr(sim, cls.rudder_cmd_dir, JsbsimCatalog.fcs_rudder_cmd_norm)
 
+    amdb_path = "/home/nico/amdb"
+    taxiPath = taxi_path(ambd_folder_path=amdb_path, number_of_points_to_use=8)
+    reader = shapefile.Reader(taxiPath.fname, encodingErrors="replace")
+
+    @classmethod
+    def update_da(sim):
+        #print("sim.get_property_value(nb_step), taxi_freq_state", sim.get_property_value(nb_step), taxi_freq_state)
+        if (sim.get_property_value(nb_step)%taxi_freq_state==1):
+            #start_time = time.time()
+            df = taxiPath.update_path((sim.get_property_value(lat_geod_deg), sim.get_property_value(lng_geoc_deg)), reader)
+            #print("--- %s seconds ---" % (time.time() - start_time))
+            
+            dist = shortest_ac_dist(0, 0, df[0][0].x, df[0][0].y, df[1][0].x, df[1][0].y)
+            #print("shortest_dist2", dist)
+            sim.set_property_value(shortest_dist, dist)
+            #print(sim.get_property_value(shortest_dist))
+
+            for i in range(1,len(df)):
+                if (df[i][2] <= 1000):
+                    #print(dict_da["d"+str(i)], df[i][1], dict_da["a"+str(i)], df[i][2]) 
+                    sim.set_property_value(dict_da["d"+str(i)], df[i][1])
+                    sim.set_property_value(dict_da["a"+str(i)], df[i][2])
+                else:
+                    sim.set_property_value(dict_da["d"+str(i)], 1000)
+                    sim.set_property_value(dict_da["a"+str(i)], 0)
+        sim.set_property_value(nb_step, int(sim.get_property_value(nb_step))+1)
+
     @classmethod
     def update_custom_properties(cls,sim,prop):
         update_custom_properties = {cls.delta_altitude : cls.update_delta_altitude,
@@ -92,6 +156,9 @@ class MyCatalog(Property, Enum):
                                     cls.elevator_cmd_dir : cls.update_elevator_cmd_dir,
 
                                     cls.rudder_cmd_dir : cls.update_rudder_cmd_dir
+
+                                    cls.d1 : cls.update_da
                                 }
         if prop in update_custom_properties:
             update_custom_properties[prop](sim)
+

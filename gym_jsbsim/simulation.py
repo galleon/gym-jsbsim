@@ -1,9 +1,10 @@
 from collections import namedtuple
 import re
 import jsbsim
-import gym_jsbsim.simulation_parameters as param
 from gym_jsbsim.catalogs.jsbsim_catalog import JsbsimCatalog
 from gym_jsbsim.catalogs.my_catalog import MyCatalog
+from gym_jsbsim.catalogs.catalog import Catalog
+from gym_jsbsim import ROOT_DIR
 
 
 class Simulation:
@@ -13,7 +14,7 @@ class Simulation:
 
     """
 
-    def __init__(self, aircraft_name="A320", init_conditions=None):
+    def __init__(self, aircraft_name="A320", init_conditions=None, jsbsim_freq = 60, agent_interaction_steps = 5):
         """
 
         Constructor. Creates an instance of JSBSim and sets initial conditions.
@@ -28,25 +29,17 @@ class Simulation:
             Defaults to None, causing a default set of initial props to be used.
 
         """
-        self.jsbsim_exec = jsbsim.FGFDMExec()
-        self.jsbsim_exec.set_debug_level(0)  # requests JSBSim not to output any messages whatsoever
         self.aircraft_name = aircraft_name
 
-        # set paths
-        self.jsbsim_exec.set_root_dir(param.ROOT_DIR)
-        self.jsbsim_exec.set_aircraft_path(param.AIRCRAFT_PATH)
-        self.jsbsim_exec.set_engine_path(param.ENGINE_PATH)
-        self.jsbsim_exec.set_systems_path(param.SYSTEM_PATH)
+        self.jsbsim_exec = None
 
-        # set jsbsim integration time step
-        dt = 1 / param.JSBSIM_FREQ
-        self.jsbsim_exec.set_dt(dt)
+        self.agent_interaction_steps = None
 
-        self.initialise(init_conditions)
+        self.initialise(init_conditions,jsbsim_freq,agent_interaction_steps)
 
 
 
-    def initialise(self, init_conditions=None):
+    def initialise(self, init_conditions=None, jsbsim_freq = 60, agent_interaction_steps = 5):
         """
 
          Loads an aircraft and initial conditions.
@@ -55,15 +48,22 @@ class Simulation:
         :param init_conditions: dict mapping properties to their initial values
 
         """
+        self.close()
+
+        self.jsbsim_exec = jsbsim.FGFDMExec(ROOT_DIR)
+        self.jsbsim_exec.set_debug_level(0)  # requests JSBSim not to output any messages whatsoever
 
         self.jsbsim_exec.load_model(self.aircraft_name)
 
-        self.set_initial_conditions(init_conditions)
+        # set jsbsim integration time step
+        dt = 1 / jsbsim_freq
+        self.jsbsim_exec.set_dt(dt)
 
-        MyCatalog.update_custom_properties(self)
+        self.agent_interaction_steps = agent_interaction_steps
+
+        self.set_initial_conditions(init_conditions)
         success = self.jsbsim_exec.run_ic()
         self.jsbsim_exec.propulsion_init_running(-1)
-        MyCatalog.update_custom_properties(self)
 
         if not success:
             raise RuntimeError('JSBSim failed to init simulation conditions.')
@@ -102,12 +102,10 @@ class Simulation:
         :return: bool, False if sim has met JSBSim termination criteria else True.
 
         """
-        MyCatalog.update_custom_properties(self)
-        for _ in range(param.AGENT_INTERACTION_STEPS):
+        for _ in range(self.agent_interaction_steps):
             result = self.jsbsim_exec.run()
             if not result:
                 raise RuntimeError('JSBSim failed.')
-        MyCatalog.update_custom_properties(self)
         return result
 
 
@@ -167,6 +165,10 @@ class Simulation:
 
         :return : float
         """
+
+        if prop.__class__ is Catalog:
+            MyCatalog.update_custom_properties(self,prop)
+
         return self.jsbsim_exec.get_property_value(prop.name_jsbsim)
 
 
@@ -201,10 +203,11 @@ class Simulation:
                 self.jsbsim_exec.set_property_value(prop.name_jsbsim + "[" + str(i) + "]", value)
 
         else:
-            try:
-                self.jsbsim_exec.set_property_value(prop.name_jsbsim, value)
-            except:
-                print(prop,'value',value,'ok')
+            self.jsbsim_exec.set_property_value(prop.name_jsbsim, value)
+
+        if prop.__class__ is Catalog:
+            MyCatalog.update_custom_properties(self,prop)
+
 
     def get_full_state(self):
         full_jsbsim_state = self.jsbsim_exec.get_property_catalog('')

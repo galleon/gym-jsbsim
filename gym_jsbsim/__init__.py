@@ -1,9 +1,8 @@
-from os import listdir
+from os import listdir,environ
 from os.path import isdir, join
 
 from gym.envs.registration import registry, register, make, spec
-from gym_jsbsim.envs.heading_control_task import HeadingControlTask
-from gym_jsbsim.simulation_parameters import ROOT_DIR, AIRCRAFT_PATH
+from gym_jsbsim.envs import TASKS
 from gym_jsbsim.catalogs import Catalog
 
 """
@@ -21,10 +20,10 @@ with OpenAI Gym so that they can be instantiated with a gym.make(id,task,aircraf
 
 """
 
-ABS_AIRCRAFT_PATH = join(ROOT_DIR, AIRCRAFT_PATH)
+ROOT_DIR = environ['JSBSIM_ROOT_DIR']
+ABS_AIRCRAFT_PATH = join(ROOT_DIR, "aircraft")
 
 AIRCRAFT_NAMES = [d for d in listdir(ABS_AIRCRAFT_PATH) if isdir(join(ABS_AIRCRAFT_PATH, d))]
-TASKS = dict(HeadingControlTask=HeadingControlTask)
 
 
 for aircraft_name in AIRCRAFT_NAMES:

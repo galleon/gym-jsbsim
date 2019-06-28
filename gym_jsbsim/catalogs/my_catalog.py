@@ -73,7 +73,6 @@ class MyCatalog(Property, Enum):
     taxi_freq_state = Property('taxi-freq-state','frequence to update taxi state',0)
     nb_step = Property('nb_step', 'shortest distance between aircraft and path [m]')
 
-    
 
     # functions updating custom properties
 
@@ -87,8 +86,8 @@ class MyCatalog(Property, Enum):
         value = utils.reduce_reflex_angle_deg(sim.get_property_value(JsbsimCatalog.attitude_psi_deg) - sim.get_property_value(cls.target_heading_deg))
         sim.set_property_value(cls.delta_heading, value)
 
-    @classmethod
-    def update_property_incr(cls, sim, discrete_prop, prop, incr_prop):
+    @staticmethod
+    def update_property_incr(sim, discrete_prop, prop, incr_prop):
         value = sim.get_property_value(discrete_prop)
         if value == 0:
             pass
@@ -125,7 +124,7 @@ class MyCatalog(Property, Enum):
             df = taxiPath.update_path((sim.get_property_value(JsbsimCatalog.position_lat_geod_deg), sim.get_property_value(JsbsimCatalog.position_long_gc_deg)), reader)
             #print("--- %s seconds ---" % (time.time() - start_time))
             
-            dist = cls.shortest_ac_dist(0, 0, df[0][0].x, df[0][0].y, df[1][0].x, df[1][0].y)
+            dist = utils.shortest_ac_dist(0, 0, df[0][0].x, df[0][0].y, df[1][0].x, df[1][0].y)
             #print("shortest_dist2", dist)
             sim.set_property_value(cls.shortest_dist, dist)
             #print(sim.get_property_value(shortest_dist))
@@ -162,7 +161,7 @@ class MyCatalog(Property, Enum):
             
     @classmethod
     def init_custom_properties(cls,sim,prop):
-        init_custom_properties = { cls.taxi_freq_state : 5,
+        init_custom_properties = { cls.taxi_freq_state : 30,
                                    
                                    cls.incr_throttle: 0.05,
 
@@ -176,7 +175,6 @@ class MyCatalog(Property, Enum):
         if prop in init_custom_properties:
             sim.set_property_value(prop,init_custom_properties[prop])
 
-    
     @classmethod
     def get_var_by_name(cls, string):
         dict_da = {
@@ -199,27 +197,3 @@ class MyCatalog(Property, Enum):
         }
         return dict_da[string]
 
-
-    @staticmethod
-    def shortest_ac_dist (x, y, x1, y1, x2, y2):
-        '''
-        Compute the shortest distance (in m) between aircraft coord (lat, lon) and the line between two points (lat1,lon1) and (lat2, lon2)
-        >>> round(shortest_ac_dist(40.759809, -73.976264, 40.758492, -73.975105, 40.759752, -73.974215))
-        160
-        >>> round(shortest_ac_dist(40.759168, -73.976741, 40.758492, -73.975105, 40.759752, -73.974215))
-        160
-        '''
-        #print(x, y, x1, y1, x2, y2)
-        # equation of line (lat1,lon1) -> (lat2, lon2): y = s*x + m
-        # slope
-        s = (y2 - y1) / (x2 - x1 + 0.00000000001)
-        # find m: m = y - s*x
-        m = y1 - s * x1
-        # coeff of line equation ay + bx + c = 0
-        a = -1
-        b = s
-        c = m
-        # compute shortest distance between aircarft and the line = abs(a*x0 + b*y0 + c) / sqrt(a²+b²))
-        s_ac_dist = math.fabs(a*x + b*y + c) / math.sqrt(a**2+b**2)
-        #print("s_ac_dist", s_ac_dist)
-        return s_ac_dist

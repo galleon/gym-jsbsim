@@ -165,12 +165,14 @@ class Simulation:
 
         :return : float
         """
-        if prop.name_jsbsim not in self.jsbsim_exec :
-            MyCatalog.init_custom_properties(self,prop)
+
         if prop.__class__ is Catalog:
             MyCatalog.update_custom_properties(self,prop)
-
-        return self.jsbsim_exec.get_property_value(prop.name_jsbsim)
+        try :
+            return self.jsbsim_exec[prop.name_jsbsim]
+        except KeyError:
+            MyCatalog.init_custom_properties(self, prop)
+            return self.jsbsim_exec.get_property_value(prop.name_jsbsim)
 
 
 
@@ -219,6 +221,11 @@ class Simulation:
                 full_state[JsbsimCatalog[prop_name]] = value
             except KeyError:
                 pass
+        for prop in MyCatalog:
+            try:
+                full_state[prop] = self.jsbsim_exec[prop.name_jsbsim]
+            except KeyError:
+                pass
         return full_state
 
     def get_init_conditions_from_state(self,state):
@@ -241,16 +248,19 @@ class Simulation:
                     }
 
         for prop,value in state.items():
-            if not re.match(r'^ic_', prop.name):
-                if prop in state_to_ic:
-                    init_conditions[state_to_ic[prop]] = value
+            if prop.__class__ is JsbsimCatalog:
+                if not re.match(r'^ic_', prop.name):
+                    if prop in state_to_ic:
+                        init_conditions[state_to_ic[prop]] = value
 
-                query_prop =  self.jsbsim_exec.query_property_catalog(prop.name_jsbsim)
-                while query_prop[0].split()[0] != prop.name_jsbsim :
-                    query_prop.pop(0)
+                    query_prop =  self.jsbsim_exec.query_property_catalog(prop.name_jsbsim)
+                    while query_prop[0].split()[0] != prop.name_jsbsim :
+                        query_prop.pop(0)
 
-                status =query_prop[0].split()[1]
-                if 'RW' in status:
-                    init_conditions[prop] = value
+                    status =query_prop[0].split()[1]
+                    if 'RW' in status:
+                        init_conditions[prop] = value
+            else:
+                init_conditions[prop] = value
 
         return init_conditions

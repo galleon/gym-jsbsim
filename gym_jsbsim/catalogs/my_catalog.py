@@ -9,12 +9,12 @@ from gym_jsbsim.envs.taxi_utils import *
 
 
 
-
+"""
 amdb_path = "/home/nico/amdb"
 taxiPath = taxi_path(ambd_folder_path=amdb_path, number_of_points_to_use=8)
 reader = shapefile.Reader(taxiPath.fname, encodingErrors="replace")
 taxi_freq_state = 30
-
+"""
 
 import gym_jsbsim.catalogs.utils as utils
 
@@ -145,9 +145,9 @@ class MyCatalog(Property, Enum):
 
                                     cls.elevator_cmd_dir : cls.update_elevator_cmd_dir,
 
-                                    cls.rudder_cmd_dir : cls.update_rudder_cmd_dir,
+                                    cls.rudder_cmd_dir : cls.update_rudder_cmd_dir#,
 
-                                    cls.d1 : cls.update_da
+                                    #cls.d1 : cls.update_da
                                 }
         if prop in update_custom_properties:
             update_custom_properties[prop](sim)

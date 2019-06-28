@@ -21,10 +21,10 @@ state_var = [c.delta_altitude,
              #c.accelerations_rdot_rad_sec2,
              ]
 
-action_var = [c.aileron_cmd_dir,
-              c.elevator_cmd_dir,
-              c.rudder_cmd_dir,
-              c.throttle_cmd_dir,
+action_var = [c.fcs_aileron_cmd_norm,
+              c.fcs_elevator_cmd_norm,
+              c.fcs_rudder_cmd_norm,
+              c.fcs_throttle_cmd_norm,
               ]
 
 init_conditions = { # 'ic/h-sl-ft', 'initial altitude MSL [ft]'
@@ -75,13 +75,13 @@ def get_reward(state, sim):
     heading_r = 1.0/math.sqrt(math.fabs(sim.get_property_value(c.delta_heading)+1))
 
     # inverse of the proportional absolute value between the initial and current altitude ...
-    alt_r = 1.0/(math.fabs(sim.get_property_value(c.delta_altitude)+1)
+    alt_r = 1.0/math.fabs(sim.get_property_value(c.delta_altitude)+1)
 
     # inverse of the normalised value of q, r, p acceleartion
-    angle_speed_r = 1.0/math.sqrt((math.fabs(last_state.accelerations_pdot_rad_sec2) + math.fabs(last_state.accelerations_qdot_rad_sec2) + math.fabs(last_state.accelerations_rdot_rad_sec2) + math.fabs(last_state.velocities_v_down_fps)) / 4.0 + 1)
+    #angle_speed_r = 1.0/math.sqrt((math.fabs(last_state.accelerations_pdot_rad_sec2) + math.fabs(last_state.accelerations_qdot_rad_sec2) + math.fabs(last_state.accelerations_rdot_rad_sec2) + math.fabs(last_state.velocities_v_down_fps)) / 4.0 + 1)
 
     # Add selective pressure to model that end up the simulation earlier
-    reward = heading_r * alt_r * angle_speed_r
+    reward = heading_r * alt_r# * angle_speed_r
     '''
     if sim.get_property_value(c.simulation_sim_time_sec) < 300:
         reward = reward / 3.0

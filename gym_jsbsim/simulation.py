@@ -165,7 +165,8 @@ class Simulation:
 
         :return : float
         """
-
+        if prop.name_jsbsim not in self.jsbsim_exec :
+            MyCatalog.init_custom_properties(self,prop)
         if prop.__class__ is Catalog:
             MyCatalog.update_custom_properties(self,prop)
 

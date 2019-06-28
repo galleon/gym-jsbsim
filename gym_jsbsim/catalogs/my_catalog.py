@@ -2,11 +2,16 @@
 
 
 from enum import Enum
+import shapefile
 from gym.spaces import Box, Discrete
 from gym_jsbsim.catalogs.property import Property
 from gym_jsbsim.catalogs.jsbsim_catalog import JsbsimCatalog
 import gym_jsbsim.catalogs.utils as utils
+from gym_jsbsim.envs.taxi_utils import taxi_path
 
+#amdb_path = "/home/nico/amdb"
+#taxiPath = taxi_path(ambd_folder_path=amdb_path, number_of_points_to_use=8)
+#reader = shapefile.Reader(taxiPath.fname, encodingErrors="replace")
 
 class MyCatalog(Property, Enum):
 
@@ -18,9 +23,13 @@ class MyCatalog(Property, Enum):
     # controls command
 
     throttle_cmd_dir = Property('fcs/throttle-cmd-dir', 'direction to move the throttle', 0, 2, Discrete)
+    incr_throttle = Property('fcs/incr-throttle','incrementation throttle', 0, 1)
     aileron_cmd_dir = Property('fcs/aileron-cmd-dir', 'direction to move the aileron', 0, 2, Discrete)
+    incr_aileron = Property('fcs/incr-aileron', 'incrementation aileron', 0, 1)
     elevator_cmd_dir = Property('fcs/elevator-cmd-dir', 'direction to move the elevator', 0, 2, Discrete)
+    incr_elevator = Property('fcs/incr-elevator', 'incrementation elevator', 0, 1)
     rudder_cmd_dir = Property('fcs/rudder-cmd-dir', 'direction to move the rudder', 0, 2, Discrete)
+    incr_rudder = Property('fcs/incr-rudder', 'incrementation rudder', 0, 1)
 
     # target conditions
 
@@ -32,8 +41,8 @@ class MyCatalog(Property, Enum):
 
     # following path
 
-    steady_flight = Property('steady_flight', 'steady_flight', 'steady flight mode', 0, 1)
-    turn_flight = Property('turn_flight', 'turn_flight', 'turn flight mode', 0, 1)
+    steady_flight = Property( 'steady_flight', 'steady flight mode', 0, 1)
+    turn_flight = Property( 'turn_flight', 'turn flight mode', 0, 1)
 
     #dist_heading_centerline_matrix = Property('dist_heading_centerline_matrix', 'dist_heading_centerline_matrix', '2D matrix with dist,angle of the next point from the aircraft to 1km (max 10 points)', [0, -45, 0, -45, 0, -45, 0, -45, 0, -45, 0, -45, 0, -45, 0, -45], [1000, 45, 1000, 45, 1000, 45, 1000, 45, 1000, 45, 1000, 45, 1000, 45, 1000, 45])
     d1 = Property('d1', 'd1', 'd1', 0, 1000) 
@@ -53,9 +62,9 @@ class MyCatalog(Property, Enum):
     a7 = Property('a7', 'a7', 'a7', -180, 180)  
     a8 = Property('a8', 'a8', 'a8', -180, 180)
 
-    shortest_dist = Property('shortest_dist', 'shortest_dist', 'shortest distance between aircraft and path [m]', 0.0, 1000.0)
-    taxi_freq_state = 5
-    nb_step = Property('nb_step', 'nb_step', 'shortest distance between aircraft and path [m]')
+    shortest_dist = Property('shortest-dist', 'shortest distance between aircraft and path [m]', 0.0, 1000.0)
+    taxi_freq_state = Property('taxi-freq-state','frequence to update taxi state',0)
+    nb_step = Property('nb-step', 'shortest distance between aircraft and path [m]',0,Discrete)
 
     dict_da = {
         "d1": d1,
@@ -89,59 +98,56 @@ class MyCatalog(Property, Enum):
         sim.set_property_value(cls.delta_heading, value)
 
     @classmethod
-    def update_property_incr(cls, sim, discrete_prop, prop, incr=0.05):
+    def update_property_incr(cls, sim, discrete_prop, prop, incr_prop):
         value = sim.get_property_value(discrete_prop)
         if value == 0:
             pass
         else :
             if value == 1:
-                sim.set_property_value(prop, sim.get_property_value(prop) - incr)
+                sim.set_property_value(prop, sim.get_property_value(prop) - sim.get_property_value(incr_prop))
             elif value == 2:
-                sim.set_property_value(prop, sim.get_property_value(prop) + incr)
+                sim.set_property_value(prop, sim.get_property_value(prop) + sim.get_property_value(incr_prop))
             sim.set_property_value(discrete_prop, 0)
 
     @classmethod
     def update_throttle_cmd_dir(cls, sim):
-        cls.update_property_incr(sim, cls.throttle_cmd_dir, JsbsimCatalog.fcs_throttle_cmd_norm)
+        cls.update_property_incr(sim, cls.throttle_cmd_dir, JsbsimCatalog.fcs_throttle_cmd_norm, MyCatalog.incr_throttle)
 
     @classmethod
     def update_aileron_cmd_dir(cls, sim):
-        cls.update_property_incr(sim, cls.aileron_cmd_dir, JsbsimCatalog.fcs_aileron_cmd_norm)
+        cls.update_property_incr(sim, cls.aileron_cmd_dir, JsbsimCatalog.fcs_aileron_cmd_norm, MyCatalog.incr_aileron)
 
     @classmethod
     def update_elevator_cmd_dir(cls, sim):
-        cls.update_property_incr(sim, cls.elevator_cmd_dir, JsbsimCatalog.fcs_elevator_cmd_norm)
+        cls.update_property_incr(sim, cls.elevator_cmd_dir, JsbsimCatalog.fcs_elevator_cmd_norm, MyCatalog.incr_elevator)
 
     @classmethod
     def update_rudder_cmd_dir(cls, sim):
-        cls.update_property_incr(sim, cls.rudder_cmd_dir, JsbsimCatalog.fcs_rudder_cmd_norm)
+        cls.update_property_incr(sim, cls.rudder_cmd_dir, JsbsimCatalog.fcs_rudder_cmd_norm, MyCatalog.incr_rudder)
 
-    amdb_path = "/home/nico/amdb"
-    taxiPath = taxi_path(ambd_folder_path=amdb_path, number_of_points_to_use=8)
-    reader = shapefile.Reader(taxiPath.fname, encodingErrors="replace")
 
     @classmethod
-    def update_da(sim):
+    def update_da(cls,sim):
         #print("sim.get_property_value(nb_step), taxi_freq_state", sim.get_property_value(nb_step), taxi_freq_state)
-        if (sim.get_property_value(nb_step)%taxi_freq_state==1):
+        if (sim.get_property_value(cls.nb_step)%cls.taxi_freq_state==1):
             #start_time = time.time()
-            df = taxiPath.update_path((sim.get_property_value(lat_geod_deg), sim.get_property_value(lng_geoc_deg)), reader)
+            df = cls.taxiPath.update_path((sim.get_property_value(JsbsimCatalog.position_lat_geod_deg), sim.get_property_value(JsbsimCatalog.position_long_gc_deg)), reader)
             #print("--- %s seconds ---" % (time.time() - start_time))
             
-            dist = shortest_ac_dist(0, 0, df[0][0].x, df[0][0].y, df[1][0].x, df[1][0].y)
+            dist = cls.shortest_ac_dist(0, 0, df[0][0].x, df[0][0].y, df[1][0].x, df[1][0].y)
             #print("shortest_dist2", dist)
-            sim.set_property_value(shortest_dist, dist)
+            sim.set_property_value(cls.shortest_dist, dist)
             #print(sim.get_property_value(shortest_dist))
 
             for i in range(1,len(df)):
                 if (df[i][2] <= 1000):
                     #print(dict_da["d"+str(i)], df[i][1], dict_da["a"+str(i)], df[i][2]) 
-                    sim.set_property_value(dict_da["d"+str(i)], df[i][1])
-                    sim.set_property_value(dict_da["a"+str(i)], df[i][2])
+                    sim.set_property_value(cls.dict_da["d"+str(i)], df[i][1])
+                    sim.set_property_value(cls.dict_da["a"+str(i)], df[i][2])
                 else:
-                    sim.set_property_value(dict_da["d"+str(i)], 1000)
-                    sim.set_property_value(dict_da["a"+str(i)], 0)
-        sim.set_property_value(nb_step, int(sim.get_property_value(nb_step))+1)
+                    sim.set_property_value(cls.dict_da["d"+str(i)], 1000)
+                    sim.set_property_value(cls.dict_da["a"+str(i)], 0)
+        sim.set_property_value(cls.nb_step, int(sim.get_property_value(cls.nb_step))+1)
 
     @classmethod
     def update_custom_properties(cls,sim,prop):
@@ -155,10 +161,26 @@ class MyCatalog(Property, Enum):
 
                                     cls.elevator_cmd_dir : cls.update_elevator_cmd_dir,
 
-                                    cls.rudder_cmd_dir : cls.update_rudder_cmd_dir
+                                    cls.rudder_cmd_dir : cls.update_rudder_cmd_dir,
 
                                     cls.d1 : cls.update_da
                                 }
         if prop in update_custom_properties:
             update_custom_properties[prop](sim)
+            
+    @classmethod
+    def init_custom_properties(cls,sim,prop):
+        init_custom_properties = { cls.taxi_freq_state : 5,
+                                   
+                                   cls.incr_throttle: 0.05,
 
+                                   cls.incr_aileron : 0.05,
+
+                                   cls.incr_elevator : 0.05,
+
+                                   cls.incr_rudder : 0.05
+        }
+
+        if prop in init_custom_properties:
+            sim.set_property_value(prop,init_custom_properties[prop])
+        

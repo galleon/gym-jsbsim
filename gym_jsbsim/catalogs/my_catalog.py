@@ -145,14 +145,12 @@ class MyCatalog(Property, Enum):
 
                                     cls.elevator_cmd_dir : cls.update_elevator_cmd_dir,
 
-                                    cls.rudder_cmd_dir : cls.update_rudder_cmd_dir
+                                    cls.rudder_cmd_dir : cls.update_rudder_cmd_dir,
 
                                     cls.d1 : cls.update_da
                                 }
         if prop in update_custom_properties:
             update_custom_properties[prop](sim)
-
-        return new_angle
     
     @classmethod
     def get_var_by_name(cls, string):
@@ -176,6 +174,16 @@ class MyCatalog(Property, Enum):
         }
         return dict_da[string]
 
+    @staticmethod
+    def reduce_reflex_angle_deg(angle):
+        """ Given an angle in degrees, normalises in [-179, 180] """
+
+        new_angle = angle % 360
+
+        if new_angle > 180:
+            new_angle -= 360
+
+        return new_angle
 
     @staticmethod
     def shortest_ac_dist (x, y, x1, y1, x2, y2):

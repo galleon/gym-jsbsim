@@ -14,7 +14,7 @@ import numpy as np
 
 state_var = [c.delta_altitude,
              c.delta_heading,
-             c.velocities_v_down_fps,
+             #c.velocities_v_down_fps,
              c.velocities_vc_fps,
              #c.accelerations_pdot_rad_sec2,
              #c.accelerations_qdot_rad_sec2,
@@ -75,13 +75,13 @@ def get_reward(state, sim):
     heading_r = 1.0/math.sqrt(math.fabs(sim.get_property_value(c.delta_heading)+1))
 
     # inverse of the proportional absolute value between the initial and current altitude ...
-    alt_r = 1.0/math.sqrt(math.fabs(sim.get_property_value(c.delta_altitude))+1)
+    alt_r = 1.0/(math.fabs(sim.get_property_value(c.delta_altitude)+1)
 
     # inverse of the normalised value of q, r, p acceleartion
-    #angle_speed_r = 1.0/math.sqrt((math.fabs(last_state.accelerations_pdot_rad_sec2) + math.fabs(last_state.accelerations_qdot_rad_sec2) + math.fabs(last_state.accelerations_rdot_rad_sec2) + math.fabs(last_state.velocities_v_down_fps)) / 4.0 + 1)
+    angle_speed_r = 1.0/math.sqrt((math.fabs(last_state.accelerations_pdot_rad_sec2) + math.fabs(last_state.accelerations_qdot_rad_sec2) + math.fabs(last_state.accelerations_rdot_rad_sec2) + math.fabs(last_state.velocities_v_down_fps)) / 4.0 + 1)
 
     # Add selective pressure to model that end up the simulation earlier
-    reward = (heading_r + alt_r) / 2.0
+    reward = heading_r * alt_r * angle_speed_r
     '''
     if sim.get_property_value(c.simulation_sim_time_sec) < 300:
         reward = reward / 3.0
@@ -107,7 +107,7 @@ def is_terminal(state, sim):
 
         sim.set_property_value(c.steady_flight,0)
     # End up the simulation after 1200 secondes or if the aircraft is under or above 500 feet of its target altitude or velocity under 400f/s
-    return sim.get_property_value(c.simulation_sim_time_sec)>=300 or math.fabs(sim.get_property_value(c.delta_altitude)) >= 300# or math.fabs(sim.get_property_value(v_air) <= 400)
+    return sim.get_property_value(c.simulation_sim_time_sec)>=300 or math.fabs(sim.get_property_value(c.delta_altitude)) >= 300 or math.fabs(sim.get_property_value(c.delta_heading) >= 90)
 
 
 HeadingControlTask = Task(state_var, action_var, init_conditions, get_reward, is_terminal)

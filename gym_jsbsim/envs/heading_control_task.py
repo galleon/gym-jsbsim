@@ -93,22 +93,22 @@ def get_reward(state, sim):
 
 def is_terminal(state, sim):
     # Change heading every 150 seconds
-    if sim.get_property_value(steady_flight)==1 and sim.get_property_value(sim_time_s) >= 150:
-        new_alt = sim.get_property_value(target_altitude_ft)# + random.uniform(-1000, 1000)
-        new_heading = sim.get_property_value(target_heading_deg) + random.uniform(-80, 80)
+    if sim.get_property_value(c.steady_flight)==1 and sim.get_property_value(c.simulation_sim_time_sec) >= 150:
+        new_alt = sim.get_property_value(c.target_altitude_ft)# + random.uniform(-1000, 1000)
+        new_heading = sim.get_property_value(c.target_heading_deg) + random.uniform(-80, 80)
         if (new_heading <= 0):
             new_heading = 360 - new_heading
         if (new_heading >= 360):
             new_heading = new_heading - 360
 
-        print(f'Time to change: {sim.get_property_value(sim_time_s)} (Altitude: {sim.get_property_value(target_altitude_ft)} -> {new_alt}, Heading: {sim.get_property_value(target_heading_deg)} -> {new_heading})')
-        sim.set_property_value(target_altitude_ft, new_alt)
-        sim.set_property_value(target_heading_deg, new_heading)
+        print(f'Time to change: {sim.get_property_value(c.simulation_sim_time_sec)} (Altitude: {sim.get_property_value(c.target_altitude_ft)} -> {new_alt}, Heading: {sim.get_property_value(c.target_heading_deg)} -> {new_heading})')
+        sim.set_property_value(c.target_altitude_ft, new_alt)
+        sim.set_property_value(c.target_heading_deg, new_heading)
 
-        sim.get_property_value(steady_flight)==0
+        sim.set_property_value(c.steady_flight,0)
 
     # End up the simulation after 1200 secondes or if the aircraft is under or above 500 feet of its target altitude or velocity under 400f/s
-    return sim.get_property_value(sim_time_s)>=300 or math.fabs(sim.get_property_value(delta_altitude)) >= 300# or math.fabs(sim.get_property_value(v_air) <= 400)
+    return sim.get_property_value(c.simulation_sim_time_sec)>=300 or math.fabs(sim.get_property_value(c.delta_altitude)) >= 300# or math.fabs(sim.get_property_value(v_air) <= 400)
 
 
 HeadingControlTask = Task(state_var, action_var, init_conditions, get_reward, is_terminal)

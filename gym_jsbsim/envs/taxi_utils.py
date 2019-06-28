@@ -212,13 +212,13 @@ class taxi_path(object):
                     points.append((a, b))
                     if b > 0:      # only points with +y with respect to ref
                         distance = Point((0, 0)).distance(Point(a, b))
-                        heading = math.degrees(math.atan2(b, a))  # considering the ref point will always be (0,0)
+                        heading = math.degrees(math.atan2(a, b))  # considering the ref point will always be (0,0)
                         df.append([Point(a, b), distance, heading])
         points.sort(key=lambda x: x[1]) # sorted by b (ie: y)
         for p in range(len(points)):
             if points[p][1] >= 0:
                 distance = Point((0, 0)).distance(Point(points[p-1][0], points[p-1][1]))
-                heading = math.degrees(math.atan2(points[p-1][1], points[p-1][0]))  # considering the ref point will always be (0,0)
+                heading = math.degrees(math.atan2(points[p-1][0], points[p-1][1]))  # considering the ref point will always be (0,0)
                 df.append([Point(points[p-1][0], points[p-1][1]), distance, heading])
                 break
         df.sort(key=lambda x: x[1])  # sorted by distance from ref

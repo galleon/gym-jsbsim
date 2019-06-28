@@ -72,10 +72,10 @@ def get_reward(state, sim):
     Reward with delta and altitude heading directly in the input vector state.
     '''
     # inverse of the proportional absolute value of the minimal angle between the initial and current heading ...
-    heading_r = 1.0/math.sqrt(math.fabs(sim.get_property_value(c.delta_heading)+1))
+    heading_r = math.exp(-math.fabs(sim.get_property_value(c.delta_heading)+1))
 
     # inverse of the proportional absolute value between the initial and current altitude ...
-    alt_r = 1.0/math.fabs(sim.get_property_value(c.delta_altitude)+1)
+    alt_r = math.exp(-math.fabs(sim.get_property_value(c.delta_altitude)+1))
 
     # inverse of the normalised value of q, r, p acceleartion
     #angle_speed_r = 1.0/math.sqrt((math.fabs(last_state.accelerations_pdot_rad_sec2) + math.fabs(last_state.accelerations_qdot_rad_sec2) + math.fabs(last_state.accelerations_rdot_rad_sec2) + math.fabs(last_state.velocities_v_down_fps)) / 4.0 + 1)

@@ -105,11 +105,7 @@ def is_terminal(state, sim):
         sim.set_property_value(c.target_altitude_ft, new_alt)
         sim.set_property_value(c.target_heading_deg, new_heading)
 
-<<<<<<< HEAD
         sim.set_property_value(c.steady_flight,0)
-=======
-        sim.get_property_value(c.steady_flight)==0
->>>>>>> 597cc8450d988c39c41b6443daace0de46357ef6
 
     # End up the simulation after 1200 secondes or if the aircraft is under or above 500 feet of its target altitude or velocity under 400f/s
     return sim.get_property_value(c.simulation_sim_time_sec)>=300 or math.fabs(sim.get_property_value(c.delta_altitude)) >= 300# or math.fabs(sim.get_property_value(v_air) <= 400)

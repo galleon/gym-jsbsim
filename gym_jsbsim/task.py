@@ -11,7 +11,7 @@ class Task:
 
     """
 
-    def __init__(self, observation_var, action_var, init_conditions, get_reward, is_terminal, output=None):
+    def __init__(self, observation_var, action_var, init_conditions, get_reward, is_terminal, output=None, jsbsim_freq = 60, agent_interaction_steps = 5):
         """
         Constructor
 
@@ -21,6 +21,8 @@ class Task:
         :param get_reward: function which calculates the agent's reward
         :param is_terminal: function which determine if the episode is terminated
         :param output: list of Property, properties to be output
+        :param jsbsim_freq: JSBSim integration frequency
+        :param agent_interaction_steps: simulation steps before the agent interact
         """
 
 
@@ -29,6 +31,9 @@ class Task:
         self.get_reward = get_reward
         self.is_terminal = is_terminal
         self.init_conditions = init_conditions
+        self.jsbsim_freq = jsbsim_freq
+        self.agent_interaction_steps = agent_interaction_steps
+
 
         #set default output to observation_var
         if output is None:

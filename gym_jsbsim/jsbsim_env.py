@@ -116,11 +116,10 @@ class JSBSimEnv(gym.Env):
 
         """
         if self.sim:
-            self.sim.close()
+            self.sim.initialise(init_conditions=self.task.init_conditions, jsbsim_freq = self.task.jsbsim_freq, agent_interaction_steps = self.task.agent_interaction_steps)
 
-        init_conditions = self.task.get_initial_conditions()
-
-        self.sim = Simulation(self.aircraft_name, init_conditions)
+        else :
+            self.sim = Simulation(aircraft_name = self.aircraft_name, init_conditions=self.task.init_conditions, jsbsim_freq = self.task.jsbsim_freq, agent_interaction_steps = self.task.agent_interaction_steps)
 
         self.state = self.get_observation()
 
@@ -142,6 +141,12 @@ class JSBSimEnv(gym.Env):
 
     def define_init_conditions(self,init_conditions):
         self.task.init_conditions=init_conditions
+
+    def define_jsbsim_freq(self, freq = 60):
+        self.task.jsbsim_freq = freq
+
+    def define_agent_interaction_steps(self,steps = 5):
+        self.task.agent_interaction_steps = steps
 
 
     def render(self, mode='human'):

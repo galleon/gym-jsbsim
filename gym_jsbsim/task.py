@@ -11,7 +11,7 @@ class Task:
 
     """
 
-    def __init__(self, observation_var, action_var, init_conditions, get_reward, is_terminal, output=None, jsbsim_freq = 60, agent_interaction_steps = 5):
+    def __init__(self, observation_var, action_var, init_conditions, get_reward, is_terminal, output=None, jsbsim_freq = 30, agent_interaction_steps = 5):
         """
         Constructor
 
@@ -26,8 +26,8 @@ class Task:
         """
 
 
-        self.action_var = action_var
-        self.observation_var = observation_var
+        self.action_space = action_var
+        self.observation_space = observation_var
         self.get_reward = get_reward
         self.is_terminal = is_terminal
         self.init_conditions = init_conditions
@@ -37,17 +37,17 @@ class Task:
 
         #set default output to observation_var
         if output is None:
-            self.output = observation_var
+            self.output = self.observation_space
         else:
             self.ouput = output
 
 
-    def get_observation_var(self):
-        return self.observation_var
+    def get_observation_space(self):
+        return self.observation_space
 
 
-    def get_action_var(self):
-        return self.action_var
+    def get_action_space(self):
+        return self.action_space
 
 
     def get_initial_conditions(self):
@@ -67,7 +67,7 @@ class Task:
 
         space_tuple = ()
 
-        for prop in self.observation_var:
+        for prop in self.observation_space:
             if prop.spaces is Box:
                 space_tuple += (Box(low=np.array([prop.min]), high=np.array([prop.max]), dtype='float'),)
             elif prop.spaces is Discrete:
@@ -83,7 +83,7 @@ class Task:
         """
         space_tuple = ()
 
-        for prop in self.action_var:
+        for prop in self.action_space:
             if prop.spaces is Box:
                 space_tuple += (Box(low=np.array([prop.min]), high=np.array([prop.max]), dtype='float'),)
             elif prop.spaces is Discrete:

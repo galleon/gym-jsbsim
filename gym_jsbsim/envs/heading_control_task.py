@@ -72,23 +72,23 @@ def get_reward(state, sim):
     Reward with delta and altitude heading directly in the input vector state.
     '''
     # inverse of the proportional absolute value of the minimal angle between the initial and current heading ...
-    heading_r = math.exp(-math.fabs(sim.get_property_value(c.delta_heading)+1))
+    heading_r = math.exp(-0.1*math.fabs(sim.get_property_value(c.delta_heading)))
 
     # inverse of the proportional absolute value between the initial and current altitude ...
-    alt_r = math.exp(-math.fabs(sim.get_property_value(c.delta_altitude)+1))
+    alt_r = math.exp(-0.1*math.fabs(sim.get_property_value(c.delta_altitude)))
 
     # inverse of the normalised value of q, r, p acceleartion
     #angle_speed_r = 1.0/math.sqrt((math.fabs(last_state.accelerations_pdot_rad_sec2) + math.fabs(last_state.accelerations_qdot_rad_sec2) + math.fabs(last_state.accelerations_rdot_rad_sec2) + math.fabs(last_state.velocities_v_down_fps)) / 4.0 + 1)
 
     # Add selective pressure to model that end up the simulation earlier
-    reward = heading_r * alt_r# * angle_speed_r
+    reward = heading_r + 2.0*alt_r# * angle_speed_r
     '''
     if sim.get_property_value(c.simulation_sim_time_sec) < 300:
         reward = reward / 3.0
     if sim.get_property_value(c.simulation_sim_time_sec) >= 300 and sim.get_property_value(c.simulation_sim_time_sec) < 1000:
         reward = reward / 2.0
     '''
-    return reward
+    return reward/3.0
 
 
 def is_terminal(state, sim):

@@ -2,6 +2,7 @@
 
 
 from enum import Enum
+import shapefile
 from gym.spaces import Box, Discrete
 from gym_jsbsim.catalogs.property import Property
 from gym_jsbsim.catalogs.jsbsim_catalog import JsbsimCatalog
@@ -29,9 +30,13 @@ class MyCatalog(Property, Enum):
     # controls command
 
     throttle_cmd_dir = Property('fcs/throttle-cmd-dir', 'direction to move the throttle', 0, 2, Discrete)
+    incr_throttle = Property('fcs/incr-throttle','incrementation throttle', 0, 1)
     aileron_cmd_dir = Property('fcs/aileron-cmd-dir', 'direction to move the aileron', 0, 2, Discrete)
+    incr_aileron = Property('fcs/incr-aileron', 'incrementation aileron', 0, 1)
     elevator_cmd_dir = Property('fcs/elevator-cmd-dir', 'direction to move the elevator', 0, 2, Discrete)
+    incr_elevator = Property('fcs/incr-elevator', 'incrementation elevator', 0, 1)
     rudder_cmd_dir = Property('fcs/rudder-cmd-dir', 'direction to move the rudder', 0, 2, Discrete)
+    incr_rudder = Property('fcs/incr-rudder', 'incrementation rudder', 0, 1)
 
     # target conditions
 
@@ -65,10 +70,10 @@ class MyCatalog(Property, Enum):
     a8 = Property('a8', 'a8', -180, 180)
 
     shortest_dist = Property('shortest_dist', 'shortest distance between aircraft and path [m]', 0.0, 1000.0)
-    
+    taxi_freq_state = Property('taxi-freq-state','frequence to update taxi state',0)
     nb_step = Property('nb_step', 'shortest distance between aircraft and path [m]')
 
-    
+
     # functions updating custom properties
 
     @classmethod
@@ -81,33 +86,34 @@ class MyCatalog(Property, Enum):
         value = utils.reduce_reflex_angle_deg(sim.get_property_value(JsbsimCatalog.attitude_psi_deg) - sim.get_property_value(cls.target_heading_deg))
         sim.set_property_value(cls.delta_heading, value)
 
-    @classmethod
-    def update_property_incr(cls, sim, discrete_prop, prop, incr=0.05):
+    @staticmethod
+    def update_property_incr(sim, discrete_prop, prop, incr_prop):
         value = sim.get_property_value(discrete_prop)
         if value == 0:
             pass
         else :
             if value == 1:
-                sim.set_property_value(prop, sim.get_property_value(prop) - incr)
+                sim.set_property_value(prop, sim.get_property_value(prop) - sim.get_property_value(incr_prop))
             elif value == 2:
-                sim.set_property_value(prop, sim.get_property_value(prop) + incr)
+                sim.set_property_value(prop, sim.get_property_value(prop) + sim.get_property_value(incr_prop))
             sim.set_property_value(discrete_prop, 0)
 
     @classmethod
     def update_throttle_cmd_dir(cls, sim):
-        cls.update_property_incr(sim, cls.throttle_cmd_dir, JsbsimCatalog.fcs_throttle_cmd_norm)
+        cls.update_property_incr(sim, cls.throttle_cmd_dir, JsbsimCatalog.fcs_throttle_cmd_norm, MyCatalog.incr_throttle)
 
     @classmethod
     def update_aileron_cmd_dir(cls, sim):
-        cls.update_property_incr(sim, cls.aileron_cmd_dir, JsbsimCatalog.fcs_aileron_cmd_norm)
+        cls.update_property_incr(sim, cls.aileron_cmd_dir, JsbsimCatalog.fcs_aileron_cmd_norm, MyCatalog.incr_aileron)
 
     @classmethod
     def update_elevator_cmd_dir(cls, sim):
-        cls.update_property_incr(sim, cls.elevator_cmd_dir, JsbsimCatalog.fcs_elevator_cmd_norm)
+        cls.update_property_incr(sim, cls.elevator_cmd_dir, JsbsimCatalog.fcs_elevator_cmd_norm, MyCatalog.incr_elevator)
 
     @classmethod
     def update_rudder_cmd_dir(cls, sim):
-        cls.update_property_incr(sim, cls.rudder_cmd_dir, JsbsimCatalog.fcs_rudder_cmd_norm)
+        cls.update_property_incr(sim, cls.rudder_cmd_dir, JsbsimCatalog.fcs_rudder_cmd_norm, MyCatalog.incr_rudder)
+
 
     @classmethod
     def update_da(cls, sim):
@@ -118,7 +124,7 @@ class MyCatalog(Property, Enum):
             df = taxiPath.update_path((sim.get_property_value(JsbsimCatalog.position_lat_geod_deg), sim.get_property_value(JsbsimCatalog.position_long_gc_deg)), reader)
             #print("--- %s seconds ---" % (time.time() - start_time))
             
-            dist = cls.shortest_ac_dist(0, 0, df[0][0].x, df[0][0].y, df[1][0].x, df[1][0].y)
+            dist = utils.shortest_ac_dist(0, 0, df[0][0].x, df[0][0].y, df[1][0].x, df[1][0].y)
             #print("shortest_dist2", dist)
             sim.set_property_value(cls.shortest_dist, dist)
             #print(sim.get_property_value(shortest_dist))
@@ -126,7 +132,7 @@ class MyCatalog(Property, Enum):
             for i in range(1,len(df)):
                 if (df[i][1] <= 1000000000):
                     sim.set_property_value(cls.get_var_by_name("d"+str(i)), df[i][1])
-                    sim.set_property_value(cls.get_var_by_name("a"+str(i)), cls.reduce_reflex_angle_deg(df[i][2] - sim.get_property_value(JsbsimCatalog.attitude_psi_deg)))
+                    sim.set_property_value(cls.get_var_by_name("a"+str(i)), utils.reduce_reflex_angle_deg(df[i][2] - sim.get_property_value(JsbsimCatalog.attitude_psi_deg)))
                     #sim.set_property_value(cls.get_var_by_name("a"+str(i)), df[i][2])
                 else:
                     sim.set_property_value(cls.get_var_by_name("d"+str(i)), 1000)
@@ -151,7 +157,24 @@ class MyCatalog(Property, Enum):
                                 }
         if prop in update_custom_properties:
             update_custom_properties[prop](sim)
-    
+
+            
+    @classmethod
+    def init_custom_properties(cls,sim,prop):
+        init_custom_properties = { cls.taxi_freq_state : 30,
+                                   
+                                   cls.incr_throttle: 0.05,
+
+                                   cls.incr_aileron : 0.05,
+
+                                   cls.incr_elevator : 0.05,
+
+                                   cls.incr_rudder : 0.05
+        }
+
+        if prop in init_custom_properties:
+            sim.set_property_value(prop,init_custom_properties[prop])
+
     @classmethod
     def get_var_by_name(cls, string):
         dict_da = {
@@ -174,39 +197,3 @@ class MyCatalog(Property, Enum):
         }
         return dict_da[string]
 
-    @staticmethod
-    def reduce_reflex_angle_deg(angle):
-        """ Given an angle in degrees, normalises in [-179, 180] """
-
-        new_angle = angle % 360
-
-        if new_angle > 180:
-            new_angle -= 360
-
-        return new_angle
-
-    @staticmethod
-    def shortest_ac_dist (x, y, x1, y1, x2, y2):
-        '''
-        Compute the shortest distance (in m) between aircraft coord (lat, lon) and the line between two points (lat1,lon1) and (lat2, lon2)
-        >>> round(shortest_ac_dist(40.759809, -73.976264, 40.758492, -73.975105, 40.759752, -73.974215))
-        160
-        >>> round(shortest_ac_dist(40.759168, -73.976741, 40.758492, -73.975105, 40.759752, -73.974215))
-        160
-        '''
-        #print(x, y, x1, y1, x2, y2)
-        # equation of line (lat1,lon1) -> (lat2, lon2): y = s*x + m
-        # slope
-        s = (y2 - y1) / (x2 - x1 + 0.00000000001)
-        # find m: m = y - s*x
-        m = y1 - s * x1
-        # coeff of line equation ay + bx + c = 0
-        a = -1
-        b = s
-        c = m
-        # compute shortest distance between aircarft and the line = abs(a*x0 + b*y0 + c) / sqrt(a²+b²))
-        s_ac_dist = math.fabs(a*x + b*y + c) / math.sqrt(a**2+b**2)
-        #print("s_ac_dist", s_ac_dist)
-        return s_ac_dist
-    
-    

@@ -40,8 +40,8 @@ class JSBSimEnv(gym.Env):
         self.aircraft_name = aircraft_name
         self.task = task
 
-        self.observation_space = None
-        self.action_space = None
+        self.observation_space = self.task.get_observation_space() #None
+        self.action_space = self.task.get_action_space() #None
 
         self.state = None
 

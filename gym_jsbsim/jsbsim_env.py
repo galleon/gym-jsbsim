@@ -234,7 +234,7 @@ class JSBSimEnv(gym.Env):
         :return: NamedTuple, the first state observation of the episode
 
         """
-        return self.sim.get_property_values(self.task.get_observation_var())
+        return self.sim.get_property_values(self.task.get_observation_space())
 
 
     def get_sim_time(self):

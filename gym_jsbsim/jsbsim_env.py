@@ -40,8 +40,8 @@ class JSBSimEnv(gym.Env):
         self.aircraft_name = aircraft_name
         self.task = task
 
-        self.observation_space = self.task.get_observation_space() #None
-        self.action_space = self.task.get_action_space() #None
+        self.observation_space = self.task.get_observation_var() #None
+        self.action_space = self.task.get_action_var()#None
 
         self.state = None
 
@@ -234,7 +234,7 @@ class JSBSimEnv(gym.Env):
         :return: NamedTuple, the first state observation of the episode
 
         """
-        return self.sim.get_property_values(self.task.get_observation_space())
+        return self.sim.get_property_values(self.task.get_observation_var())
 
 
     def get_sim_time(self):

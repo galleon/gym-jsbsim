@@ -40,8 +40,8 @@ class JSBSimEnv(gym.Env):
         self.aircraft_name = aircraft_name
         self.task = task
 
-        self.observation_space = None
-        self.action_space = None
+        self.observation_space = self.task.get_observation_space() #None
+        self.action_space = self.task.get_action_space()#None
 
         self.state = None
 
@@ -74,7 +74,13 @@ class JSBSimEnv(gym.Env):
         """
 
         if action is not None:
-            if not len(action) == len(self.action_space):
+            #print(action, self.action_space)
+            #nb_action = 0
+            #for x in action:
+            #    nb_action += 1
+            #print(nb_action)
+            #print(len(self.action_space.spaces))
+            if not len(action) == len(self.action_space.spaces):
                 raise ValueError(
                     'mismatch between action and action space size')
 

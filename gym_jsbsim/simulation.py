@@ -166,13 +166,11 @@ class Simulation:
         :return : float
         """
 
-        if prop.__class__ is Catalog:
-            MyCatalog.update_custom_properties(self,prop)
-        try :
-            return self.jsbsim_exec[prop.name_jsbsim]
-        except KeyError:
-            MyCatalog.init_custom_properties(self, prop)
-            return self.jsbsim_exec.get_property_value(prop.name_jsbsim)
+        if prop.access == 'R':
+            if prop.update :
+                prop.update(self)
+        return self.jsbsim_exec.get_property_value(prop.name_jsbsim)
+
 
 
 
@@ -208,8 +206,8 @@ class Simulation:
         else:
             self.jsbsim_exec.set_property_value(prop.name_jsbsim, value)
 
-        if prop.__class__ is Catalog:
-            MyCatalog.update_custom_properties(self,prop)
+        if prop.access == 'W':
+            prop.update(self)
 
 
     def get_state(self):
@@ -248,19 +246,9 @@ class Simulation:
                     }
 
         for prop,value in state.items():
-            if prop.__class__ is JsbsimCatalog:
-                if not re.match(r'^ic_', prop.name):
-                    if prop in state_to_ic:
-                        init_conditions[state_to_ic[prop]] = value
-
-                    query_prop =  self.jsbsim_exec.query_property_catalog(prop.name_jsbsim)
-                    while query_prop[0].split()[0] != prop.name_jsbsim :
-                        query_prop.pop(0)
-
-                    status =query_prop[0].split()[1]
-                    if 'RW' in status:
-                        init_conditions[prop] = value
-            else:
-                init_conditions[prop] = value
-
+            if not re.match(r'^ic_', prop.name):
+                if prop in state_to_ic:
+                    init_conditions[state_to_ic[prop]] = value
+                if 'RW' in prop.access:
+                    init_conditions[prop] = value
         return init_conditions

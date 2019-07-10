@@ -20,31 +20,24 @@ class JSBSimEnv(gym.Env):
 
     metadata = {'render.modes': ['human', 'csv']}
 
-
-    def __init__(self, task, aircraft_name):
+    def __init__(self, task):
         """
 
         Constructor. Init some internal state, but JSBSimEnv.reset() must be
 
         called first before interacting with environment.
 
-
-
-        :param task the Task for the task agent is to perform
-
-        :param aircraft_name: the name of the JSBSim aircraft to be used.
+        :param task: the Task for the task agent is to perform
 
         """
 
         self.sim = None
-        self.aircraft_name = aircraft_name
-        self.task = task
+        self.task = task()
 
-        self.observation_space = self.task.get_observation_space() #None
-        self.action_space = self.task.get_action_space()#None
+        self.observation_space = self.task.get_observation_space()  # None
+        self.action_space = self.task.get_action_space()  # None
 
         self.state = None
-
 
     def step(self, action=None):
         """
@@ -76,10 +69,10 @@ class JSBSimEnv(gym.Env):
         if action is not None:
             #print(action, self.action_space)
             #nb_action = 0
-            #for x in action:
+            # for x in action:
             #    nb_action += 1
-            #print(nb_action)
-            #print(len(self.action_space.spaces))
+            # print(nb_action)
+            # print(len(self.action_space.spaces))
             if not len(action) == len(self.action_space.spaces):
                 raise ValueError(
                     'mismatch between action and action space size')
@@ -89,7 +82,6 @@ class JSBSimEnv(gym.Env):
         reward, done, info = self.task.get_reward(self.state, self.sim), self.task.is_terminal(self.state, self.sim), {}
 
         return np.array(self.state), reward, done, info
-
 
     def make_step(self, action=None):
         """
@@ -112,7 +104,6 @@ class JSBSimEnv(gym.Env):
 
         return self.get_observation()
 
-
     def reset(self):
         """
 
@@ -122,10 +113,9 @@ class JSBSimEnv(gym.Env):
 
         """
         if self.sim:
-            self.sim.initialise(init_conditions=self.task.init_conditions, jsbsim_freq = self.task.jsbsim_freq, agent_interaction_steps = self.task.agent_interaction_steps)
+            self.sim.close()
 
-        else :
-            self.sim = Simulation(aircraft_name = self.aircraft_name, init_conditions=self.task.init_conditions, jsbsim_freq = self.task.jsbsim_freq, agent_interaction_steps = self.task.agent_interaction_steps)
+        self.sim = Simulation(aircraft_name=self.task.aircraft_name, init_conditions=self.task.init_conditions, jsbsim_freq=self.task.jsbsim_freq, agent_interaction_steps=self.task.agent_interaction_steps)
 
         self.state = self.get_observation()
 
@@ -134,26 +124,6 @@ class JSBSimEnv(gym.Env):
         self.action_space = self.task.get_action_space()
 
         return np.array(self.state)
-
-
-    def define_state(self,states):
-        self.task.observation_var = states
-
-    def define_actions(self,actions):
-        self.task.action_var = actions
-
-    def define_reward(self,get_reward):
-        self.task.get_reward = get_reward
-
-    def define_init_conditions(self,init_conditions):
-        self.task.init_conditions=init_conditions
-
-    def define_jsbsim_freq(self, freq = 60):
-        self.task.jsbsim_freq = freq
-
-    def define_agent_interaction_steps(self,steps = 5):
-        self.task.agent_interaction_steps = steps
-
 
     def render(self, mode='human'):
         """Renders the environment.
@@ -188,7 +158,6 @@ class JSBSimEnv(gym.Env):
         else:
             pass
 
-
     def seed(self, seed=None):
         """
 
@@ -217,7 +186,6 @@ class JSBSimEnv(gym.Env):
         """
         return
 
-
     def close(self):
         """ Cleans up this environment's objects
 
@@ -231,8 +199,6 @@ class JSBSimEnv(gym.Env):
         if self.sim:
             self.sim.close()
 
-
-
     def get_observation(self):
         """
         get state observation from sim.
@@ -242,7 +208,6 @@ class JSBSimEnv(gym.Env):
         """
         return self.sim.get_property_values(self.task.get_observation_var())
 
-
     def get_sim_time(self):
         """ Gets the simulation time from sim, a float. """
 
@@ -251,7 +216,7 @@ class JSBSimEnv(gym.Env):
     def get_full_state(self):
         return self.sim.get_full_state()
 
-    def set_full_state(self,state):
+    def set_full_state(self, state):
         init_conditions = self.sim.get_init_conditions_from_state(state)
-        self.define_init_conditions(init_conditions)
+        self.task.define_init_conditions(init_conditions)
         self.reset()

@@ -214,9 +214,9 @@ class JSBSimEnv(gym.Env):
         return self.sim.get_sim_time()
 
     def get_full_state(self):
-        return self.sim.get_full_state()
+        return self.sim.get_state()
 
     def set_full_state(self, state):
-        init_conditions = self.sim.get_init_conditions_from_state(state)
+        init_conditions = self.sim.set_state(state)
         self.task.define_init_conditions(init_conditions)
         self.reset()

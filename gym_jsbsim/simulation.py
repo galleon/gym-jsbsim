@@ -176,7 +176,7 @@ class Simulation:
             if prop.update:
                 prop.update(self)
 
-    def get_full_state(self):
+    def get_state(self):
         full_jsbsim_state = self.jsbsim_exec.get_property_catalog('')
         full_state = dict()
         for prop_jsbsim, value in full_jsbsim_state.items():
@@ -192,7 +192,7 @@ class Simulation:
                 pass
         return full_state
 
-    def get_init_conditions_from_state(self, state):
+    def set_state(self,state):
         init_conditions = {}
 
         state_to_ic = {JsbsimCatalog.position_lat_gc_deg: JsbsimCatalog.ic_lat_gc_deg,

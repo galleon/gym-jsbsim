@@ -78,7 +78,7 @@ class Task:
     def define_action(self, actions=None):
         self.action_var = actions
 
-    def define_init_conditions(self, init_conditions):
+    def define_init_conditions(self, init_conditions = None):
         self.init_conditions = init_conditions
 
     def define_output(self, output=None):

@@ -64,9 +64,9 @@ class MyCatalog(Property, Enum):
         #print("sim.get_property_value(nb_step), taxi_freq_state", sim.get_property_value(nb_step), taxi_freq_state)
         #print(taxi_freq_state)
         if (sim.get_property_value(MyCatalog.nb_step)%sim.get_property_value(MyCatalog.taxi_freq_state)==1):
-            #start_time = time.time()
+            #start_time = timetime()
             df = taxiPath.update_path((sim.get_property_value(JsbsimCatalog.position_lat_geod_deg), sim.get_property_value(JsbsimCatalog.position_long_gc_deg)), reader)
-            #print("--- %s seconds ---" % (time.time() - start_time))
+            #print("--- %s seconds ---". % (time.time() - start_time))
 
             dist = utils.shortest_ac_dist(0, 0, df[0][0].x, df[0][0].y, df[1][0].x, df[1][0].y)
             #print("shortest_dist2", dist)
@@ -74,7 +74,7 @@ class MyCatalog(Property, Enum):
             #print(sim.get_property_value(shortest_dist))
 
             for i in range(1,len(df)):
-                if (df[i][1] <= 1000000000):
+                if (df[i][1] <= 1000):
                     sim.set_property_value(MyCatalog["d"+str(i)], df[i][1])
                     sim.set_property_value(MyCatalog["a"+str(i)], utils.reduce_reflex_angle_deg(df[i][2] - sim.get_property_value(JsbsimCatalog.attitude_psi_deg)))
                     #sim.set_property_value(MyCatalog["a"+str(i)], df[i][2])

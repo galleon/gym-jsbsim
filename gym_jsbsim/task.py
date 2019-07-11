@@ -1,3 +1,4 @@
+from types import MethodType
 import numpy as np
 import gym
 from gym.spaces import Box, Discrete
@@ -11,52 +12,31 @@ class Task:
 
     """
 
-    def __init__(self, observation_var, action_var, init_conditions, get_reward, is_terminal, output=None, jsbsim_freq = 60, agent_interaction_steps = 5):
-        """
-        Constructor
+    action_var = None
+    state_var = None
+    init_conditions = None
+    output = state_var
+    jsbsim_freq = 60
+    agent_interaction_steps = 5
+    aircraft_name = 'A320'
 
-        :param action_var: list of Property, the task's actions
-        :param observation_var: list of Properties, the task's observation representation
-        :param init_conditions: dict mapping properties to their initial values
-        :param get_reward: function which calculates the agent's reward
-        :param is_terminal: function which determine if the episode is terminated
-        :param output: list of Property, properties to be output
-        :param jsbsim_freq: JSBSim integration frequency
-        :param agent_interaction_steps: simulation steps before the agent interact
-        """
+    def get_reward(self, state, sim):
+        return 0
 
-
-        self.action_var = action_var
-        self.observation_var = observation_var
-        self.get_reward = get_reward
-        self.is_terminal = is_terminal
-        self.init_conditions = init_conditions
-        self.jsbsim_freq = jsbsim_freq
-        self.agent_interaction_steps = agent_interaction_steps
-
-
-        #set default output to observation_var
-        if output is None:
-            self.output = observation_var
-        else:
-            self.ouput = output
-
+    def is_terminal(self, state, sim):
+        return False
 
     def get_observation_var(self):
-        return self.observation_var
-
+        return self.state_var
 
     def get_action_var(self):
         return self.action_var
 
-
     def get_initial_conditions(self):
         return self.init_conditions
 
-
-    def get_props_output(self):
+    def get_output(self):
         return self.output
-
 
     def get_observation_space(self):
         """
@@ -67,13 +47,12 @@ class Task:
 
         space_tuple = ()
 
-        for prop in self.observation_var:
+        for prop in self.state_var:
             if prop.spaces is Box:
                 space_tuple += (Box(low=np.array([prop.min]), high=np.array([prop.max]), dtype='float'),)
             elif prop.spaces is Discrete:
                 space_tuple += (Discrete(prop.max - prop.min + 1),)
         return gym.spaces.Tuple(space_tuple)
-
 
     def get_action_space(self):
         """
@@ -89,3 +68,30 @@ class Task:
             elif prop.spaces is Discrete:
                 space_tuple += (Discrete(prop.max - prop.min + 1),)
         return gym.spaces.Tuple(space_tuple)
+
+    def define_aircraft(self, aircraft_name='A320'):
+        self.aircraft_name = aircraft_name
+
+    def define_state(self, states=None):
+        self.state_var = states
+
+    def define_action(self, actions=None):
+        self.action_var = actions
+
+    def define_init_conditions(self, init_conditions = None):
+        self.init_conditions = init_conditions
+
+    def define_output(self, output=None):
+        self.output = output
+
+    def define_jsbsim_freq(self, freq=60):
+        self.jsbsim_freq = freq
+
+    def define_agent_interaction_steps(self, steps=5):
+        self.agent_interaction_steps = steps
+
+    def define_reward(self, func):
+        self.get_reward = MethodType(func, self)
+
+    def define_is_terminal(self, func):
+        self.is_terminal = MethodType(func, self)

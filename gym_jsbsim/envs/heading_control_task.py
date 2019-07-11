@@ -14,17 +14,17 @@ import numpy as np
 
 state_var = [c.delta_altitude,
              c.delta_heading,
-             #c.velocities_v_down_fps,
+             c.velocities_v_down_fps,
              c.velocities_vc_fps,
-             #c.accelerations_pdot_rad_sec2,
-             #c.accelerations_qdot_rad_sec2,
-             #c.accelerations_rdot_rad_sec2,
+             c.velocities_p_rad_sec,
+             c.velocities_q_rad_sec,
+             c.velocities_r_rad_sec
              ]
 
 action_var = [c.fcs_aileron_cmd_norm,
               c.fcs_elevator_cmd_norm,
               c.fcs_rudder_cmd_norm,
-              c.fcs_throttle_cmd_norm,
+              c.fcs_throttle_cmd_norm
               ]
 
 init_conditions = { # 'ic/h-sl-ft', 'initial altitude MSL [ft]'
@@ -50,9 +50,9 @@ init_conditions = { # 'ic/h-sl-ft', 'initial altitude MSL [ft]'
                     #'ic/roc-fpm', 'initial rate of climb [ft/min]'
                     c.ic_roc_fpm: 0,
                     #'ic/psi-true-deg', 'initial (true) heading [deg]'
-                    c.ic_psi_true_deg: 100,
+                    c.ic_psi_true_deg: 330,
                     # target heading deg
-                    c.target_heading_deg: 100,
+                    c.target_heading_deg: 330,
                     # target heading deg
                     c.target_altitude_ft: 10000,
                     # controls command
@@ -62,7 +62,8 @@ init_conditions = { # 'ic/h-sl-ft', 'initial altitude MSL [ft]'
                     c.fcs_mixture_cmd_norm: 1,
                     # gear up
                     c.gear_gear_pos_norm : 0,
-                    c.gear_gear_cmd_norm: 0
+                    c.gear_gear_cmd_norm: 0,
+                    c.steady_flight:1
 
 }
 
@@ -72,23 +73,25 @@ def get_reward(state, sim):
     Reward with delta and altitude heading directly in the input vector state.
     '''
     # inverse of the proportional absolute value of the minimal angle between the initial and current heading ...
-    heading_r = math.exp(-0.1*math.fabs(sim.get_property_value(c.delta_heading)))
+    heading_r = math.exp(-math.fabs(sim.get_property_value(c.delta_heading)))
 
     # inverse of the proportional absolute value between the initial and current altitude ...
-    alt_r = math.exp(-0.1*math.fabs(sim.get_property_value(c.delta_altitude)))
+    alt_r = math.exp(-math.fabs(sim.get_property_value(c.delta_altitude)))
 
     # inverse of the normalised value of q, r, p acceleartion
-    #angle_speed_r = 1.0/math.sqrt((math.fabs(last_state.accelerations_pdot_rad_sec2) + math.fabs(last_state.accelerations_qdot_rad_sec2) + math.fabs(last_state.accelerations_rdot_rad_sec2) + math.fabs(last_state.velocities_v_down_fps)) / 4.0 + 1)
+    angle_speed_r = math.exp(-(0.33*math.fabs(sim.get_property_value(c.velocities_p_rad_sec)) + 
+                               0.33*math.fabs(sim.get_property_value(c.velocities_q_rad_sec)) + 
+                               0.33*math.fabs(sim.get_property_value(c.velocities_r_rad_sec))))
 
     # Add selective pressure to model that end up the simulation earlier
-    reward = heading_r + 2.0*alt_r# * angle_speed_r
+    reward = 0.4*heading_r + 0.4*alt_r + 0.2*angle_speed_r
     '''
     if sim.get_property_value(c.simulation_sim_time_sec) < 300:
         reward = reward / 3.0
     if sim.get_property_value(c.simulation_sim_time_sec) >= 300 and sim.get_property_value(c.simulation_sim_time_sec) < 1000:
         reward = reward / 2.0
     '''
-    return reward/3.0
+    return reward
 
 
 def is_terminal(state, sim):

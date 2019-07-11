@@ -134,13 +134,15 @@ def plot_line(ax, ob, color='#6699cc', zorder=1, linewidth=3, alpha=1):
     ax.plot(x, y, color=color, linewidth=linewidth, solid_capstyle='round', zorder=zorder, alpha=alpha)
 
 #-----------------------------------------------------------------------------------------------------------------------
-#           Taxi Path Class
+#           Taxi Path Class 
+# FIXME: Need to be optimise for computational issue
+# TODO: Add a cart2geo(self, refPoint, Point) >> (lat, lon)
 #-----------------------------------------------------------------------------------------------------------------------
 
 
 class taxi_path(object):
 
-    def __init__(self,ambd_folder_path="/home/jyotsna/src/attol_taxi_ctrl/amdb",ref_pts=None, number_of_points_to_use=8):
+    def __init__(self,ambd_folder_path="./amdb",ref_pts=None, number_of_points_to_use=8):
         self.fname_ref = 'AM_AerodromeReferencePoint.shp'  #Airport reference point
         self.shapefile_dir =  ambd_folder_path # 'amdb' folder path
         self.fname = self.shapefile_dir + '/AM_AsrnEdge.shp'
@@ -194,6 +196,9 @@ class taxi_path(object):
         return results
 
     def update_path(self,ref_pts, reader):
+        '''
+        FIXME: update this function in regards to Y negative term. Accroding to the shape of the centerline, next point is not always positive
+        '''
         #self.edges = self.loadLinefile(self.shapefile_dir + '/AM_AsrnEdge.shp', ref_pts, self.default_h)
         #start_time = time.time()
         self.edges = self.loadLinefile(ref_pts, self.default_h, reader)
@@ -212,13 +217,16 @@ class taxi_path(object):
                     points.append((a, b))
                     if b > 0:      # only points with +y with respect to ref
                         distance = Point((0, 0)).distance(Point(a, b))
-                        heading = math.degrees(math.atan2(a, b))  # considering the ref point will always be (0,0)
+                        heading = math.degrees(math.atan2(b, a))  # considering the ref point will always be (0,0): FIXME: is it (a, b) or (b, a)
+                        heading = (heading + 360) % 360
                         df.append([Point(a, b), distance, heading])
         points.sort(key=lambda x: x[1]) # sorted by b (ie: y)
+        # add the first negative y point
         for p in range(len(points)):
             if points[p][1] >= 0:
                 distance = Point((0, 0)).distance(Point(points[p-1][0], points[p-1][1]))
                 heading = math.degrees(math.atan2(points[p-1][0], points[p-1][1]))  # considering the ref point will always be (0,0)
+                heading = (heading +360) % 360
                 df.append([Point(points[p-1][0], points[p-1][1]), distance, heading])
                 break
         df.sort(key=lambda x: x[1])  # sorted by distance from ref

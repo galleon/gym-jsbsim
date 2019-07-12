@@ -24,12 +24,12 @@ class MyCatalog(Property, Enum):
 
 
     def update_delta_altitude(sim):
-        value = sim.get_property_value(JsbsimCatalog.position_h_sl_ft) - sim.get_property_value(MyCatalog.target_altitude_ft)
+        value = sim.get_property_value(MyCatalog.target_altitude_ft) - sim.get_property_value(JsbsimCatalog.position_h_sl_ft)
         sim.set_property_value(MyCatalog.delta_altitude, value)
 
     def update_delta_heading(sim):
         value = utils.reduce_reflex_angle_deg(
-            sim.get_property_value(JsbsimCatalog.attitude_psi_deg) - sim.get_property_value(MyCatalog.target_heading_deg))
+            sim.get_property_value(MyCatalog.target_heading_deg)) - sim.get_property_value(JsbsimCatalog.attitude_psi_deg)
         sim.set_property_value(MyCatalog.delta_heading, value)
 
     @staticmethod

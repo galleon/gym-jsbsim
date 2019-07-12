@@ -80,9 +80,9 @@ class HeadingControlTask(Task):
         alt_r = math.exp(-math.fabs(sim.get_property_value(c.delta_altitude)))
 
         # inverse of the normalised value of q, r, p acceleartion
-        angle_speed_r = math.exp(-(0.33*math.fabs(sim.get_property_value(c.velocities_p_rad_sec)) + 
-                                0.33*math.fabs(sim.get_property_value(c.velocities_q_rad_sec)) + 
-                                0.33*math.fabs(sim.get_property_value(c.velocities_r_rad_sec))))
+        angle_speed_r = math.exp(-(0.33*math.fabs(sim.get_property_value(c.velocities_p_rad_sec)*180/math.pi) + 
+                                0.33*math.fabs(sim.get_property_value(c.velocities_q_rad_sec)*180/math.pi) + 
+                                0.33*math.fabs(sim.get_property_value(c.velocities_r_rad_sec)*180/math.pi)))
 
         # Add selective pressure to model that end up the simulation earlier
         reward = 0.4*heading_r + 0.4*alt_r + 0.2*angle_speed_r

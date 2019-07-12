@@ -11,7 +11,7 @@ RUN pip install --upgrade pip
 RUN apt-get -y install git vim htop bc
 
 # PIP pyGRN gym_jsbsim
-RUN pip install numpy tqdm jsbsim gym matplotlib geopandas pyshp joblib
+RUN pip install numpy tqdm jsbsim gym matplotlib geopandas pyshp joblib psmisc
 
 # EXPORT var env
 ENV JSBSIM_ROOT_DIR=/home/GJsim/jsbsim-JSBSim-trusty-v2018a

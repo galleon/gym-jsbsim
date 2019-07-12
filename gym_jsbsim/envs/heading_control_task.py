@@ -80,12 +80,13 @@ class HeadingControlTask(Task):
         alt_r = math.exp(-math.fabs(sim.get_property_value(c.delta_altitude)))
 
         # inverse of the normalised value of q, r, p acceleartion
-        angle_speed_r = math.exp(-(0.33*math.fabs(sim.get_property_value(c.velocities_p_rad_sec)*180/math.pi) + 
-                                0.33*math.fabs(sim.get_property_value(c.velocities_q_rad_sec)*180/math.pi) + 
-                                0.33*math.fabs(sim.get_property_value(c.velocities_r_rad_sec)*180/math.pi)))
+        #angle_speed_r = math.exp(-(0.33*math.fabs(sim.get_property_value(c.velocities_p_rad_sec)*180/math.pi) + 
+        #                        0.33*math.fabs(sim.get_property_value(c.velocities_q_rad_sec)*180/math.pi) + 
+        #                        0.33*math.fabs(sim.get_property_value(c.velocities_r_rad_sec)*180/math.pi)))
+        angle_speed_r = math.exp(-(math.fabs(sim.get_property_value(c.velocities_q_rad_sec)*180/math.pi)))
 
         # Add selective pressure to model that end up the simulation earlier
-        reward = 0.4*heading_r + 0.4*alt_r + 0.2*angle_speed_r
+        reward = 0.25*heading_r + 0.05*alt_r + 0.7*angle_speed_r
         '''
         if sim.get_property_value(c.simulation_sim_time_sec) < 300:
             reward = reward / 3.0
@@ -98,6 +99,10 @@ class HeadingControlTask(Task):
     def is_terminal(self, state, sim):
         # Change heading every 150 seconds
         if sim.get_property_value(c.simulation_sim_time_sec) >= sim.get_property_value(c.steady_flight):
+            # if the traget heading was not reach before, we stop the simulation (to avoid reward aircraft the don't care of the heading)
+            if math.fabs(sim.get_property_value(c.delta_heading)) > 10:
+                return True
+
             new_alt = sim.get_property_value(c.target_altitude_ft)# + random.uniform(-1000, 1000)
             angle = int(sim.get_property_value(c.steady_flight)/150) * 10
             if int(sim.get_property_value(c.steady_flight)/150) % 2 == 1:

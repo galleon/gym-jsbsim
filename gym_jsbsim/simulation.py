@@ -13,7 +13,7 @@ class Simulation:
 
     """
 
-    def __init__(self, aircraft_name="A320", init_conditions=None, jsbsim_freq=60, agent_interaction_steps=5):
+    def __init__(self, aircraft_name="A320", init_conditions=None, jsbsim_freq=60, agent_interaction_steps=1):
         """
 
         Constructor. Creates an instance of JSBSim, loads an aircraft and sets initial conditions.

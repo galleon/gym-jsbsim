@@ -86,7 +86,7 @@ class HeadingControlTask(Task):
         #angle_speed_r = math.exp(-(10*math.fabs(sim.get_property_value(c.velocities_q_rad_sec)*180/math.pi)))
 
         # Add selective pressure to model that end up the simulation earlier
-        reward = 0.1*heading_r + 0.05*alt_r + 0.85*angle_speed_r
+        reward = 0.2*heading_r + 0.05*alt_r + 0.75*angle_speed_r
         '''
         if sim.get_property_value(c.simulation_sim_time_sec) < 300:
             reward = reward / 3.0
@@ -101,6 +101,9 @@ class HeadingControlTask(Task):
         if sim.get_property_value(c.simulation_sim_time_sec) >= sim.get_property_value(c.steady_flight):
             # if the traget heading was not reach before, we stop the simulation (to avoid reward aircraft the don't care of the heading)
             if math.fabs(sim.get_property_value(c.delta_heading)) > 5:
+                return True
+
+            if math.fabs(sim.get_property_value(c.accelerations_a_pilot_x_ft_sec2)) > 12.87 or math.fabs(sim.get_property_value(c.accelerations_a_pilot_y_ft_sec2)) > 12.87 or math.fabs(sim.get_property_value(c.accelerations_a_pilot_z_ft_sec2)) > 12.87: #<0.4g
                 return True
 
             new_alt = sim.get_property_value(c.target_altitude_ft)# + random.uniform(-1000, 1000)

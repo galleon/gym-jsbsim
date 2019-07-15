@@ -97,13 +97,14 @@ class HeadingControlTask(Task):
 
 
     def is_terminal(self, state, sim):
+        # if acceleration are too high stop the simulation
+        if math.fabs(sim.get_property_value(c.accelerations_a_pilot_x_ft_sec2)) > 12.87 or math.fabs(sim.get_property_value(c.accelerations_a_pilot_y_ft_sec2)) > 12.87 or math.fabs(sim.get_property_value(c.accelerations_a_pilot_z_ft_sec2)) > 12.87: #<0.4g
+            return True
+
         # Change heading every 150 seconds
         if sim.get_property_value(c.simulation_sim_time_sec) >= sim.get_property_value(c.steady_flight):
             # if the traget heading was not reach before, we stop the simulation (to avoid reward aircraft the don't care of the heading)
             if math.fabs(sim.get_property_value(c.delta_heading)) > 5:
-                return True
-
-            if math.fabs(sim.get_property_value(c.accelerations_a_pilot_x_ft_sec2)) > 12.87 or math.fabs(sim.get_property_value(c.accelerations_a_pilot_y_ft_sec2)) > 12.87 or math.fabs(sim.get_property_value(c.accelerations_a_pilot_z_ft_sec2)) > 12.87: #<0.4g
                 return True
 
             new_alt = sim.get_property_value(c.target_altitude_ft)# + random.uniform(-1000, 1000)

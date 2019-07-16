@@ -116,10 +116,7 @@ class HeadingControlTask(Task):
             else:
                 new_heading = sim.get_property_value(c.target_heading_deg) - angle
                 
-            if (new_heading <= 0):
-                new_heading = 360 - new_heading
-            if (new_heading >= 360):
-                new_heading = new_heading - 360
+            new_heading = (new_heading +360) % 360
 
             print(f'Time to change: {sim.get_property_value(c.simulation_sim_time_sec)} (Altitude: {sim.get_property_value(c.target_altitude_ft)} -> {new_alt}, Heading: {sim.get_property_value(c.target_heading_deg)} -> {new_heading})')
             sim.set_property_value(c.target_altitude_ft, new_alt)

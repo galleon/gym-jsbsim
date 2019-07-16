@@ -80,9 +80,9 @@ class HeadingControlTask(Task):
         alt_r = math.exp(-math.fabs(sim.get_property_value(c.delta_altitude)))
 
         # inverse of the normalised value of q, r, p acceleartion
-        angle_speed_r = math.exp(-(0.33*math.fabs(sim.get_property_value(c.accelerations_a_pilot_x_ft_sec2)) + 
-                                0.33*math.fabs(sim.get_property_value(c.accelerations_a_pilot_y_ft_sec2)) + 
-                                0.33*math.fabs(sim.get_property_value(c.accelerations_a_pilot_z_ft_sec2))))
+        angle_speed_r = math.exp(-(0*math.fabs(sim.get_property_value(c.accelerations_a_pilot_x_ft_sec2)) + 
+                                0*math.fabs(sim.get_property_value(c.accelerations_a_pilot_y_ft_sec2)) + 
+                                1.0*math.fabs(sim.get_property_value(c.accelerations_a_pilot_z_ft_sec2))))
         #angle_speed_r = math.exp(-(10*math.fabs(sim.get_property_value(c.velocities_q_rad_sec)*180/math.pi)))
 
         # Add selective pressure to model that end up the simulation earlier
@@ -98,8 +98,10 @@ class HeadingControlTask(Task):
 
     def is_terminal(self, state, sim):
         # if acceleration are too high stop the simulation
-        if math.fabs(sim.get_property_value(c.accelerations_a_pilot_x_ft_sec2)) > 12.87 or math.fabs(sim.get_property_value(c.accelerations_a_pilot_y_ft_sec2)) > 12.87 or math.fabs(sim.get_property_value(c.accelerations_a_pilot_z_ft_sec2)) > 12.87: #<0.4g
-            return True
+        acc = 32 #1G
+        if (sim.get_property_value(c.simulation_sim_time_sec)>10):
+            if math.fabs(sim.get_property_value(c.accelerations_a_pilot_x_ft_sec2)) > acc or math.fabs(sim.get_property_value(c.accelerations_a_pilot_y_ft_sec2)) > acc or math.fabs(sim.get_property_value(c.accelerations_a_pilot_z_ft_sec2)) > acc:
+                return True
 
         # Change heading every 150 seconds
         if sim.get_property_value(c.simulation_sim_time_sec) >= sim.get_property_value(c.steady_flight):

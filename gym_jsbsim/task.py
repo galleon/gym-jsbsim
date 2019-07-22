@@ -2,11 +2,12 @@ from types import MethodType
 import numpy as np
 import gym
 from gym.spaces import Box, Discrete
+from gym_jsbsim.catalogs.catalog import Catalog
 
 class Task:
     """
 
-        A class to create a task with its own observation variables,
+        A class to subclass in order to create a task with its own observation variables,
 
         action variables, termination conditions and agent_reward function.
 
@@ -19,6 +20,20 @@ class Task:
     jsbsim_freq = 60
     agent_interaction_steps = 5
     aircraft_name = 'A320'
+
+    def __init__(self):
+
+        # set default output to state_var
+        if self.output is None:
+            self.output = self.state_var
+
+        # modify Catalog to have only the current task properties
+        names_away = []
+        for name,prop in Catalog.items():
+            if not( prop in self.action_var or prop in self.state_var or prop in self.init_conditions or prop in self.output) :
+                names_away.append(name)
+        for name in names_away:
+            Catalog.pop(name)
 
     def get_reward(self, state, sim):
         return 0

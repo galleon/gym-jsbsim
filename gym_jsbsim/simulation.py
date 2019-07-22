@@ -2,8 +2,7 @@ from collections import namedtuple
 import re
 from os import environ
 import jsbsim
-from gym_jsbsim.catalogs.jsbsim_catalog import JsbsimCatalog
-from gym_jsbsim.catalogs.my_catalog import MyCatalog
+from gym_jsbsim.catalogs.catalog import Catalog
 
 
 class Simulation:
@@ -37,6 +36,9 @@ class Simulation:
         self.jsbsim_exec.set_debug_level(0)  # requests JSBSim not to output any messages whatsoever
 
         self.jsbsim_exec.load_model(aircraft_name)
+
+        # collect all jsbsim properties in Catalog
+        Catalog.add_jsbsim_props(self.jsbsim_exec.query_property_catalog(''))
 
         # set jsbsim integration time step
         dt = 1 / jsbsim_freq
@@ -108,8 +110,7 @@ class Simulation:
         : return: NamedTuple with properties name and their values
 
         """
-        Props = namedtuple("NamedTuple", [prop.name for prop in props])
-        return Props(*[self.get_property_value(prop) for prop in props])
+        return [self.get_property_value(prop) for prop in props]
 
     def set_property_values(self, props, values):
         """
@@ -156,63 +157,36 @@ class Simulation:
         elif value > prop.max:
             value = prop.max
 
-        equal_engine_properties = [JsbsimCatalog.fcs_throttle_cmd_norm,
-                                   JsbsimCatalog.fcs_throttle_pos_norm,
-                                   JsbsimCatalog.fcs_mixture_cmd_norm,
-                                   JsbsimCatalog.fcs_mixture_pos_norm,
-                                   JsbsimCatalog.fcs_advance_pos_norm,
-                                   JsbsimCatalog.fcs_advance_cmd_norm,
-                                   JsbsimCatalog.fcs_feather_pos_norm,
-                                   JsbsimCatalog.fcs_feather_cmd_norm]
+        self.jsbsim_exec.set_property_value(prop.name_jsbsim, value)
 
-        if prop in equal_engine_properties:
-            for i in range(self.jsbsim_exec.propulsion_get_num_engines()):
-                self.jsbsim_exec.set_property_value(prop.name_jsbsim + "[" + str(i) + "]", value)
-
-        else:
-            self.jsbsim_exec.set_property_value(prop.name_jsbsim, value)
-
-        if prop.access == 'W':
+        if 'W' in prop.access:
             if prop.update:
                 prop.update(self)
 
     def get_state(self):
-        full_jsbsim_state = self.jsbsim_exec.get_property_catalog('')
-        full_state = dict()
-        for prop_jsbsim, value in full_jsbsim_state.items():
-            prop_name = re.sub(r"[\-/\]\[]+", '_', prop_jsbsim)
-            try:
-                full_state[JsbsimCatalog[prop_name]] = value
-            except KeyError:
-                pass
-        for prop in MyCatalog:
-            try:
-                full_state[prop] = self.jsbsim_exec[prop.name_jsbsim]
-            except KeyError:
-                pass
-        return full_state
+        return {prop: self.get_property_value(prop) for prop in Catalog.values()}
 
     def set_state(self,state):
         init_conditions = {}
 
-        state_to_ic = {JsbsimCatalog.position_lat_gc_deg: JsbsimCatalog.ic_lat_gc_deg,
-                       JsbsimCatalog.position_long_gc_deg: JsbsimCatalog.ic_long_gc_deg,
-                       JsbsimCatalog.position_h_sl_ft: JsbsimCatalog.ic_h_sl_ft,
-                       JsbsimCatalog.position_h_agl_ft: JsbsimCatalog.ic_h_agl_ft,
-                       JsbsimCatalog.position_terrain_elevation_asl_ft: JsbsimCatalog.ic_terrain_elevation_ft,
-                       JsbsimCatalog.attitude_psi_deg: JsbsimCatalog.ic_psi_true_deg,
-                       JsbsimCatalog.attitude_theta_deg: JsbsimCatalog.ic_theta_deg,
-                       JsbsimCatalog.attitude_phi_deg: JsbsimCatalog.ic_phi_deg,
-                       JsbsimCatalog.velocities_u_fps: JsbsimCatalog.ic_u_fps,
-                       JsbsimCatalog.velocities_v_fps: JsbsimCatalog.ic_v_fps,
-                       JsbsimCatalog.velocities_w_fps: JsbsimCatalog.ic_w_fps,
-                       JsbsimCatalog.velocities_p_rad_sec: JsbsimCatalog.ic_p_rad_sec,
-                       JsbsimCatalog.velocities_q_rad_sec: JsbsimCatalog.ic_q_rad_sec,
-                       JsbsimCatalog.velocities_r_rad_sec: JsbsimCatalog.ic_r_rad_sec,
+        state_to_ic = {Catalog.position_lat_gc_deg: Catalog.ic_lat_gc_deg,
+                       Catalog.position_long_gc_deg: Catalog.ic_long_gc_deg,
+                       Catalog.position_h_sl_ft: Catalog.ic_h_sl_ft,
+                       Catalog.position_h_agl_ft: Catalog.ic_h_agl_ft,
+                       Catalog.position_terrain_elevation_asl_ft: Catalog.ic_terrain_elevation_ft,
+                       Catalog.attitude_psi_deg: Catalog.ic_psi_true_deg,
+                       Catalog.attitude_theta_deg: Catalog.ic_theta_deg,
+                       Catalog.attitude_phi_deg: Catalog.ic_phi_deg,
+                       Catalog.velocities_u_fps: Catalog.ic_u_fps,
+                       Catalog.velocities_v_fps: Catalog.ic_v_fps,
+                       Catalog.velocities_w_fps: Catalog.ic_w_fps,
+                       Catalog.velocities_p_rad_sec: Catalog.ic_p_rad_sec,
+                       Catalog.velocities_q_rad_sec: Catalog.ic_q_rad_sec,
+                       Catalog.velocities_r_rad_sec: Catalog.ic_r_rad_sec,
                        }
 
         for prop, value in state.items():
-            if not re.match(r'^ic_', prop.name):
+            if not re.match(r'^ic/', prop.name_jsbsim):
                 if prop in state_to_ic:
                     init_conditions[state_to_ic[prop]] = value
                 elif 'RW' in prop.access:

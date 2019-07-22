@@ -81,7 +81,7 @@ class JSBSimEnv(gym.Env):
 
         reward, done, info = self.task.get_reward(self.state, self.sim), self.task.is_terminal(self.state, self.sim), {}
 
-        return np.array(self.state), reward, done, info
+        return self.state, reward, done, info
 
     def make_step(self, action=None):
         """
@@ -123,7 +123,7 @@ class JSBSimEnv(gym.Env):
 
         self.action_space = self.task.get_action_space()
 
-        return np.array(self.state)
+        return self.state
 
     def render(self, mode='human'):
         """Renders the environment.
@@ -206,7 +206,11 @@ class JSBSimEnv(gym.Env):
         :return: NamedTuple, the first state observation of the episode
 
         """
-        return self.sim.get_property_values(self.task.get_observation_var())
+        obs_list = self.sim.get_property_values(self.task.get_observation_var())
+        obs_tuple = ()
+        for obs in obs_list:
+            obs_tuple += (np.array([obs]),)
+        return obs_tuple
 
     def get_sim_time(self):
         """ Gets the simulation time from sim, a float. """

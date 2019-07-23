@@ -136,7 +136,7 @@ def plot_line(ax, ob, color='#6699cc', zorder=1, linewidth=3, alpha=1):
 #-----------------------------------------------------------------------------------------------------------------------
 #           Taxi Path Class 
 # FIXME: Need to be optimise for computational issue
-# TODO: Add a cart2geo(self, refPoint, Point) >> (lat, lon)
+
 #-----------------------------------------------------------------------------------------------------------------------
 
 
@@ -154,7 +154,7 @@ class taxi_path(object):
         reader = shapefile.Reader(shapefile_dir+'/AM_AsrnEdge.shp', encodingErrors="replace")
         self.edges = [edge for edge in reader.shapeRecords()]
         self.edges_longlat = [(shp.shape.points[:], shp.record[2]) for idn in self.path_id_numbers for shp in self.edges if shp.record[2] == idn]
-        # self.edges_longlat[0] = ([(long1,lat1),(long2,lat2)],'idnumber')
+        # self.edges_longlat[0] = ([(long1,lat1),(long2,lat2)],'idnumber') restricted to edges in the path_id_numbers
         self.start_coords = (self.edges_longlat[0][0][0][1],self.edges_longlat[0][0][0][0])   #(lat, long)
         self.stop_coords = (self.edges_longlat[-1][0][-1][1],self.edges_longlat[-1][0][-1][0]) #(lat, long)
         print('selected path: ', self.path_id_numbers)

@@ -136,7 +136,7 @@ def plot_line(ax, ob, color='#6699cc', zorder=1, linewidth=3, alpha=1):
 #-----------------------------------------------------------------------------------------------------------------------
 #           Taxi Path Class 
 # FIXME: Need to be optimise for computational issue
-# TO DO: update_path()
+# TODO: Add a cart2geo(self, refPoint, Point) >> (lat, lon)
 #-----------------------------------------------------------------------------------------------------------------------
 
 
@@ -157,7 +157,6 @@ class taxi_path_local(object):
         self.fname = self.shapefile_dir + '/AM_AsrnEdge.shp'
         self.reader = shapefile.Reader(self.fname, encodingErrors="replace")
         print(self.path_id_numbers)
-
 
     def plot_path(self):
         print('TBD')
@@ -180,8 +179,9 @@ class taxi_path_local(object):
         # edges_cartesian[0] = ([[x1,y1],[x2,y2]],'idnumber')
         return edges_cartesian, edges_longlat
 
+
     def update_path(self, ref_pts):
-        self.edges_cartesian, self.edges_longlat = self.loadLinefile(ref_pts, self.default_h)
+        self.edges = self.loadLinefile(ref_pts, self.default_h)
         df = []
         points = []
         i = 0

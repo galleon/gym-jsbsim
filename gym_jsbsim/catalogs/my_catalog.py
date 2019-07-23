@@ -10,12 +10,12 @@ from gym_jsbsim.envs.taxi_utils import *
 
 
 
-"""
-amdb_path = "/home/nico/amdb"
+
+amdb_path = "/home/jyotsna/amdb"
 taxiPath = taxi_path(ambd_folder_path=amdb_path, number_of_points_to_use=8)
 reader = shapefile.Reader(taxiPath.fname, encodingErrors="replace")
 taxi_freq_state = 30
-"""
+
 
 import gym_jsbsim.catalogs.utils as utils
 
@@ -65,14 +65,17 @@ class MyCatalog(Property, Enum):
         #print(taxi_freq_state)
         if (sim.get_property_value(MyCatalog.nb_step)%sim.get_property_value(MyCatalog.taxi_freq_state)==1):
             #start_time = timetime()
+            """ make this Quick"""
             df = taxiPath.update_path((sim.get_property_value(JsbsimCatalog.position_lat_geod_deg), sim.get_property_value(JsbsimCatalog.position_long_gc_deg)), reader)
             #print("--- %s seconds ---". % (time.time() - start_time))
+
 
             dist = utils.shortest_ac_dist(0, 0, df[0][0].x, df[0][0].y, df[1][0].x, df[1][0].y)
             #print("shortest_dist2", dist)
             sim.set_property_value(MyCatalog.shortest_dist, dist)
             #print(sim.get_property_value(shortest_dist))
 
+            """ check with mario for units of distance"""
             for i in range(1,len(df)):
                 if (df[i][1] <= 1000):
                     sim.set_property_value(MyCatalog["d"+str(i)], df[i][1])
@@ -134,3 +137,5 @@ class MyCatalog(Property, Enum):
     shortest_dist = Property('shortest_dist', 'shortest distance between aircraft and path [m]', 0.0, 1000.0, access = 'R', update = update_da)
     taxi_freq_state = Property('taxi-freq-state','frequence to update taxi state',0)
     nb_step = Property('nb_step', 'shortest distance between aircraft and path [m]', access = 'R',update = update_da)
+
+

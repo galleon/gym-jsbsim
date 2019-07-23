@@ -15,4 +15,4 @@ def random_agent(episodes=100):
 			break
 
 if __name__ == "__main__":
-    random_agent()
+	random_agent()

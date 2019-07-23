@@ -136,7 +136,7 @@ def plot_line(ax, ob, color='#6699cc', zorder=1, linewidth=3, alpha=1):
 #-----------------------------------------------------------------------------------------------------------------------
 #           Taxi Path Class 
 # FIXME: Need to be optimise for computational issue
-# TODO: Add a cart2geo(self, refPoint, Point) >> (lat, lon)
+# TO DO: update_path()
 #-----------------------------------------------------------------------------------------------------------------------
 
 
@@ -158,6 +158,7 @@ class taxi_path_local(object):
         self.reader = shapefile.Reader(self.fname, encodingErrors="replace")
         print(self.path_id_numbers)
 
+
     def plot_path(self):
         print('TBD')
 
@@ -173,14 +174,14 @@ class taxi_path_local(object):
         edges_longlat = [(shp.shape.points[:], shp.record[2]) for idn in tp.path_id_numbers for shp in shapes if
                      shp.record[2] == idn]
         # edges_longlat[0] = ([(long1,lat1),(long2,lat2)],'idnumber')
-        edges_catesian = []
-        for edge in edges_new:
-            edges_catesian.append((np.array([fromPolarToCart(ref_pts, height, [i[1]], [i[0]])[0] for i in edge[0]]), edge[1]))
+        edges_cartesian = []
+        for edge in edges_longlat:
+            edges_cartesian.append((np.array([fromPolarToCart(ref_pts, height, [i[1]], [i[0]])[0] for i in edge[0]]), edge[1]))
         # edges_cartesian[0] = ([[x1,y1],[x2,y2]],'idnumber')
-        return edges_catesian, edges_longlat
+        return edges_cartesian, edges_longlat
 
     def update_path(self, ref_pts):
-        self.edges = self.loadLinefile(ref_pts, self.default_h)
+        self.edges_cartesian, self.edges_longlat = self.loadLinefile(ref_pts, self.default_h)
         df = []
         points = []
         i = 0

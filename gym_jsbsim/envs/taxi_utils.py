@@ -140,7 +140,7 @@ def plot_line(ax, ob, color='#6699cc', zorder=1, linewidth=3, alpha=1):
 #-----------------------------------------------------------------------------------------------------------------------
 
 
-class taxi_path_local(object):
+class taxi_path(object):
 
     def __init__(self, ambd_folder_path="/home/jyotsna/src/attol_taxi_ctrl/amdb", ref_pts=None):
         self.fname_ref = 'AM_AerodromeReferencePoint.shp'  # Airport reference point
@@ -156,7 +156,7 @@ class taxi_path_local(object):
         self.number_of_points_to_use = 8  # number of points to use on the path for learning
         self.fname = self.shapefile_dir + '/AM_AsrnEdge.shp'
         self.reader = shapefile.Reader(self.fname, encodingErrors="replace")
-        print(self.path_id_numbers)
+        print('selected path: ', self.path_id_numbers)
 
     def plot_path(self):
         print('TBD')

@@ -143,19 +143,18 @@ def plot_line(ax, ob, color='#6699cc', zorder=1, linewidth=3, alpha=1):
 class taxi_path(object):
 
     def __init__(self, ambd_folder_path="/home/jyotsna/src/attol_taxi_ctrl/amdb", ref_pts=None):
-        self.fname_ref = 'AM_AerodromeReferencePoint.shp'  # Airport reference point
-        self.shapefile_dir = ambd_folder_path  # 'amdb' folder path
-        self.default_h = 148.72  # Altitude of toulouse airport
+        self.fname_ref = 'AM_AerodromeReferencePoint.shp'  #Airport reference point
+        self.shapefile_dir =  ambd_folder_path # 'amdb' folder path
+        self.default_h = 148.72 # Altitude of toulouse airport
         self.ref = shapefile.Reader(shapefile_dir + '/' + self.fname_ref)
-        self.ref_pts = np.array(self.ref.shapeRecords()[0].shape.points)[0][
-                       ::-1]  # reference (x,y) in (Lat, long)  Example TLS: array([43.635     ,  1.36777778])
-        path_id_numbers = [1977, 1974, 1973, 2001, 2202, 2203, 2453, 2204, 2206, 2000, 1996, 1968, 1969, 1971, 2020,
-                           2019, 2018, 1931, 1929, 1925, 1926, 2031, 2042, 2134, 2091, 2099, 2103, 2385, 2105, 2136,
-                           1978, 1947, 1949]
+        self.ref_pts = np.array(self.ref.shapeRecords()[0].shape.points)[0][::-1]   # reference (x,y) in (Lat, long)  Example TLS: array([43.635     ,  1.36777778])
+        path_id_numbers = [1977, 1974, 1973, 2001, 2202, 2203, 2453, 2204, 2206, 2000, 1996,  1968,  1969, 1971, 2020, 2019, 2018,  1931, 1929, 1925, 1926, 2031, 2042,   2134, 2091,  2099, 2103, 2385, 2105, 2136, 1978,  1947, 1949]
         self.path_id_numbers = [str(id) for id in path_id_numbers]
-        self.number_of_points_to_use = 8  # number of points to use on the path for learning
-        self.fname = self.shapefile_dir + '/AM_AsrnEdge.shp'
-        self.reader = shapefile.Reader(self.fname, encodingErrors="replace")
+        self.number_of_points_to_use = 8    # number of points to use on the path for learning
+        reader = shapefile.Reader(shapefile_dir+'/AM_AsrnEdge.shp', encodingErrors="replace")
+        self.edges = [edge for edge in reader.shapeRecords()]
+        self.edges_longlat = [(shp.shape.points[:], shp.record[2]) for idn in self.path_id_numbers for shp in self.edges if shp.record[2] == idn]
+        # self.edges_longlat[0] = ([(long1,lat1),(long2,lat2)],'idnumber')
         print('selected path: ', self.path_id_numbers)
 
     def plot_path(self):
@@ -170,7 +169,7 @@ class taxi_path(object):
             if elmt[0] in to_get:
                 fields[elmt[0]] = idx - 1
 
-        edges_longlat = [(shp.shape.points[:], shp.record[2]) for idn in tp.path_id_numbers for shp in shapes if
+        edges_longlat = [(shp.shape.points[:], shp.record[2]) for idn in self.path_id_numbers for shp in shapes if
                      shp.record[2] == idn]
         # edges_longlat[0] = ([(long1,lat1),(long2,lat2)],'idnumber')
         edges_cartesian = []

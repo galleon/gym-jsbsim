@@ -140,69 +140,47 @@ def plot_line(ax, ob, color='#6699cc', zorder=1, linewidth=3, alpha=1):
 #-----------------------------------------------------------------------------------------------------------------------
 
 
-class taxi_path(object):
+class taxi_path_local(object):
 
-    def __init__(self,ambd_folder_path="./amdb",ref_pts=None, number_of_points_to_use=8):
-        self.fname_ref = 'AM_AerodromeReferencePoint.shp'  #Airport reference point
-        self.shapefile_dir =  ambd_folder_path # 'amdb' folder path
-        self.fname = self.shapefile_dir + '/AM_AsrnEdge.shp'
-        self.default_h = 148.72 # Altitude of toulouse airport
-        self.ref = shapefile.Reader(self.shapefile_dir + '/' + self.fname_ref)
-        self.ref_pts = np.array(self.ref.shapeRecords()[0].shape.points)[0][::-1]   # reference (x,y) in Lat, long  Example TLS: array([43.635     ,  1.36777778])
-        path_id_numbers = [1977, 1974, 1973, 2001, 2202, 2203, 2453, 2204, 2206, 2000, 1996,  1968,  1969, 1971, 2020, 2019, 2018,  1931, 1929, 1925, 1926, 2031, 2042,   2134, 2091,  2099, 2103, 2385, 2105, 2136, 1978,  1947, 1949 ]
+    def __init__(self, ambd_folder_path="/home/jyotsna/src/attol_taxi_ctrl/amdb", ref_pts=None):
+        self.fname_ref = 'AM_AerodromeReferencePoint.shp'  # Airport reference point
+        self.shapefile_dir = ambd_folder_path  # 'amdb' folder path
+        self.default_h = 148.72  # Altitude of toulouse airport
+        self.ref = shapefile.Reader(shapefile_dir + '/' + self.fname_ref)
+        self.ref_pts = np.array(self.ref.shapeRecords()[0].shape.points)[0][
+                       ::-1]  # reference (x,y) in (Lat, long)  Example TLS: array([43.635     ,  1.36777778])
+        path_id_numbers = [1977, 1974, 1973, 2001, 2202, 2203, 2453, 2204, 2206, 2000, 1996, 1968, 1969, 1971, 2020,
+                           2019, 2018, 1931, 1929, 1925, 1926, 2031, 2042, 2134, 2091, 2099, 2103, 2385, 2105, 2136,
+                           1978, 1947, 1949]
         self.path_id_numbers = [str(id) for id in path_id_numbers]
-        self.number_of_points_to_use = number_of_points_to_use    # number of points to use on the path for learning
-
+        self.number_of_points_to_use = 8  # number of points to use on the path for learning
+        self.fname = self.shapefile_dir + '/AM_AsrnEdge.shp'
+        self.reader = shapefile.Reader(self.fname, encodingErrors="replace")
+        print(self.path_id_numbers)
 
     def plot_path(self):
         print('TBD')
 
-    def loadLinefile(self, ref_pts, height, reader):
-        #reader = shapefile.Reader(fname, encodingErrors="replace")
+    def loadLinefile(self, ref_pts, height):
         results = []
         to_get = ['feattype', 'idnumber', 'idnetwrk', 'node1ref', 'node2ref', 'direc', 'edgetype', 'edgederv']
         fields = {}
-        for idx, elmt in enumerate(reader.fields):
+        # this can be done in init
+        for idx, elmt in enumerate(self.reader.fields):
             if elmt[0] in to_get:
                 fields[elmt[0]] = idx - 1
-        for shape in reader.shapeRecords():
-            idn = shape.record[fields['idnumber']]
-            if idn in self.path_id_numbers:
-                X = np.array([fromPolarToCart(ref_pts, height, [i[1]], [i[0]])[0]
-                              for i in shape.shape.points[:]])
-                tmp = LineString([Point(i[1], i[0]) for i in X])
-                meta = {}
-                for elmt in to_get:
-                    meta[elmt] = shape.record[fields[elmt]]
-                results.append([tmp, meta])
-        return results
 
-    def loadPointFile(self,fname, ref_pts, height, meta=4):
-        reader = shapefile.Reader(fname, encodingErrors="replace")
-        results = []
-        to_get = ['feattype', 'idnumber', 'idnetwrk', 'idthr', 'termref', 'nodetype', 'catstop']
-        fields = {}
-        for idx, elmt in enumerate(reader.fields):
-            if elmt[0] in to_get:
-                fields[elmt[0]] = idx - 1
-        for shape in reader.shapeRecords():
-            X = np.array([fromPolarToCart(ref_pts, height, [i[1]], [i[0]])[0]
-                          for i in shape.shape.points[:]])
-            tmp = Point(X[0][1], X[0][0])
-            meta = {}
-            for elmt in to_get:
-                meta[elmt] = shape.record[fields[elmt]]
-            results.append([tmp, meta])
-        return results
+        edges_longlat = [(shp.shape.points[:], shp.record[2]) for idn in tp.path_id_numbers for shp in shapes if
+                     shp.record[2] == idn]
+        # edges_longlat[0] = ([(long1,lat1),(long2,lat2)],'idnumber')
+        edges_catesian = []
+        for edge in edges_new:
+            edges_catesian.append((np.array([fromPolarToCart(ref_pts, height, [i[1]], [i[0]])[0] for i in edge[0]]), edge[1]))
+        # edges_cartesian[0] = ([[x1,y1],[x2,y2]],'idnumber')
+        return edges_catesian, edges_longlat
 
-    def update_path(self,ref_pts, reader):
-        '''
-        FIXME: update this function in regards to Y negative term. Accroding to the shape of the centerline, next point is not always positive
-        '''
-        #self.edges = self.loadLinefile(self.shapefile_dir + '/AM_AsrnEdge.shp', ref_pts, self.default_h)
-        #start_time = time.time()
-        self.edges = self.loadLinefile(ref_pts, self.default_h, reader)
-        #print("--- %s seconds: loadLinefile ---" % (time.time() - start_time))
+    def update_path(self, ref_pts):
+        self.edges = self.loadLinefile(ref_pts, self.default_h)
         df = []
         points = []
         i = 0
@@ -215,20 +193,10 @@ class taxi_path(object):
 
                 else:
                     points.append((a, b))
-                    if b > 0:      # only points with +y with respect to ref
+                    if b > 0:  # only points with +y with respect to ref
                         distance = Point((0, 0)).distance(Point(a, b))
-                        heading = math.degrees(math.atan2(b, a))  # considering the ref point will always be (0,0): FIXME: is it (a, b) or (b, a)
-                        heading = (heading + 360) % 360
+                        heading = math.degrees(math.atan2(b, a))  # considering the ref point will always be (0,0)
                         df.append([Point(a, b), distance, heading])
-        points.sort(key=lambda x: x[1]) # sorted by b (ie: y)
-        # add the first negative y point
-        for p in range(len(points)):
-            if points[p][1] >= 0:
-                distance = Point((0, 0)).distance(Point(points[p-1][0], points[p-1][1]))
-                heading = math.degrees(math.atan2(points[p-1][0], points[p-1][1]))  # considering the ref point will always be (0,0)
-                heading = (heading +360) % 360
-                df.append([Point(points[p-1][0], points[p-1][1]), distance, heading])
-                break
+
         df.sort(key=lambda x: x[1])  # sorted by distance from ref
         return df[:self.number_of_points_to_use]
-

@@ -172,13 +172,18 @@ class taxi_path(object):
 
 
     def update_path(self, ref_pts):
+        """
+        returns: list[[(x,y),distance,heading,(lat,long)],[.....]]
+        -------
+        """
         self.edges_cartesian = self.loadLinefile(ref_pts, self.default_h)
         df = []
         points = []
         i = 0
-        for line in self.edges:
-            x, y = line[0].xy
-            for a, b in zip(x, y):
+        for l in range(len(self.edges_cartesian)):
+            line = self.edges_cartesian[l]
+            for i in range(len(line[0])):
+                a, b = line[0][i][0], line[0][i][1]
                 if (a, b) in points:
                     # print('Copy')
                     pass
@@ -188,7 +193,8 @@ class taxi_path(object):
                     if b > 0:  # only points with +y with respect to ref
                         distance = Point((0, 0)).distance(Point(a, b))
                         heading = math.degrees(math.atan2(b, a))  # considering the ref point will always be (0,0)
-                        df.append([Point(a, b), distance, heading])
+                        df.append([(a, b), distance, heading,
+                                   (self.edges_longlat[l][0][i][1], self.edges_longlat[l][0][i][0])])
 
         df.sort(key=lambda x: x[1])  # sorted by distance from ref
         return df[:self.number_of_points_to_use]

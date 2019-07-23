@@ -161,26 +161,16 @@ class taxi_path(object):
         print('TBD')
 
     def loadLinefile(self, ref_pts, height):
-        results = []
-        to_get = ['feattype', 'idnumber', 'idnetwrk', 'node1ref', 'node2ref', 'direc', 'edgetype', 'edgederv']
-        fields = {}
-        # this can be done in init
-        for idx, elmt in enumerate(self.reader.fields):
-            if elmt[0] in to_get:
-                fields[elmt[0]] = idx - 1
 
-        edges_longlat = [(shp.shape.points[:], shp.record[2]) for idn in self.path_id_numbers for shp in shapes if
-                     shp.record[2] == idn]
-        # edges_longlat[0] = ([(long1,lat1),(long2,lat2)],'idnumber')
         edges_cartesian = []
-        for edge in edges_longlat:
+        for edge in self.edges_longlat:
             edges_cartesian.append((np.array([fromPolarToCart(ref_pts, height, [i[1]], [i[0]])[0] for i in edge[0]]), edge[1]))
         # edges_cartesian[0] = ([[x1,y1],[x2,y2]],'idnumber')
-        return edges_cartesian, edges_longlat
+        return edges_cartesian
 
 
     def update_path(self, ref_pts):
-        self.edges = self.loadLinefile(ref_pts, self.default_h)
+        self.edges_cartesian = self.loadLinefile(ref_pts, self.default_h)
         df = []
         points = []
         i = 0

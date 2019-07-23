@@ -10,12 +10,12 @@ from gym_jsbsim.envs.taxi_utils import *
 
 
 
-
+"""
 amdb_path = "/home/jyotsna/amdb"
 taxiPath = taxi_path(ambd_folder_path=amdb_path, number_of_points_to_use=8)
 reader = shapefile.Reader(taxiPath.fname, encodingErrors="replace")
 taxi_freq_state = 30
-
+"""
 
 import gym_jsbsim.catalogs.utils as utils
 

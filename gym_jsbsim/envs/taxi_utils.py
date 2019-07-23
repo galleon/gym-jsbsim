@@ -155,6 +155,8 @@ class taxi_path(object):
         self.edges = [edge for edge in reader.shapeRecords()]
         self.edges_longlat = [(shp.shape.points[:], shp.record[2]) for idn in self.path_id_numbers for shp in self.edges if shp.record[2] == idn]
         # self.edges_longlat[0] = ([(long1,lat1),(long2,lat2)],'idnumber')
+        self.start_coords = (self.edges_longlat[0][0][0][1],self.edges_longlat[0][0][0][0])   #(lat, long)
+        self.stop_coords = (self.edges_longlat[-1][0][-1][1],self.edges_longlat[-1][0][-1][0]) #(lat, long)
         print('selected path: ', self.path_id_numbers)
 
     def plot_path(self):

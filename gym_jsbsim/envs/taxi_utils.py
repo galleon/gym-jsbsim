@@ -1,15 +1,14 @@
-import geopandas as pd
+import geopandas as gpd
 import numpy as np
 import shapefile
 #from src.taxi.naviguation import *
-from shapely.geometry import Point, LineString, Polygon
-#from taxi.geo import *
-#from src import taxi
-#from bin import *
+from shapely.geometry import Point, LineString, MultiLineString
 import math
 import pandas as pd
 import time
-
+from functools import partial
+import pyproj
+from shapely.ops import transform
 
 D2R = np.deg2rad(1)
 def fromPolarToCart(x0, h, Lat, Long):
@@ -136,6 +135,8 @@ def plot_line(ax, ob, color='#6699cc', zorder=1, linewidth=3, alpha=1):
 #-----------------------------------------------------------------------------------------------------------------------
 #           Taxi Path Class 
 # FIXME: Need to be optimise for computational issue
+# add initial heading
+# orient cartisian plane with aircraft heading
 #-----------------------------------------------------------------------------------------------------------------------
 
 
@@ -154,9 +155,23 @@ class taxi_path(object):
         self.edges = [edge for edge in reader.shapeRecords()]
         self.edges_longlat = [(shp.shape.points[:], shp.record[2]) for idn in self.path_id_numbers for shp in self.edges if shp.record[2] == idn]
         # self.edges_longlat[0] = ([(long1,lat1),(long2,lat2)],'idnumber')
-        self.start_coords = (self.edges_longlat[0][0][0][1],self.edges_longlat[0][0][0][0])   #(lat, long)
-        self.stop_coords = (self.edges_longlat[-1][0][-1][1],self.edges_longlat[-1][0][-1][0]) #(lat, long)
+        self.start_coords = (self.edges_longlat[0][0][-1][1],self.edges_longlat[0][0][-1][0])   #(lat, long)
+        self.stop_coords = (self.edges_longlat[-1][0][0][1],self.edges_longlat[-1][0][0][0]) #(lat, long)
+
         print('selected path: ', self.path_id_numbers)
+        self.project = partial(
+            pyproj.transform,
+            pyproj.Proj(init='EPSG:4326'),
+            pyproj.Proj(init='EPSG:3310'))
+
+        gdf = gpd.GeoDataFrame(self.edges_longlat)
+        gdf[0] = gdf[0].apply(lambda x: LineString(x))
+        self.gdf = gdp.GeoDataFrame(geometry=gdf[0], crs={'init': 'epsg:4326'})
+        self.gdf.to_crs(epsg=3310, inplace=True)
+        self.path = MultiLineString([i for i in gd_new.geometry])
+
+        # to update in reward function
+        self.shortest_dist = None
 
     def plot_path(self):
         print('TBD')
@@ -191,9 +206,15 @@ class taxi_path(object):
                     points.append((a, b))
                     if b > 0:  # only points with +y with respect to ref
                         distance = Point((0, 0)).distance(Point(a, b))
-                        heading = math.degrees(math.atan2(b, a))  # considering the ref point will always be (0,0)
+                        heading = math.degrees(math.atan2(b, a))  # considering the ref point will always be (0,0) ()
                         df.append([(a, b), distance, heading,
                                    (self.edges_longlat[l][0][i][1], self.edges_longlat[l][0][i][0])])
 
         df.sort(key=lambda x: x[1])  # sorted by distance from ref
+        p_transformed = transform(self.project, Point(ref_pts[1], ref_pts[0]))
+        self.shortest_dist = self.path.distance(p_transformed)
+
+
         return df[:self.number_of_points_to_use]
+
+

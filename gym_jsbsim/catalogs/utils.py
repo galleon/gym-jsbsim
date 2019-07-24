@@ -10,7 +10,8 @@ def reduce_reflex_angle_deg(angle):
 
     return new_angle
 
-"""replace with normal distance function: dist between aircraft and centerline"""
+"""replaced with normal distance function: dist between aircraft and centerline"""
+
 def shortest_ac_dist (x, y, x1, y1, x2, y2):
     '''
     Compute the shortest distance (in m) between aircraft coord (lat, lon) and the line between two points (lat1,lon1) and (lat2, lon2)

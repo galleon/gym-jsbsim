@@ -66,7 +66,7 @@ class MyCatalog(Property, Enum):
         if (sim.get_property_value(MyCatalog.nb_step)%sim.get_property_value(MyCatalog.taxi_freq_state)==1):
             #start_time = timetime()
             """ make this Quick"""
-            df = taxiPath.update_path((sim.get_property_value(JsbsimCatalog.position_lat_geod_deg), sim.get_property_value(JsbsimCatalog.position_long_gc_deg)), reader)
+            df = taxiPath.update_path((sim.get_property_value(JsbsimCatalog.position_lat_geod_deg), sim.get_property_value(JsbsimCatalog.position_long_gc_deg)))
             #print("--- %s seconds ---". % (time.time() - start_time))
 
 

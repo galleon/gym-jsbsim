@@ -75,7 +75,7 @@ class MyCatalog(Property, Enum):
             sim.set_property_value(MyCatalog.shortest_dist, dist)
             #print(sim.get_property_value(shortest_dist))
 
-            """ check with mario for units of distance"""
+           
             for i in range(1,len(df)):
                 if (df[i][1] <= 1000):
                     sim.set_property_value(MyCatalog["d"+str(i)], df[i][1])

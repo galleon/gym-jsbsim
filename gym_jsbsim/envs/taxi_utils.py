@@ -9,6 +9,7 @@ import time
 from functools import partial
 import pyproj
 from shapely.ops import transform
+import matplotlib.pyplot as plt
 
 D2R = np.deg2rad(1)
 def fromPolarToCart(x0, h, Lat, Long):
@@ -141,6 +142,12 @@ def plot_line(ax, ob, color='#6699cc', zorder=1, linewidth=3, alpha=1):
 
 
 class taxi_path(object):
+    """
+    methods to use:
+    self.update(ref_pts)  -> list[[(x,y),distance,heading,(lat,long)],[.....]]
+
+    self.plot()  -> displays path and position of ref_pts
+    """
 
     def __init__(self, ambd_folder_path="/home/jyotsna/src/attol_taxi_ctrl/amdb", number_of_points_to_use=8,ref_pts=None):
         self.fname_ref = 'AM_AerodromeReferencePoint.shp'  #Airport reference point
@@ -174,7 +181,11 @@ class taxi_path(object):
         self.shortest_dist = None
 
     def plot_path(self):
-        print('TBD')
+        plt.figure()
+        self.gdf.plot(figsize=(20, 10))
+        p = self.p_transformed
+        plt.plot(p.xy[0][0], p.xy[1][0], '*', color='r', )
+        plt.show()
 
     def loadLinefile(self, ref_pts, height):
 
@@ -191,6 +202,7 @@ class taxi_path(object):
         -------
         """
         self.edges_cartesian = self.loadLinefile(ref_pts, self.default_h)
+        self.ref_pts = ref_pts
         df = []
         points = []
         i = 0
@@ -211,9 +223,8 @@ class taxi_path(object):
                                    (self.edges_longlat[l][0][i][1], self.edges_longlat[l][0][i][0])])
 
         df.sort(key=lambda x: x[1])  # sorted by distance from ref
-        p_transformed = transform(self.project, Point(ref_pts[1], ref_pts[0]))
-        self.shortest_dist = self.path.distance(p_transformed)
-
+        self.p_transformed = transform(self.project, Point(ref_pts[1], ref_pts[0]))
+        self.shortest_dist = self.path.distance(self.p_transformed)
 
         return df[:self.number_of_points_to_use]
 

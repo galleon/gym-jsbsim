@@ -168,7 +168,7 @@ class taxi_path(object):
         gdf[0] = gdf[0].apply(lambda x: LineString(x))
         self.gdf = gpd.GeoDataFrame(geometry=gdf[0], crs={'init': 'epsg:4326'})
         self.gdf.to_crs(epsg=3310, inplace=True)
-        self.path = MultiLineString([i for i in gd_new.geometry])
+        self.path = MultiLineString([i for i in self.gdf.geometry])
 
         # to update in reward function
         self.shortest_dist = None

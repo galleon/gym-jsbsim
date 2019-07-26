@@ -10,11 +10,10 @@ from gym_jsbsim.envs.taxi_utils import *
 
 
 
-"""
-amdb_path = "/home/jyotsna/amdb"
+
+amdb_path = "../amdb"
 taxiPath = taxi_path(ambd_folder_path=amdb_path, number_of_points_to_use=8)
-taxi_freq_state = 30
-"""
+#taxi_freq_state = 30
 
 import gym_jsbsim.catalogs.utils as utils
 
@@ -62,22 +61,22 @@ class MyCatalog(Property, Enum):
     def update_da(sim):
         #print("sim.get_property_value(nb_step), taxi_freq_state", sim.get_property_value(nb_step), taxi_freq_state)
         #print(taxi_freq_state)
-        if (sim.get_property_value(MyCatalog.nb_step)%sim.get_property_value(MyCatalog.taxi_freq_state)==1):
-            #start_time = timetime()
-            df = taxiPath.update_path((sim.get_property_value(JsbsimCatalog.position_lat_geod_deg), sim.get_property_value(JsbsimCatalog.position_long_gc_deg)))
-            #print("--- %s seconds ---". % (time.time() - start_time))
+        #if (sim.get_property_value(MyCatalog.nb_step)%sim.get_property_value(MyCatalog.taxi_freq_state)==1):
+        #start_time = timetime()
+        df = taxiPath.update_path((sim.get_property_value(JsbsimCatalog.position_lat_geod_deg), sim.get_property_value(JsbsimCatalog.position_long_gc_deg)))
+        #print("--- %s seconds ---". % (time.time() - start_time))
 
-            dist = taxi_path.shortest_dist
-            #print("shortest_dist2 in meters", dist)
-            sim.set_property_value(MyCatalog.shortest_dist, dist)
-            #print(sim.get_property_value(shortest_dist))
+        dist = taxiPath.shortest_dist
+        #print("shortest_dist2 in meters", dist)
+        sim.set_property_value(MyCatalog.shortest_dist, dist)
+        #print(sim.get_property_value(shortest_dist))
 
-            for i in range(1,len(df)):
-                sim.set_property_value(MyCatalog["d"+str(i)], df[i][1])
-                sim.set_property_value(MyCatalog["a"+str(i)], utils.reduce_reflex_angle_deg(df[i][2] - sim.get_property_value(JsbsimCatalog.attitude_psi_deg)))
-                #sim.set_property_value(MyCatalog["a"+str(i)], df[i][2])
+        for i in range(1,len(df)+1):
+            sim.set_property_value(MyCatalog["d"+str(i)], df[i-1][1])
+            sim.set_property_value(MyCatalog["a"+str(i)], utils.reduce_reflex_angle_deg(df[i-1][2] - sim.get_property_value(JsbsimCatalog.attitude_psi_deg)))
+            #sim.set_property_value(MyCatalog["a"+str(i)], df[i][2])
 
-        sim.set_property_value(MyCatalog.nb_step, int(sim.get_property_value(MyCatalog.nb_step))+1)
+        #sim.set_property_value(MyCatalog.nb_step, int(sim.get_property_value(MyCatalog.nb_step))+1)
 
 
     # position and attitude
@@ -128,5 +127,5 @@ class MyCatalog(Property, Enum):
     a8 = Property('a8', 'a8', -180, 180, access = 'R')
 
     shortest_dist = Property('shortest_dist', 'shortest distance between aircraft and path [m]', 0.0, 1000.0, access = 'R')
-    taxi_freq_state = Property('taxi-freq-state','frequence to update taxi state',0)
-    nb_step = Property('nb_step', 'shortest distance between aircraft and path [m]', access = 'R')
+    #taxi_freq_state = Property('taxi-freq-state','frequence to update taxi state',0)
+    #nb_step = Property('nb_step', 'shortest distance between aircraft and path [m]', access = 'R')

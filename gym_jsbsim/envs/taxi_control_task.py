@@ -20,8 +20,8 @@ class TaxiControlTask(Task):
                   c.fcs_throttle_cmd_norm
     ]
 
-    INIT_AC_LON = 1.372124
-    INIT_AC_LAT = 43.618951
+    INIT_AC_LON = 1.37211666700005708
+    INIT_AC_LAT = 43.6189638890000424
     INIT_AC_HEADING = 320
     INITIAL_ALTITUDE_FT = 11.52
     INITIAL_VELOCITY_U = 33.76/3.0 #20 knots/sec
@@ -62,8 +62,8 @@ class TaxiControlTask(Task):
                         c.propulsion_set_running: -1,
                         # gear up
                         c.gear_gear_pos_norm : 1,
-                        c.gear_gear_cmd_norm: 1,
-                        c.nb_step:0
+                        c.gear_gear_cmd_norm: 1
+                        #c.nb_step:0
     }
 
 

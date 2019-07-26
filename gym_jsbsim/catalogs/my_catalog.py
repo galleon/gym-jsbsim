@@ -6,7 +6,7 @@ import shapefile
 from gym.spaces import Box, Discrete
 from gym_jsbsim.catalogs.property import Property
 from gym_jsbsim.catalogs.jsbsim_catalog import JsbsimCatalog
-from gym_jsbsim.envs.taxi_utils import * 
+from gym_jsbsim.envs.taxi_utils import *
 
 
 
@@ -64,7 +64,6 @@ class MyCatalog(Property, Enum):
         #print(taxi_freq_state)
         if (sim.get_property_value(MyCatalog.nb_step)%sim.get_property_value(MyCatalog.taxi_freq_state)==1):
             #start_time = timetime()
-
             df = taxiPath.update_path((sim.get_property_value(JsbsimCatalog.position_lat_geod_deg), sim.get_property_value(JsbsimCatalog.position_long_gc_deg)))
             #print("--- %s seconds ---". % (time.time() - start_time))
 
@@ -73,15 +72,11 @@ class MyCatalog(Property, Enum):
             sim.set_property_value(MyCatalog.shortest_dist, dist)
             #print(sim.get_property_value(shortest_dist))
 
-
             for i in range(1,len(df)):
-                if (df[i][1] <= 1000):
-                    sim.set_property_value(MyCatalog["d"+str(i)], df[i][1])
-                    sim.set_property_value(MyCatalog["a"+str(i)], utils.reduce_reflex_angle_deg(df[i][2] - sim.get_property_value(JsbsimCatalog.attitude_psi_deg)))
-                    #sim.set_property_value(MyCatalog["a"+str(i)], df[i][2])
-                else:
-                    sim.set_property_value(MyCatalog["d"+str(i)], 1000)
-                    sim.set_property_value(MyCatalog["a"+str(i)], 0)
+                sim.set_property_value(MyCatalog["d"+str(i)], df[i][1])
+                sim.set_property_value(MyCatalog["a"+str(i)], utils.reduce_reflex_angle_deg(df[i][2] - sim.get_property_value(JsbsimCatalog.attitude_psi_deg)))
+                #sim.set_property_value(MyCatalog["a"+str(i)], df[i][2])
+
         sim.set_property_value(MyCatalog.nb_step, int(sim.get_property_value(MyCatalog.nb_step))+1)
 
 
@@ -116,24 +111,22 @@ class MyCatalog(Property, Enum):
 
     #dist_heading_centerline_matrix = Property('dist_heading_centerline_matrix', 'dist_heading_centerline_matrix', '2D matrix with dist,angle of the next point from the aircraft to 1km (max 10 points)', [0, -45, 0, -45, 0, -45, 0, -45, 0, -45, 0, -45, 0, -45, 0, -45], [1000, 45, 1000, 45, 1000, 45, 1000, 45, 1000, 45, 1000, 45, 1000, 45, 1000, 45])
     d1 = Property('d1', 'd1', 0, 1000, access = 'R', update = update_da)
-    d2 = Property('d2', 'd2', 0, 1000, access = 'R', update = update_da)
-    d3 = Property('d3', 'd3', 0, 1000, access = 'R', update = update_da)
-    d4 = Property('d4', 'd4', 0, 1000, access = 'R', update = update_da)
-    d5 = Property('d5', 'd5', 0, 1000, access = 'R', update = update_da)
-    d6 = Property('d6', 'd6', 0, 1000, access = 'R', update = update_da)
-    d7 = Property('d7', 'd7', 0, 1000, access = 'R', update = update_da)
-    d8 = Property('d8', 'd8', 0, 1000, access = 'R', update = update_da)
-    a1 = Property('a1', 'a1', -180, 180, access = 'R', update = update_da)
-    a2 = Property('a2', 'a2', -180, 180, access = 'R', update = update_da)
-    a3 = Property('a3', 'a3', -180, 180, access = 'R', update = update_da)
-    a4 = Property('a4', 'a4', -180, 180, access = 'R', update = update_da)
-    a5 = Property('a5', 'a5', -180, 180, access = 'R', update = update_da)
-    a6 = Property('a6', 'a6', -180, 180, access = 'R', update = update_da)
-    a7 = Property('a7', 'a7', -180, 180, access = 'R', update = update_da)
-    a8 = Property('a8', 'a8', -180, 180, access = 'R', update = update_da)
+    d2 = Property('d2', 'd2', 0, 1000, access = 'R')
+    d3 = Property('d3', 'd3', 0, 1000, access = 'R')
+    d4 = Property('d4', 'd4', 0, 1000, access = 'R')
+    d5 = Property('d5', 'd5', 0, 1000, access = 'R')
+    d6 = Property('d6', 'd6', 0, 1000, access = 'R')
+    d7 = Property('d7', 'd7', 0, 1000, access = 'R')
+    d8 = Property('d8', 'd8', 0, 1000, access = 'R')
+    a1 = Property('a1', 'a1', -180, 180, access = 'R')
+    a2 = Property('a2', 'a2', -180, 180, access = 'R')
+    a3 = Property('a3', 'a3', -180, 180, access = 'R')
+    a4 = Property('a4', 'a4', -180, 180, access = 'R')
+    a5 = Property('a5', 'a5', -180, 180, access = 'R')
+    a6 = Property('a6', 'a6', -180, 180, access = 'R')
+    a7 = Property('a7', 'a7', -180, 180, access = 'R')
+    a8 = Property('a8', 'a8', -180, 180, access = 'R')
 
-    shortest_dist = Property('shortest_dist', 'shortest distance between aircraft and path [m]', 0.0, 1000.0, access = 'R', update = update_da)
+    shortest_dist = Property('shortest_dist', 'shortest distance between aircraft and path [m]', 0.0, 1000.0, access = 'R')
     taxi_freq_state = Property('taxi-freq-state','frequence to update taxi state',0)
-    nb_step = Property('nb_step', 'shortest distance between aircraft and path [m]', access = 'R',update = update_da)
-
-
+    nb_step = Property('nb_step', 'shortest distance between aircraft and path [m]', access = 'R')

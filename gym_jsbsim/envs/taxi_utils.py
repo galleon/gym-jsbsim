@@ -1,231 +1,117 @@
 import geopandas as gpd
-import numpy as np
-import shapefile
-#from src.taxi.naviguation import *
-from shapely.geometry import Point, LineString, MultiLineString
-import math
-import pandas as pd
-import time
-from functools import partial
-import pyproj
-from shapely.ops import transform
+import pycrs
+from shapely.geometry import Point,Polygon
 import matplotlib.pyplot as plt
-
-D2R = np.deg2rad(1)
-def fromPolarToCart(x0, h, Lat, Long):
-    '''
-        x0  = (lat, long) of reference point [ rad ]
-        h   = height of reference points [ m ]
-        Lat = [lat0; lat1; ...] lattitudes of points [rad]
-        Long = [long0; long1; ...] longitudes of points [rad]
-    '''
-    X = np.array([[Lat[i] * D2R, Long[i] * D2R, h]
-                  for i in range(len(Lat))])
-    X = polar2cart(X)
-    return ecef_c2ned(np.array((x0[0] *D2R, x0[1] * D2R, h)), X)
-
-def ecef_c2ned(x0,x=None,ref='spheroid'):
-    """ Projection of coordinates from ECEF frame to NED frame defined at the
-        point x0
-        Implementation of Eq (1.6-22) of "Johnson, Lewis, Stevens (2015) Aircraft
-        control and simulation, Wiley-Blackwell, 3rd edition"
-        If no points are given, the function returns the rotation matrix
-
-    Input
-    ----------
-
-    x0 : np.array
-        Vector of origin point x0 = [latitude, longitude, h] in [rad,rad,m]
-
-    x : np.array
-        [N x 3] matrix of the N points to move from ECEF to NED, given in
-        cartesian coordinates in [m, m, m]
-
-    Output
-    ----------
-
-    y : np.array
-        [N x 3] matrix of the N points in the NED frame in [m, m, m]
-
-    or
-
-    mat : np.array
-        [3 x 3] matrix of rotation from ECEF_C to NED in x0
-
-    """
-    lat     = x0[0].copy()
-    lon     = x0[1].copy()
-    x0_cart = polar2cart(x0.reshape((1,3)))
-    #h0 = x0_cart[0,2]
-    sphi    = np.sin(lat)
-    cphi    = np.cos(lat)
-    slon    = np.sin(lon)
-    clon    = np.cos(lon)
-    mat     = np.array([[-sphi*clon,-sphi*slon,cphi],
-                        [-slon,clon,0],
-                        [-cphi*clon,-cphi*slon,-sphi]])
-    if x is None:
-        return mat;
-    else:
-        if x.size == 3:
-            x = x.reshape((1,3))
-        y = x.copy()
-        for i in range(len(y[:,0])):
-            vec = x[[i],:].reshape((3,1)) - x0_cart.T
-            #vec[2] = vec[2] - h0
-            y[[i],:] = np.dot(mat,vec).reshape((1,3))
-        return y;
+import pyproj
+import numpy as np
+from math import atan2
+from gym_jsbsim.catalogs.utils import reduce_reflex_angle_deg
 
 
-def polar2cart(Xin):
-    """ Conversion of coordinates from polar to cartesian in ECEF frame
-        Implementation of Eq (1.6-17) of "Johnson, Lewis, Stevens (2015) Aircraft
-        control and simulation, Wiley-Blackwell, 3rd edition"
-
-    Input
-    ----------
-
-    Xin : np.array
-         [N x 3] matrix of the N points to convert, given in polar ccordinates
-         such as [latitude, longitude, h] in [rad,rad,m]
-         with h the height above the spheroid, along the normal.
-
-
-    Output
-    ----------
-
-    Xout : np.array
-          [N x 3] matrix of the N points in cartesian coordiantes in [m, m, m]
-
-    """
-    a = 6378.1370*1e3   # in m
-    b = 6356.7523*1e3   # in m
-    e = np.sqrt(1 - (b/a)**2)
-    dh = 0.0
-
-    if Xin.size == 3:
-        Xin = Xin.reshape((1,3))
-        lat = Xin[0,0].copy()
-        lon = Xin[0,1].copy()
-        h   = Xin[0,2] + dh
-    else:
-        lat = Xin[:,0].copy()
-        lon = Xin[:,1].copy()
-        h   = Xin[:,2].copy()
-
-    N = a/np.sqrt(1 - (e*np.sin(lat))**2)
-
-    x = (N + h)*np.cos(lat)*np.cos(lon)
-    y  = (N + h)*np.cos(lat)*np.sin(lon)
-    z = (N*(1-e**2) + h)*np.sin(lat)
-
-    if Xin.size == 3:
-        Xout = np.array([x,y,z]).reshape((1,3))
-    else:
-        Xout = np.array([x,y,z]).transpose();
-    return Xout;
-
-def plot_line_issimple(ax, ob, **kwargs):
-    kwargs["color"] = color_issimple(ob)
-    plot_line(ax, ob, **kwargs)
-
-def plot_line(ax, ob, color='#6699cc', zorder=1, linewidth=3, alpha=1):
-    x, y = ob.xy
-    ax.plot(x, y, color=color, linewidth=linewidth, solid_capstyle='round', zorder=zorder, alpha=alpha)
-
-#-----------------------------------------------------------------------------------------------------------------------
-#           Taxi Path Class 
-# FIXME: Need to be optimise for computational issue
-# add initial heading
-# orient cartisian plane with aircraft heading
-#-----------------------------------------------------------------------------------------------------------------------
+def heading(row,src_col):
+    point = row[src_col]
+    a,b = point.xy[0][0],  point.xy[1][0]
+    heading = np.rad2deg(atan2(a,b))
+    if heading<0:
+        heading = 360+ heading
+    return heading
 
 
 class taxi_path(object):
     """
     methods to use:
-    self.update(ref_pts)  -> list[[(x,y),distance,heading,(lat,long)],[.....]]
-
-    self.plot()  -> displays path and position of ref_pts
+    1. self.update(ref_pts,aircraft_heading_deg)  -> list[[(x,y),distance,heading,(long,lat)],[.....]]
+    2. self.shortest_dist  -> returns the shortest (normal) distance to target path.
+    3. self.plot() -> to visualize the airport, current path, next target points and aircraft position.
     """
 
-    def __init__(self, ambd_folder_path="/home/jyotsna/src/attol_taxi_ctrl/amdb", number_of_points_to_use=8,ref_pts=None):
-        self.fname_ref = 'AM_AerodromeReferencePoint.shp'  #Airport reference point
+    def __init__(self, ambd_folder_path="../amdb", number_of_points_to_use='all'):
+        """
+        :param ambd_folder_path: path to folder with airport shapefiles
+        :param number_of_points_to_use: number of next points to return
+        """
+
+        path_id_numbers = [1977, 1974, 1973, 2001, 2202, 2203, 2453, 2204, 2206, 2000, 1996,  1968,  1969,
+                           1971, 2020, 2019, 2018,  1931, 1929, 1925, 1926, 2031, 2042,   2134, 2091,  2099,
+                           2103, 2385, 2105, 2136, 1978,  1947, 1949]
         self.shapefile_dir =  ambd_folder_path # 'amdb' folder path
-        self.default_h = 148.72 # Altitude of toulouse airport
-        self.ref = shapefile.Reader(self.shapefile_dir + '/' + self.fname_ref)
-        self.ref_pts = np.array(self.ref.shapeRecords()[0].shape.points)[0][::-1]   # reference (x,y) in (Lat, long)  Example TLS: array([43.635     ,  1.36777778])
-        path_id_numbers = [1977, 1974, 1973, 2001, 2202, 2203, 2453, 2204, 2206, 2000, 1996,  1968,  1969, 1971, 2020, 2019, 2018,  1931, 1929, 1925, 1926, 2031, 2042,   2134, 2091,  2099, 2103, 2385, 2105, 2136, 1978,  1947, 1949]
-        self.path_id_numbers = [str(id) for id in path_id_numbers]
-        self.number_of_points_to_use = number_of_points_to_use    # number of points to use on the path for learning
-        reader = shapefile.Reader(self.shapefile_dir+'/AM_AsrnEdge.shp', encodingErrors="replace")
-        self.edges = [edge for edge in reader.shapeRecords()]
-        self.edges_longlat = [(shp.shape.points[:], shp.record[2]) for idn in self.path_id_numbers for shp in self.edges if shp.record[2] == idn]
-        # self.edges_longlat[0] = ([(long1,lat1),(long2,lat2)],'idnumber')
-        self.start_coords = (self.edges_longlat[0][0][-1][1],self.edges_longlat[0][0][-1][0])   #(lat, long)
-        self.stop_coords = (self.edges_longlat[-1][0][0][1],self.edges_longlat[-1][0][0][0]) #(lat, long)
+        self.id_str = ['%d'%x for x in path_id_numbers]
+        centerline = 'AM_AsrnEdge.shp'
+        self.n = number_of_points_to_use
 
-        print('selected path: ', self.path_id_numbers)
-        self.project = partial(
-            pyproj.transform,
-            pyproj.Proj(init='EPSG:4326'),
-            pyproj.Proj(init='EPSG:3310'))
+        self.df = gpd.read_file(self.shapefile_dir + '/' + centerline)
+        self.current_track = self.df[self.df['idnumber'].isin(self.id_str)][['idnumber', 'geometry']]
+        self.current_track['centroid'] = self.current_track.centroid
 
-        gdf = gpd.GeoDataFrame(self.edges_longlat)
-        gdf[0] = gdf[0].apply(lambda x: LineString(x))
-        self.gdf = gpd.GeoDataFrame(geometry=gdf[0], crs={'init': 'epsg:4326'})
-        self.gdf.to_crs(epsg=3310, inplace=True)
-        self.path = MultiLineString([i for i in self.gdf.geometry])
+        self.order = {}
+        i = 1
+        for id_n in self.id_str:
+            self.order[id_n]=i
+            i +=1
+
+        self.current_track['order'] = self.current_track.idnumber.map(self.order)
+        self.current_track.index = self.current_track.order
 
         # to update in reward function
         self.shortest_dist = None
 
-    def plot_path(self):
-        plt.figure()
-        self.gdf.plot(figsize=(20, 10))
-        p = self.p_transformed
-        plt.plot(p.xy[0][0], p.xy[1][0], '*', color='r', )
+    def plot(self):
+        plt.figure(figsize=(10, 20))
+        ax = plt.subplot(111)
+        aeqd = pyproj.Proj(proj='aeqd', ellps='WGS84', datum='WGS84', lat_0=aircraft_loc[1], lon_0=aircraft_loc[0]).srs
+        df_new = self.df.to_crs(crs=aeqd)
+        ax = df_new.plot(ax=ax, color=(0, 1, 1), lw=1)
+        ax = self.current_track_new.plot(ax=ax, color=(1, 0, 1), lw=2)
+        ax.plot(0, 0, 's', color='r', lw=4)
+        ax = self.current_track_new.centroid.plot(ax=ax)
         plt.show()
 
-    def loadLinefile(self, ref_pts, height):
-
-        edges_cartesian = []
-        for edge in self.edges_longlat:
-            edges_cartesian.append((np.array([fromPolarToCart(ref_pts, height, [i[1]], [i[0]])[0] for i in edge[0]]), edge[1]))
-        # edges_cartesian[0] = ([[x1,y1],[x2,y2]],'idnumber')
-        return edges_cartesian
-
-
-    def update_path(self, ref_pts):
+    def update_path(self, aircraft_loc,ac_heading):
         """
-        returns: list[[(x,y),distance,heading,(lat,long)],[.....]]
-        -------
+        :param ref_pts: aircraft (longitude,latitude)
+        :param ac_heading:
+        :return: list[[(x,y),distance,heading,(long,lat)],[.....]]
         """
-        self.edges_cartesian = self.loadLinefile(ref_pts, self.default_h)
-        self.ref_pts = ref_pts
-        df = []
-        points = []
-        i = 0
-        for l in range(len(self.edges_cartesian)):
-            line = self.edges_cartesian[l]
-            for i in range(len(line[0])):
-                a, b = line[0][i][0], line[0][i][1]
-                if (a, b) in points:
-                    # print('Copy')
-                    pass
+        aeqd = pyproj.Proj(proj='aeqd', ellps='WGS84', datum='WGS84', lat_0=aircraft_loc[1], lon_0=aircraft_loc[0]).srs
+        current_track_new = self.current_track.to_crs(crs=aeqd)
+        current_track_new['centroid'] = current_track_new.centroid
+        current_track_new['distance'] = current_track_new['geometry'].distance(Point(0, 0))
+        current_track_new = current_track_new.sort_values(by=['distance'])
 
-                else:
-                    points.append((a, b))
-                    if b > 0:  # only points with +y with respect to ref
-                        distance = Point((0, 0)).distance(Point(a, b))
-                        heading = math.degrees(math.atan2(b, a))  # considering the ref point will always be (0,0) ()
-                        df.append([(a, b), distance, heading,
-                                   (self.edges_longlat[l][0][i][1], self.edges_longlat[l][0][i][0])])
+        ind_start = None
+        for ind, row in enumerate(self.id_str):
+            if row == current_track_new.idnumber.iloc[0]:
+                ind_start = ind
+                break
+            else:
+                pass
+        new_path = self.id_str[ind_start:]
 
-        df.sort(key=lambda x: x[1])  # sorted by distance from ref
-        self.p_transformed = transform(self.project, Point(ref_pts[1], ref_pts[0]))
-        self.shortest_dist = self.path.distance(self.p_transformed)
+        # update to remaining path
+        current_track_new = current_track_new[current_track_new.idnumber.isin(new_path)]
+        current_track_new = current_track_new.sort_index()
 
-        return df[:self.number_of_points_to_use]
+        current_track_new['heading'] = current_track_new.apply(heading, src_col='centroid', axis=1)
+        current_track_new['delta_heading'] = current_track_new.heading.apply(
+            lambda x: reduce_reflex_angle_deg(x - ac_heading))
+
+        if self.n == 'all':
+            n = len(current_track_new.index)
+        else:
+            n = self.n
+
+        output = [[(current_track_new.loc[i].centroid.xy[0][0], current_track_new.loc[i].centroid.xy[1][0]),
+                   current_track_new.loc[i].distance, current_track_new.loc[i].delta_heading,
+                   (self.current_track.loc[i].centroid.xy[0][0], self.current_track.loc[i].centroid.xy[1][0])]
+                  for i in current_track_new.index[:n]]
+
+        self.shortest_dist = output[0][1]
+
+        if (output[0][2] > 45) or (output[0][2] < -45):
+            output = output[1:n]
+
+        self.current_track_new = current_track_new
+
+        return output
 
 

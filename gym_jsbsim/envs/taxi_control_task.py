@@ -22,7 +22,7 @@ class TaxiControlTask(Task):
 
     INIT_AC_LON = 1.37211666700005708
     INIT_AC_LAT = 43.6189638890000424
-    INIT_AC_HEADING = 320
+    INIT_AC_HEADING = 323
     INITIAL_ALTITUDE_FT = 11.52
     INITIAL_VELOCITY_U = 33.76/3.0 #20 knots/sec
 
@@ -80,7 +80,7 @@ class TaxiControlTask(Task):
         #else:
         #    vel_r = 0.
 
-        dist_r = 1.0/math.sqrt((sim.get_property_value(c.shortest_dist)+1))
+        dist_r = math.exp(-sim.get_property_value(c.shortest_dist)) #1.0/math.sqrt((sim.get_property_value(c.shortest_dist)+1))
 
         reward = dist_r
         '''
@@ -97,6 +97,6 @@ class TaxiControlTask(Task):
         # End up the simulation after 1200 secondes or if the aircraft is under or above 500 feet of its target altitude or velocity under 400f/s
         #print("state", state)
         #print("sim.get_property_value(v_air)", sim.get_property_value(v_air), sim.get_property_value(u_fps), sim.get_property_value(v_fps))
-        return sim.get_property_value(c.simulation_sim_time_sec)>=120 or math.fabs(sim.get_property_value(c.velocities_vc_fps)) >= 21 or math.fabs(sim.get_property_value(c.velocities_vc_fps)) <= 6
+        return sim.get_property_value(c.simulation_sim_time_sec)>=300 or math.fabs(sim.get_property_value(c.shortest_dist)) >= 3 or math.fabs(sim.get_property_value(c.velocities_vc_fps)) >= 21 or math.fabs(sim.get_property_value(c.velocities_vc_fps)) <= 7
 
 

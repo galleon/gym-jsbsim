@@ -7,6 +7,7 @@ from gym.spaces import Box, Discrete
 from gym_jsbsim.catalogs.property import Property
 from gym_jsbsim.catalogs.jsbsim_catalog import JsbsimCatalog
 from gym_jsbsim.envs.taxi_utils import *
+import time
 
 
 
@@ -62,19 +63,28 @@ class MyCatalog(Property, Enum):
         #print("sim.get_property_value(nb_step), taxi_freq_state", sim.get_property_value(nb_step), taxi_freq_state)
         #print(taxi_freq_state)
         #if (sim.get_property_value(MyCatalog.nb_step)%sim.get_property_value(MyCatalog.taxi_freq_state)==1):
-        #start_time = timetime()
-        df = taxiPath.update_path((sim.get_property_value(JsbsimCatalog.position_long_gc_deg), sim.get_property_value(JsbsimCatalog.position_lat_geod_deg)),JsbsimCatalog.attitude_psi_deg)
-        #print("--- %s seconds ---". % (time.time() - start_time))
+        #start_time = time.time()
+        df = taxiPath.update_path((sim.get_property_value(JsbsimCatalog.position_long_gc_deg), sim.get_property_value(JsbsimCatalog.position_lat_geod_deg)),sim.get_property_value(JsbsimCatalog.attitude_psi_deg))
+        #print("--- %s seconds ---",(time.time() - start_time))
 
         dist = taxiPath.shortest_dist
         #print("shortest_dist2 in meters", dist)
         sim.set_property_value(MyCatalog.shortest_dist, dist)
-        #print(sim.get_property_value(shortest_dist))
+        #print(sim.get_property_value(MyCatalog.shortest_dist))
 
         for i in range(1,len(df)+1):
             sim.set_property_value(MyCatalog["d"+str(i)], df[i-1][1])
-            sim.set_property_value(MyCatalog["a"+str(i)], utils.reduce_reflex_angle_deg(df[i-1][2] - sim.get_property_value(JsbsimCatalog.attitude_psi_deg)))
+            sim.set_property_value(MyCatalog["a"+str(i)], df[i-1][2])#]utils.reduce_reflex_angle_deg(df[i-1][2] - sim.get_property_value(JsbsimCatalog.attitude_psi_deg)))
             #sim.set_property_value(MyCatalog["a"+str(i)], df[i][2])
+
+        #d = sim.get_property_value(MyCatalog.d1)
+        #print(d)
+        #print("a",sim.get_property_value(MyCatalog.a1))
+        #print("d",sim.get_property_value(MyCatalog.d1), sim.get_property_value(MyCatalog.d2), sim.get_property_value(MyCatalog.d3), sim.get_property_value(MyCatalog.d4), sim.get_property_value(MyCatalog.d5), sim.get_property_value(MyCatalog.d6), sim.get_property_value(MyCatalog.d7), sim.get_property_value(MyCatalog.d8))
+        #print("a",sim.get_property_value(MyCatalog.a1), sim.get_property_value(MyCatalog.a2), sim.get_property_value(MyCatalog.a3), sim.get_property_value(MyCatalog.a4), sim.get_property_value(MyCatalog.a5), sim.get_property_value(MyCatalog.a6), sim.get_property_value(MyCatalog.a7), sim.get_property_value(MyCatalog.a8))
+        #print(sim.get_property_value(MyCatalog.shortest_dist))
+        #print("")
+        
 
         #sim.set_property_value(MyCatalog.nb_step, int(sim.get_property_value(MyCatalog.nb_step))+1)
 

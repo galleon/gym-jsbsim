@@ -97,6 +97,6 @@ class TaxiControlTask(Task):
         # End up the simulation after 1200 secondes or if the aircraft is under or above 500 feet of its target altitude or velocity under 400f/s
         #print("state", state)
         #print("sim.get_property_value(v_air)", sim.get_property_value(v_air), sim.get_property_value(u_fps), sim.get_property_value(v_fps))
-        return sim.get_property_value(c.simulation_sim_time_sec)>=300 or math.fabs(sim.get_property_value(c.shortest_dist)) >= 20 or math.fabs(sim.get_property_value(c.velocities_vc_fps)) >= 21 or math.fabs(sim.get_property_value(c.velocities_vc_fps)) <= 7
+        return sim.get_property_value(c.simulation_sim_time_sec)>=300 or math.fabs(sim.get_property_value(c.shortest_dist)) >= 50 or math.fabs(sim.get_property_value(c.velocities_vc_fps)) >= 21 or math.fabs(sim.get_property_value(c.velocities_vc_fps)) <= 7
 
 

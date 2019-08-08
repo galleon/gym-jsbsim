@@ -17,7 +17,7 @@ class Task:
     state_var = None
     init_conditions = None
     output = state_var
-    jsbsim_freq = 30
+    jsbsim_freq = 60
     agent_interaction_steps = 5
     aircraft_name = 'A320'
 

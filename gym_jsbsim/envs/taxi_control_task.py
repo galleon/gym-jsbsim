@@ -83,12 +83,7 @@ class TaxiControlTask(Task):
         dist_r = math.exp(-sim.get_property_value(c.shortest_dist)) #1.0/math.sqrt((sim.get_property_value(c.shortest_dist)+1))
 
         reward = dist_r
-        '''
-        if sim.get_property_value(sim_time_s) < 300:
-            reward = reward / 3.0
-        if sim.get_property_value(sim_time_s) >= 300 and sim.get_property_value(sim_time_s) < 1000:
-            reward = reward / 2.0
-        '''
+        
         return reward
 
 
@@ -97,6 +92,18 @@ class TaxiControlTask(Task):
         # End up the simulation after 1200 secondes or if the aircraft is under or above 500 feet of its target altitude or velocity under 400f/s
         #print("state", state)
         #print("sim.get_property_value(v_air)", sim.get_property_value(v_air), sim.get_property_value(u_fps), sim.get_property_value(v_fps))
-        return sim.get_property_value(c.simulation_sim_time_sec)>=300 or math.fabs(sim.get_property_value(c.shortest_dist)) >= 100 or math.fabs(sim.get_property_value(c.velocities_vc_fps)) >= 21 or math.fabs(sim.get_property_value(c.velocities_vc_fps)) <= 7
+        
+        if sim.get_property_value(c.simulation_sim_time_sec) < 60:
+            max_centerline_distance = 50
+        else:
+            if sim.get_property_value(c.simulation_sim_time_sec) < 120:
+                max_centerline_distance = 30
+            else:
+                if sim.get_property_value(c.simulation_sim_time_sec) < 180:
+                    max_centerline_distance = 10
+                else:
+                    max_centerline_distance = 1
+
+        return sim.get_property_value(c.simulation_sim_time_sec)>=300 or math.fabs(sim.get_property_value(c.shortest_dist)) >= max_centerline_distance or math.fabs(sim.get_property_value(c.velocities_vc_fps)) > 21 or math.fabs(sim.get_property_value(c.velocities_vc_fps)) < 7
 
 

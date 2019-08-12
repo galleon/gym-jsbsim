@@ -15,8 +15,7 @@ class TaxiControlTask(Task):
                  c.a1, c.a2, c.a3, c.a4]#, c.a5, c.a6, c.a7, c.a8]
 
     action_var = [c.fcs_steer_cmd_norm,
-                  c.fcs_left_brake_cmd_norm,
-                  c.fcs_right_brake_cmd_norm,
+                  c.fcs_center_brake_cmd_norm,
                   c.fcs_throttle_cmd_norm
     ]
 

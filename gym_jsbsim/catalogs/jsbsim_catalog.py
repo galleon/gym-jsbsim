@@ -137,6 +137,12 @@ class JsbsimCatalog(Property, Enum):
 
     def update_equal_feather_cmd(sim):
         JsbsimCatalog.update_equal_engine_props(sim, JsbsimCatalog.fcs_feather_cmd_norm)
+    
+    @staticmethod
+    def update_equal_brake_cmd(sim):
+        value = sim.get_property_value(JsbsimCatalog.fcs_center_brake_cmd_norm)
+        sim.jsbsim_exec.set_property_value(JsbsimCatalog.fcs_left_aileron_pos_norm, value)
+        sim.jsbsim_exec.set_property_value(JsbsimCatalog.fcs_right_aileron_pos_norm, value)
 
     fcs_aileron_cmd_norm = Property('fcs/aileron-cmd-norm', 'aileron commanded position, normalised', -1., 1.)
     fcs_elevator_cmd_norm = Property('fcs/elevator-cmd-norm', 'elevator commanded position, normalised', -1., 1.)
@@ -146,7 +152,7 @@ class JsbsimCatalog(Property, Enum):
     gear_gear_cmd_norm = Property('gear/gear-cmd-norm', 'all landing gear commanded position, normalised', 0., 1.)
     fcs_speedbrake_cmd_norm = Property('fcs/speedbrake-cmd-norm', 'normalised')
     fcs_left_brake_cmd_norm = Property('fcs/left-brake-cmd-norm', 'Left brake command(normalized)', 0., 1.)
-    fcs_center_brake_cmd_norm = Property('fcs/center-brake-cmd-norm', 'normalised')
+    fcs_center_brake_cmd_norm = Property('fcs/center-brake-cmd-norm', 'normalised', update=update_equal_brake_cmd)
     fcs_right_brake_cmd_norm = Property('fcs/right-brake-cmd-norm', 'Right brake command(normalized)', 0., 1.)
     fcs_spoiler_cmd_norm = Property('fcs/spoiler-cmd-norm', 'normalised')
     fcs_flap_cmd_norm = Property('fcs/flap-cmd-norm', 'normalised')

@@ -141,8 +141,8 @@ class JsbsimCatalog(Property, Enum):
     @staticmethod
     def update_equal_brake_props(sim):
         value = sim.get_property_value(JsbsimCatalog.fcs_center_brake_cmd_norm)
-        sim.jsbsim_exec.set_property_value(JsbsimCatalog.fcs_left_aileron_pos_norm.name_jsbsim, value)
-        sim.jsbsim_exec.set_property_value(JsbsimCatalog.fcs_right_aileron_pos_norm.name_jsbsim, value)
+        sim.jsbsim_exec.set_property_value(JsbsimCatalog.fcs_left_brake_cmd_norm.name_jsbsim, value)
+        sim.jsbsim_exec.set_property_value(JsbsimCatalog.fcs_right_brake_cmd_norm.name_jsbsim, value)
     
     def update_equal_brake_cmd(sim):
         JsbsimCatalog.update_equal_brake_props(sim)

@@ -11,7 +11,7 @@ import time
 import os.path
 
 my_path = os.path.abspath(os.path.dirname(__file__))
-amdb_path = os.path.join(my_path, "../amdb") 
+amdb_path = os.path.join(my_path, "../../amdb") 
 taxiPath = taxi_path(ambd_folder_path=amdb_path, number_of_points_to_use=4)
 
 #taxi_freq_state = 30

@@ -2,7 +2,6 @@
 
 
 from enum import Enum
-import shapefile
 from gym.spaces import Box, Discrete
 from gym_jsbsim.catalogs.property import Property
 from gym_jsbsim.catalogs.jsbsim_catalog import JsbsimCatalog

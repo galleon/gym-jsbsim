@@ -18,6 +18,7 @@ taxiPath = taxi_path(ambd_folder_path=amdb_path, number_of_points_to_use=4)
 #taxi_freq_state = 30
 
 import gym_jsbsim.catalogs.utils as utils
+from numpy.linalg import norm
 
 
 class MyCatalog(Property, Enum):
@@ -58,6 +59,13 @@ class MyCatalog(Property, Enum):
 
     def update_rudder_cmd_dir(sim):
         MyCatalog.update_property_incr(sim, MyCatalog.rudder_cmd_dir, JsbsimCatalog.fcs_rudder_cmd_norm, MyCatalog.incr_rudder)
+
+
+    def update_detect_extreme_state(sim):
+        extreme_velocity = sim.get_property_value(JsbsimCatalog.velocities_eci_velocity_mag_fps) >= 1e10
+        extreme_rotation = norm(sim.get_property_values([JsbsimCatalog.velocities_p_rad_sec,JsbsimCatalog.velocities_q_rad_sec,JsbsimCatalog.velocities_r_rad_sec])) >= 1000
+        extreme_altitude = sim.get_property_value(JsbsimCatalog.position_h_sl_ft) >= 1e10
+        sim.set_property_value(MyCatalog.detect_extreme_state, extreme_altitude or extreme_rotation or extreme_velocity)
 
 
     def update_da(sim):
@@ -106,10 +114,15 @@ class MyCatalog(Property, Enum):
     rudder_cmd_dir = Property('fcs/rudder-cmd-dir', 'direction to move the rudder', 0, 2, spaces = Discrete, access = 'W',update = update_rudder_cmd_dir)
     incr_rudder = Property('fcs/incr-rudder', 'incrementation rudder', 0, 1)
 
+    # detect functions
+
+    detect_extreme_state = Property('detect/extreme-state','detect extreme rotation, velocity and altitude',0,1,spaces = Discrete,access = 'R', update = update_detect_extreme_state)
+
     # target conditions
 
     target_altitude_ft = Property('tc/h-sl-ft', 'target altitude MSL [ft]', JsbsimCatalog.position_h_sl_ft.min, JsbsimCatalog.position_h_sl_ft.max)
     target_heading_deg = Property('tc/target-heading-deg', 'target heading [deg]', JsbsimCatalog.attitude_psi_deg.min, JsbsimCatalog.attitude_psi_deg.max)
+    target_vg = Property('tc/target-vg', 'target ground velocity [ft/s]')
     target_time = Property('tc/target-time-sec', 'target time [sec]', 0)
     target_latitude_geod_deg = Property('tc/target-latitude-geod-deg', 'target geocentric latitude [deg]', -90, 90)
     target_longitude_geod_deg = Property('tc/target-longitude-geod-deg', 'target geocentric longitude [deg]', -180, 180)

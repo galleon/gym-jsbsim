@@ -2,23 +2,21 @@
 
 
 from enum import Enum
-import shapefile
 from gym.spaces import Box, Discrete
 from gym_jsbsim.catalogs.property import Property
 from gym_jsbsim.catalogs.jsbsim_catalog import JsbsimCatalog
 from gym_jsbsim.envs.taxi_utils import *
+from gym_jsbsim.catalogs import utils
 import time
+import os.path
+from numpy.linalg import norm
 
-
-
-
-amdb_path = "../amdb"
+my_path = os.path.abspath(os.path.dirname(__file__))
+amdb_path = os.path.join(my_path, "../../amdb") 
 taxiPath = taxi_path(ambd_folder_path=amdb_path, number_of_points_to_use=4)
 
 #taxi_freq_state = 30
 
-import gym_jsbsim.catalogs.utils as utils
-from numpy.linalg import norm
 
 
 class MyCatalog(Property, Enum):

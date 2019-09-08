@@ -71,7 +71,7 @@ class MyCatalog(Property, Enum):
         #print(taxi_freq_state)
         #if (sim.get_property_value(MyCatalog.nb_step)%sim.get_property_value(MyCatalog.taxi_freq_state)==1):
         #start_time = time.time()
-        df = taxiPath.update_path((sim.get_property_value(JsbsimCatalog.position_long_gc_deg), sim.get_property_value(JsbsimCatalog.position_lat_geod_deg)),sim.get_property_value(JsbsimCatalog.attitude_psi_deg))
+        df = taxiPath.update_path((sim.get_property_value(JsbsimCatalog.position_long_gc_deg), sim.get_property_value(JsbsimCatalog.position_lat_geod_deg)))
         #print("--- %s seconds ---",(time.time() - start_time))
 
         dist = taxiPath.shortest_dist

@@ -92,7 +92,7 @@ class taxi_path(object):
         self.points_df['rel_bearing'] = relative_bearing
 
         # to update in reward function
-        self.shortest_dist = None
+        self.shortest_dist = 0.0
 
     def plot(self):
         plt.figure(figsize=(10, 20))
@@ -120,6 +120,7 @@ class taxi_path(object):
         output2 = [[self.points_df.points.loc[i], self.points_df.rel_distance.loc[i], self.points_df.rel_bearing.loc[i]]
                    for i in range(idx + 1, idx + n)]
         output += output2
+        self.shortest_dist = shortest_dist
 
         return output
 

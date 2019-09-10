@@ -79,7 +79,7 @@ class JSBSimEnv(gym.Env):
 
         self.state = self.make_step(action)
 
-        reward, done, info = self.task.get_reward(self.state, self.sim), self.task.is_terminal(self.state, self.sim), {}
+        reward, done, info = self.task.get_reward(self.state, self.sim), self.is_terminal(), {}
 
         return self.state, reward, done, info
 
@@ -124,6 +124,18 @@ class JSBSimEnv(gym.Env):
         self.action_space = self.task.get_action_space()
 
         return self.state
+
+    def is_terminal(self):
+        """
+
+        Checks if the state is terminal.
+
+        :return: bool
+
+        """
+        is_not_contained = not self.observation_space.contains(self.state)
+
+        return is_not_contained or self.task.is_terminal(self.state, self.sim)
 
     def render(self, mode='human'):
         """Renders the environment.

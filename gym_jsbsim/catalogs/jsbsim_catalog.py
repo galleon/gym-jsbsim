@@ -227,3 +227,6 @@ class JsbsimCatalog(Property, Enum):
     simulation_dt = Property('simulation/dt', 'JSBSim simulation timestep [s]', access='R')
     simulation_sim_time_sec = Property('simulation/sim-time-sec', 'Simulation time [s]', access='R')
     simulation_do_simple_trim = Property('simulation/do_simple_trim', '', access='W')
+
+    # Auto Pilot
+    ap_vg_hold = Property('ap/vg-hold', 'Auto Pilot ON OFF', access='W')

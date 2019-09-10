@@ -7,6 +7,7 @@ from geographiclib.geodesic import Geodesic
 import geopandas as gpd
 import pandas as pd
 import os
+from gym_jsbsim.catalogs import utils
 
 
 def get_bearing(p1, p2):
@@ -73,7 +74,7 @@ class taxi_path(object):
         # to update in reward function
         self.shortest_dist = None
 
-    def update_path(self, aircraft_loc):
+    def update_path(self, aircraft_loc, aircraft_heading):
         """
         :param ref_pts: aircraft (longitude,latitude)
         :param ac_heading:
@@ -86,7 +87,17 @@ class taxi_path(object):
         nearest_point = ops.nearest_points(line, Point(aircraft_loc))[0]
         idx = self.points_df[self.points_df.points == nearest_point.coords[:2][0]].index[0]
         shortest_dist = float("{:.4f}".format(get_distance(aircraft_loc, self.points_df.points.loc[idx])))
-        target_heading = float("{:.4f}".format(get_bearing(aircraft_loc, self.points_df.points.loc[idx])))
+        target_heading = (float("{:.4f}".format(get_bearing(aircraft_loc, self.points_df.points.loc[idx]))) + 360) % 360
+        delta_heading = utils.reduce_reflex_angle_deg(aircraft_heading - target_heading)
+        
+        
+        if abs(delta_heading) > 90:
+            idx = idx + 1
+            shortest_dist = float("{:.4f}".format(get_distance(aircraft_loc, self.points_df.points.loc[idx])))
+            target_heading = (float("{:.4f}".format(get_bearing(aircraft_loc, self.points_df.points.loc[idx]))) + 360) % 360
+        
+        #print(target_heading)
+
 
         output = [[nearest_point.coords[:2][0], shortest_dist, target_heading]]
         output2 = [[self.points_df.points.loc[i], self.points_df.rel_distance.loc[i], self.points_df.rel_bearing.loc[i]]

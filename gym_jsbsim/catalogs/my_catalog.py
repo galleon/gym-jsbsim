@@ -93,26 +93,28 @@ class MyCatalog(Property, Enum):
         #print("")
         
         sec = str(sim.get_property_value(JsbsimCatalog.simulation_sim_time_sec))
-        if (True):
-            '''
+        if (False):
+            
             try:
                 #s,d1,d2,d3,d4
                 print("[" + 
-                    "[" + sec + "," + str(df[0][-1][0]) + "," + str(df[0][-1][1]) + "," + "5]" + "," + 
-                    "[" + sec + "," + str(df[1][-1][0]) + "," + str(df[1][-1][1]) + "," + "5]" + "," + 
-                    "[" + sec + "," + str(df[2][-1][0]) + "," + str(df[2][-1][1]) + "," + "5]" + "," + 
-                    "[" + sec + "," + str(df[3][-1][0]) + "," + str(df[3][-1][1]) + "," + "5]" +
+                    "[" + sec + "," + str(df[0][0][0]) + "," + str(df[0][0][1]) + "," + "5]" + "," + 
+                    "[" + sec + "," + str(df[1][0][0]) + "," + str(df[1][0][1]) + "," + "5]" + "," + 
+                    "[" + sec + "," + str(df[2][0][0]) + "," + str(df[2][0][1]) + "," + "5]" + "," + 
+                    "[" + sec + "," + str(df[3][0][0]) + "," + str(df[3][0][1]) + "," + "5]" +
                     "],")
             except:
+                pass
             '''
             try:
                 print("[" + 
-                "[" + sec + "," + str(df[0][-1][0]) + "," + str(df[0][-1][1]) + "," + "5]" + "," + 
-                "[" + sec + "," + str(df[1][-1][0]) + "," + str(df[1][-1][1]) + "," + "5]" + "," + 
-                "[" + sec + "," + str(df[2][-1][0]) + "," + str(df[2][-1][1]) + "," + "5]" + 
+                "[" + sec + "," + str(df[0][0][0]) + "," + str(df[0][0][1]) + "," + "5]" + "," + 
+                "[" + sec + "," + str(df[1][0][0]) + "," + str(df[1][0][1]) + "," + "5]" + "," + 
+                "[" + sec + "," + str(df[2][0][0]) + "," + str(df[2][0][1]) + "," + "5]" + 
                 "],")
             except:
                 pass
+            '''
 
         #sim.set_property_value(MyCatalog.nb_step, int(sim.get_property_value(MyCatalog.nb_step))+1)
 
@@ -152,7 +154,7 @@ class MyCatalog(Property, Enum):
     turn_flight = Property('turn_flight', 'turn flight mode', 0, 1)
 
     #dist_heading_centerline_matrix = Property('dist_heading_centerline_matrix', 'dist_heading_centerline_matrix', '2D matrix with dist,angle of the next point from the aircraft to 1km (max 10 points)', [0, -45, 0, -45, 0, -45, 0, -45, 0, -45, 0, -45, 0, -45, 0, -45], [1000, 45, 1000, 45, 1000, 45, 1000, 45, 1000, 45, 1000, 45, 1000, 45, 1000, 45])
-    d1 = Property('d1', 'd1', 0, 1000, access = 'R')
+    d1 = Property('d1', 'd1', 0, 1000, access = 'R', update = update_da)
     d2 = Property('d2', 'd2', 0, 1000, access = 'R')
     d3 = Property('d3', 'd3', 0, 1000, access = 'R')
     d4 = Property('d4', 'd4', 0, 1000, access = 'R')
@@ -160,7 +162,7 @@ class MyCatalog(Property, Enum):
     d6 = Property('d6', 'd6', 0, 1000, access = 'R')
     d7 = Property('d7', 'd7', 0, 1000, access = 'R')
     d8 = Property('d8', 'd8', 0, 1000, access = 'R')
-    a1 = Property('a1', 'a1', -180, 180, access = 'R', update = update_da)
+    a1 = Property('a1', 'a1', -180, 180, access = 'R')
     a2 = Property('a2', 'a2', -180, 180, access = 'R')
     a3 = Property('a3', 'a3', -180, 180, access = 'R')
     a4 = Property('a4', 'a4', -180, 180, access = 'R')

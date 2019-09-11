@@ -80,8 +80,9 @@ class JSBSimEnv(gym.Env):
         self.state = self.make_step(action)
 
         reward, done, info = self.task.get_reward(self.state, self.sim), self.is_terminal(), {}
+        state = self.state if not done else self._get_clipped_state() # returned state should be in observation_space
 
-        return self.state, reward, done, info
+        return state, reward, done, info
 
     def make_step(self, action=None):
         """
@@ -231,6 +232,11 @@ class JSBSimEnv(gym.Env):
 
     def get_full_state(self):
         return self.sim.get_state()
+
+    def _get_clipped_state(self):
+        return np.clip(self.state,
+                       [o.low for o in self.observation_space],
+                       [o.high for o in self.observation_space])
 
     def set_full_state(self, state):
         init_conditions = self.sim.set_state(state)

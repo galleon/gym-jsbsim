@@ -59,7 +59,9 @@ class TaxiapControlTask(Task):
                         c.gear_gear_pos_norm : 1,
                         c.gear_gear_cmd_norm: 1,
                         # AP ON
-                        c.ap_vg_hold: 1
+                        c.ap_vg_hold: 1,
+                        # id_path
+                        c.id_path : 0
     }
 
 

@@ -71,8 +71,12 @@ class MyCatalog(Property, Enum):
         #print(taxi_freq_state)
         #if (sim.get_property_value(MyCatalog.nb_step)%sim.get_property_value(MyCatalog.taxi_freq_state)==1):
         #start_time = time.time()
-        df = taxiPath.update_path((sim.get_property_value(JsbsimCatalog.position_long_gc_deg), sim.get_property_value(JsbsimCatalog.position_lat_geod_deg)), sim.get_property_value(JsbsimCatalog.attitude_psi_deg))
+        df, next_p = taxiPath.update_path2((sim.get_property_value(JsbsimCatalog.position_long_gc_deg), sim.get_property_value(JsbsimCatalog.position_lat_geod_deg)), sim.get_property_value(JsbsimCatalog.attitude_psi_deg), int(sim.get_property_value(MyCatalog.id_path)))
         #print("--- %s seconds ---",(time.time() - start_time))
+
+        # change centerline next id_path if needed 
+        if next_p:
+            sim.set_property_value(MyCatalog.id_path, sim.get_property_value(MyCatalog.id_path)+1)
 
         dist = taxiPath.shortest_dist
         #print("shortest_dist2 in meters", dist)
@@ -152,6 +156,7 @@ class MyCatalog(Property, Enum):
 
     steady_flight = Property('steady_flight', 'steady flight mode', 0, 1000000)
     turn_flight = Property('turn_flight', 'turn flight mode', 0, 1)
+    id_path = Property('id_path', 'where I am in the centerline path')
 
     #dist_heading_centerline_matrix = Property('dist_heading_centerline_matrix', 'dist_heading_centerline_matrix', '2D matrix with dist,angle of the next point from the aircraft to 1km (max 10 points)', [0, -45, 0, -45, 0, -45, 0, -45, 0, -45, 0, -45, 0, -45, 0, -45], [1000, 45, 1000, 45, 1000, 45, 1000, 45, 1000, 45, 1000, 45, 1000, 45, 1000, 45])
     d1 = Property('d1', 'd1', 0, 1000, access = 'R', update = update_da)

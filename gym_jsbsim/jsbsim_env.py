@@ -234,9 +234,13 @@ class JSBSimEnv(gym.Env):
         return self.sim.get_state()
 
     def _get_clipped_state(self):
-        return np.clip(self.state,
-                       [o.low for o in self.observation_space],
-                       [o.high for o in self.observation_space])
+        clipped_state = np.clip(self.state,
+                                [o.low for o in self.observation_space],
+                                [o.high for o in self.observation_space])
+        # Shape the state as a tuple of arrays
+        clipped_state = tuple(np.array([val]) for val in clipped_state.squeeze())
+
+        return clipped_state
 
     def set_full_state(self, state):
         init_conditions = self.sim.set_state(state)

@@ -1,0 +1,117 @@
+<autopilot name="A320 Autopilot"> 
+ <!-- INTERFACE PROPERTIES --> 
+   <property> ap/altitude-hold </property>
+   <property> ap/vg-hold </property>
+   <property value="0.000024"> ap/altitude-pid-kp </property>
+   <property value="0.0000008"> ap/altitude-pid-ki </property>
+   <property value="0.00018"> ap/altitude-pid-kd </property>
+   <property value="2"> ap/vg-pid-throttle-kp </property>
+   <property value="0.008"> ap/vg-pid-throttle-ki </property>
+   <property value="0"> ap/vg-pid-throttle-kd </property>
+   <property value="1"> ap/vg-brake-gain </property>
+   <property> tc/h-sl-ft </property>
+   <property> tc/target-vg </property> 
+
+<!-- Ground velocity controller --> 
+ <channel name="AP ground velocity"> 
+
+   <switch name="fcs/vg-ap-on-off">
+     <default value="-1"/>
+     <test value="0">
+       ap/vg-hold == 1
+     </test>
+   </switch>
+
+   <summer name="velocities/delta-vg">
+    <input> tc/target-vg </input>
+    <input> -velocities/vg-fps</input>
+   </summer>
+
+   <pid name="fcs/vg-throttle-ap-error-pid"> 
+     <input> velocities/delta-vg </input>
+        <kp> ap/vg-pid-throttle-kp </kp>
+        <ki> ap/vg-pid-throttle-ki </ki>     
+        <kd> ap/vg-pid-throttle-kd </kd>
+        <trigger> fcs/vg-ap-on-off </trigger>    
+   </pid>
+
+   <pure_gain name="fcs/vg-brake-ap-error-gain">
+     <input> fcs/vg-throttle-ap-error-pid </input>
+     <gain> ap/vg-brake-gain </gain>
+   </pure_gain>
+
+   <switch name="ap/brake-cmd-norm">
+       <default value="fcs/left-brake-cmd-norm"/>
+       <test value="-fcs/vg-brake-ap-error-gain">
+         ap/vg-hold == 1
+       </test>
+       <clipto>
+         <min> 0 </min>
+         <max> 1 </max>
+       </clipto>
+       <output> fcs/left-brake-cmd-norm </output>
+       <output> fcs/right-brake-cmd-norm </output>
+   </switch>
+
+   <switch name="ap/throttle-cmd-norm">
+       <default value="0.0"/>
+       <test value="fcs/vg-throttle-ap-error-pid">
+         ap/vg-hold == 1
+       </test>
+   </switch>
+
+   <summer>
+      <input> ap/throttle-cmd-norm </input>
+      <input> fcs/throttle-cmd-norm </input>
+      <clipto>
+         <min> 0 </min>
+         <max> 1 </max>
+      </clipto>
+      <output> fcs/throttle-pos-norm </output>
+   </summer>
+   <summer>
+      <input> ap/throttle-cmd-norm </input>
+      <input> fcs/throttle-cmd-norm[1] </input>
+      <clipto>
+         <min> 0 </min>
+         <max> 1 </max>
+      </clipto>
+      <output> fcs/throttle-pos-norm[1] </output>
+   </summer>
+
+ </channel>
+
+ <!-- Elevator controller --> 
+ <channel name="AP altitude"> 
+
+   <switch name="fcs/elevator-ap-on-off">
+     <default value="-1"/>
+     <test value="0">
+       ap/altitude-hold == 1
+     </test>
+   </switch>
+
+   <summer name="position/delta-altitude">
+    <input> tc/h-sl-ft </input>
+    <input> -position/h-sl-ft</input>
+   </summer>
+
+   <pid name="fcs/altitude-ap-error-pid"> 
+     <input> position/delta-altitude </input>
+        <kp> ap/altitude-pid-kp </kp>
+        <ki> ap/altitude-pid-ki </ki>     
+        <kd> ap/altitude-pid-kd </kd>
+        <trigger> fcs/elevator-ap-on-off </trigger>    
+   </pid>
+
+   <switch name="fcs/altitude-switch">
+       <default value="0.0"/>
+       <test value="-fcs/altitude-ap-error-pid">
+         ap/altitude-hold == 1
+       </test>
+       <output> ap/elevator-cmd-norm </output>
+   </switch>
+
+ </channel>
+</autopilot>
+   

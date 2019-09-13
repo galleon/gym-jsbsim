@@ -11,7 +11,7 @@ import math
 class TaxiapControlTask(Task):
     #state_var = [c.velocities_vc_fps, c.shortest_dist, c.d1, c.d2, c.d3, c.d4, c.a1, c.a2, c.a3, c.a4]
     
-    state_var = [c.velocities_vc_fps, c.delta_heading]
+    state_var = [c.velocities_vc_fps, c.delta_heading]#c.shortest_dist, c.a1, c.d1]
 
     action_var = [c.fcs_steer_cmd_norm]
 
@@ -59,7 +59,9 @@ class TaxiapControlTask(Task):
                         c.gear_gear_pos_norm : 1,
                         c.gear_gear_cmd_norm: 1,
                         # AP ON
-                        c.ap_vg_hold: 1
+                        c.ap_vg_hold: 1,
+                        # id_path
+                        c.id_path : 0
     }
 
 
@@ -79,10 +81,13 @@ class TaxiapControlTask(Task):
         #dist_r = math.exp(-sim.get_property_value(c.shortest_dist)) #1.0/math.sqrt((sim.get_property_value(c.shortest_dist)+1))
         #print(sim.get_property_value(c.simulation_sim_time_sec), "vitesse", sim.get_property_value(c.velocities_vc_fps), "distance", sim.get_property_value(c.shortest_dist), "reward", dist_r, "steer", sim.get_property_value(c.fcs_steer_cmd_norm), "a1, a2", sim.get_property_value(c.a1), sim.get_property_value(c.a2))
         # inverse of the proportional absolute value of the minimal angle between the initial and current heading ...
-        heading_r = math.exp(-math.fabs(sim.get_property_value(c.delta_heading)))
+        shortest_dist_r = math.exp(-math.fabs(sim.get_property_value(c.shortest_dist)))
+        delta_heading_r = math.exp(-math.fabs(sim.get_property_value(c.delta_heading)))
+
+        #print(sim.get_property_value(c.delta_heading))
 
 
-        reward = heading_r
+        reward = delta_heading_r
         
         return reward
 
@@ -97,24 +102,28 @@ class TaxiapControlTask(Task):
         LAWS 1 (static): velocity < 7 knots in turn and < 20 knots in straight line
         '''
         # TURN
-        if abs(sim.get_property_value(c.a1)) > 15:
+        a1 = sim.get_property_value(c.a1)
+        if abs(a1) > 15:
             sim.set_property_value(c.target_vg, 7.0*self.k2f)
         else: # STRAIGHTLINE
             sim.set_property_value(c.target_vg, 20.0*self.k2f)
 
         
-        sim.set_property_value(c.target_heading_deg, ((sim.get_property_value(c.attitude_psi_deg) + sim.get_property_value(c.a1)) + 360) % 360)
+        sim.set_property_value(c.target_heading_deg, (sim.get_property_value(c.attitude_psi_deg) + a1) % 360)
+
 
         
-        if sim.get_property_value(c.simulation_sim_time_sec) < 60:
-            max_centerline_distance = 50
-        elif sim.get_property_value(c.simulation_sim_time_sec) < 120:
-            max_centerline_distance = 30
-        elif sim.get_property_value(c.simulation_sim_time_sec) < 180:
+        if sim.get_property_value(c.simulation_sim_time_sec) < 30:
+            max_centerline_distance = 40
+        elif sim.get_property_value(c.simulation_sim_time_sec) < 60:
+            max_centerline_distance = 20
+        elif sim.get_property_value(c.simulation_sim_time_sec) < 90:
             max_centerline_distance = 10
+        elif sim.get_property_value(c.simulation_sim_time_sec) < 120:
+            max_centerline_distance = 5
         else:
             max_centerline_distance = 1
 
-        return sim.get_property_value(c.simulation_sim_time_sec)>=150 #or math.fabs(sim.get_property_value(c.shortest_dist)) >= max_centerline_distance
+        return sim.get_property_value(c.simulation_sim_time_sec)>=150 or math.fabs(sim.get_property_value(c.shortest_dist)) >= max_centerline_distance
 
 

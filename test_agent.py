@@ -31,14 +31,14 @@ def random_agent():
 		a1 = env.sim.get_property_value(prp.a1)
 		#sd = env.sim.get_property_value(prp.shortest_dist)
 
-		
+		#a1 = 1
 
 		traj_string += [sim_time, lon, lat, alt]
 		attitude_string += [sim_time, psi, theta, phi]
 
 		#action = env.action_space.sample()
 		
-		a1_norm = 0.2*min(max(a1, -1.0),1.0)#2.0 * (a1 - env.observation_space[1].low) / (env.observation_space[1].high - env.observation_space[1].low) - 1.0
+		a1_norm = min(max(a1, -1.0),1.0)#2.0 * (a1 - env.observation_space[1].low) / (env.observation_space[1].high - env.observation_space[1].low) - 1.0
 
 		env.sim.set_property_value(prp.ap_vg_hold, 1)
 
@@ -54,18 +54,20 @@ def random_agent():
 		elif sim_time < 150:
 			env.sim.set_property_value(prp.target_vg, 200*k2f)
 		'''
-		if env.sim.get_property_value(prp.a1) > 15:
+		'''
+		if a1 > 15:
 			env.sim.set_property_value(prp.target_vg, 7.0*k2f)
 		else: # STRAIGHTLINE
 			env.sim.set_property_value(prp.target_vg, 20.0*k2f)
+		'''
 		action = [a1_norm]
 
 		#print(sim_time, "a1", a1, "-----", a1_norm, "vel", env.sim.get_property_value(prp.velocities_vc_fps), "vel_cmd", env.sim.get_property_value(prp.fcs_throttle_cmd_norm), "brake", env.sim.get_property_value(prp.fcs_left_brake_cmd_norm), env.sim.get_property_value(prp.fcs_center_brake_cmd_norm), env.sim.get_property_value(prp.fcs_right_brake_cmd_norm))
-		#start_time = time.time()
+		
 		state, reward, done, _ = env.step(action)
 		#print("--- %s seconds test_agent.py env.step() ---",(time.time() - start_time))
 
-		#print(str(sim_time) + "," +  str(env.sim.get_property_value(prp.velocities_vc_fps)), a1_norm, str(env.sim.get_property_value(prp.target_vg)))
+		#print(str(sim_time), a1, a1_norm, env.sim.get_property_value(prp.fcs_steer_cmd_norm))#str(env.sim.get_property_value(prp.velocities_vc_fps)), a1, d1*1000, env.sim.get_property_value(prp.delta_heading), env.sim.get_property_value(prp.shortest_dist), env.sim.get_property_value(prp.fcs_steer_cmd_norm))
 		#print("action", action)
 		#print("state", state)
 		#print("reward", reward)

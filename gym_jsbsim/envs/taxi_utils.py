@@ -122,7 +122,7 @@ class taxi_path(object):
         """
         next_point = False
         output = []
-        if abs(get_bearing(aircraft_loc, self.centerlinepoints[id_path])) > 60 or get_distance(aircraft_loc, self.centerlinepoints[id_path]) < 1:
+        if abs(get_bearing(aircraft_loc, self.centerlinepoints[id_path])) > 60 or Point(aircraft_loc).distance(Point(self.centerlinepoints[id_path]))*100000 < 1:
             # I move to the next centerline point
             next_point = True
             # I keep my next 4 points
@@ -132,7 +132,7 @@ class taxi_path(object):
             my_points_state = self.centerlinepoints[id_path:min(id_path+4, len(self.centerlinepoints)-1)]
         # I compute heading and distance of my next 4 points
         for p in my_points_state:
-            output.append([p, get_distance(aircraft_loc, p), get_bearing(aircraft_loc, p)])
+            output.append([p, Point(aircraft_loc).distance(Point(p)), get_bearing(aircraft_loc, p)])
         
         # Compute the shortest distance to the centerline
         self.shortest_dist = self.centerline.distance(Point(aircraft_loc))*100000 #Point((1.3578, 43.587434)).distance(Point((1.3577, 43.587288)))*100000 # = 17m

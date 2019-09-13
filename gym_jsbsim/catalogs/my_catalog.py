@@ -75,6 +75,7 @@ class MyCatalog(Property, Enum):
         #print("--- %s seconds ---",(time.time() - start_time))
 
         # change centerline next id_path if needed 
+        #print(next_p)
         if next_p:
             sim.set_property_value(MyCatalog.id_path, sim.get_property_value(MyCatalog.id_path)+1)
 
@@ -98,7 +99,7 @@ class MyCatalog(Property, Enum):
         
         sec = str(sim.get_property_value(JsbsimCatalog.simulation_sim_time_sec))
         if (False):
-            
+            '''
             try:
                 #s,d1,d2,d3,d4
                 print("[" + 
@@ -118,7 +119,7 @@ class MyCatalog(Property, Enum):
                 "],")
             except:
                 pass
-            '''
+            
 
         #sim.set_property_value(MyCatalog.nb_step, int(sim.get_property_value(MyCatalog.nb_step))+1)
 
@@ -159,7 +160,7 @@ class MyCatalog(Property, Enum):
     id_path = Property('id_path', 'where I am in the centerline path')
 
     #dist_heading_centerline_matrix = Property('dist_heading_centerline_matrix', 'dist_heading_centerline_matrix', '2D matrix with dist,angle of the next point from the aircraft to 1km (max 10 points)', [0, -45, 0, -45, 0, -45, 0, -45, 0, -45, 0, -45, 0, -45, 0, -45], [1000, 45, 1000, 45, 1000, 45, 1000, 45, 1000, 45, 1000, 45, 1000, 45, 1000, 45])
-    d1 = Property('d1', 'd1', 0, 1000, access = 'R', update = update_da)
+    d1 = Property('d1', 'd1', 0, 1000, access = 'R')
     d2 = Property('d2', 'd2', 0, 1000, access = 'R')
     d3 = Property('d3', 'd3', 0, 1000, access = 'R')
     d4 = Property('d4', 'd4', 0, 1000, access = 'R')
@@ -167,7 +168,7 @@ class MyCatalog(Property, Enum):
     d6 = Property('d6', 'd6', 0, 1000, access = 'R')
     d7 = Property('d7', 'd7', 0, 1000, access = 'R')
     d8 = Property('d8', 'd8', 0, 1000, access = 'R')
-    a1 = Property('a1', 'a1', -180, 180, access = 'R')
+    a1 = Property('a1', 'a1', -180, 180, access = 'R', update = update_da)
     a2 = Property('a2', 'a2', -180, 180, access = 'R')
     a3 = Property('a3', 'a3', -180, 180, access = 'R')
     a4 = Property('a4', 'a4', -180, 180, access = 'R')

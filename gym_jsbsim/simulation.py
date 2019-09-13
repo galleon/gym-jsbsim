@@ -60,9 +60,9 @@ class Simulation:
             raise ValueError('Tried to initialize a non-existent engine!')
         elif i < 0 :
             for j in range(n):
-                self.set_property_value(Catalog['propulsion_engine_' + str(j) + '_set_running'], 1)
+                self.jsbsim_exec.set_property_value('propulsion/engine[' + str(j) + ']/set-running', 1)
         else :
-            self.set_property_value(Catalog['propulsion_engine_' + str(i) + '_set_running'], 1)
+            self.jsbsim_exec.set_property_value('propulsion/engine[' + str(i) + ']/set-running', 1)
 
     def set_initial_conditions(self, init_conditions=None):
         """

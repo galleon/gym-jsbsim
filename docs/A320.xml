@@ -109,7 +109,7 @@
             <brake_group> RIGHT </brake_group>
             <retractable>1</retractable>
         </contact>
-        <contact type="BOGEY" name="TAIL_1">
+        <contact type="STRUCTURE" name="TAIL_1">
             <location unit="IN">
                 <x> 987 </x>
                 <y> 0 </y>
@@ -124,7 +124,7 @@
             <brake_group> NONE </brake_group>
             <retractable>0</retractable>
         </contact>
-        <contact type="BOGEY" name="ENG_1">
+        <contact type="STRUCTURE" name="ENG_1">
             <location unit="IN">
                 <x> 515.4 </x>
                 <y> 226.2 </y>
@@ -139,7 +139,7 @@
             <brake_group> NONE </brake_group>
             <retractable>0</retractable>
         </contact>
-        <contact type="BOGEY" name="ENG_2">
+        <contact type="STRUCTURE" name="ENG_2">
             <location unit="IN">
                 <x> 515.4 </x>
                 <y> -226.2 </y>
@@ -154,7 +154,7 @@
             <brake_group> NONE </brake_group>
             <retractable>0</retractable>
         </contact>
-        <contact type="BOGEY" name="WING_TIP_1">
+        <contact type="STRUCTURE" name="WING_TIP_1">
             <location unit="IN">
                 <x> 846.1 </x>
                 <y> -667.6 </y>
@@ -169,7 +169,7 @@
             <brake_group> NONE </brake_group>
             <retractable>0</retractable>
         </contact>
-        <contact type="BOGEY" name="WING_TIP_2">
+        <contact type="STRUCTURE" name="WING_TIP_2">
             <location unit="IN">
                 <x> 846.1 </x>
                 <y> 667.6 </y>
@@ -184,7 +184,7 @@
             <brake_group> NONE </brake_group>
             <retractable>0</retractable>
         </contact>
-        <contact type="BOGEY" name="NOSE_TIP">
+        <contact type="STRUCTURE" name="NOSE_TIP">
             <location unit="IN">
                 <x> 0 </x>
                 <y> 0 </y>
@@ -199,7 +199,7 @@
             <brake_group> NONE </brake_group>
             <retractable>0</retractable>
         </contact>
-        <contact type="BOGEY" name="NOSE_TOP">
+        <contact type="STRUCTURE" name="NOSE_TOP">
             <location unit="IN">
                 <x> 131.6 </x>
                 <y> 0 </y>
@@ -214,7 +214,7 @@
             <brake_group> NONE </brake_group>
             <retractable>0</retractable>
         </contact>
-        <contact type="BOGEY" name="TAIL_TOP">
+        <contact type="STRUCTURE" name="TAIL_TOP">
             <location unit="IN">
                 <x> 1382.6 </x>
                 <y> 0 </y>
@@ -229,7 +229,7 @@
             <brake_group> NONE </brake_group>
             <retractable>0</retractable>
         </contact>
-        <contact type="BOGEY" name="TAIL_TIP">
+        <contact type="STRUCTURE" name="TAIL_TIP">
             <location unit="IN">
                 <x> 1476.7 </x>
                 <y> 0 </y>
@@ -318,7 +318,7 @@
     </propulsion>
 
 
-    <autopilot file="ap"/>
+    <autopilot file="A320ap"/>
 
     <flight_control name="FCS: A320">
         <channel name="Pitch">

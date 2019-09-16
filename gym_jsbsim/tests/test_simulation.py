@@ -12,14 +12,14 @@ class TestSimulation(unittest.TestCase):
 
     """
 
-    # the properties
+    # the properties to check at the end of the two simulations
     state_properties = [c.position_h_sl_ft,c.position_lat_geod_deg,c.position_long_gc_deg,
                         c.velocities_u_fps,c.velocities_v_fps,c.velocities_w_fps,
                         c.velocities_p_rad_sec, c.velocities_q_rad_sec,c.velocities_r_rad_sec]
 
     error_max = 0.001
 
-    tmax = 3600 # seconds
+    tmax = 3600 # in seconds
 
     def setUp(self):
         self.env = gym_jsbsim.make('GymJsbsim-HeadingControlTask-v0')

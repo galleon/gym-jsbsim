@@ -1,9 +1,5 @@
 import unittest
 import random
-import sys
-sys.path.append('H:\\new_gym-jsbsim\\gym-jsbsim')
-import os
-os.environ['JSBSIM_ROOT_DIR'] = 'H:/jsbsim-code'
 import gym_jsbsim
 from gym_jsbsim import Catalog as c
 from gym_jsbsim.catalogs.utils import reduce_reflex_angle_deg

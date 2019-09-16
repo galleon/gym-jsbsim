@@ -1,8 +1,4 @@
 import unittest
-import sys
-sys.path.append('H:\\new_gym-jsbsim\\gym-jsbsim')
-import os
-os.environ['JSBSIM_ROOT_DIR'] = 'H:/jsbsim-code'
 import gym_jsbsim
 
 

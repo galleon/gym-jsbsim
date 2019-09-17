@@ -14,12 +14,12 @@ def get_bearing(p1, p2):
     """
     :param p1: (long,lat)
     :param p2: (long,lat)
-    :return: bearing in degrees
+    :return: bearing in degrees [0,360]
     """
     long1, lat1 = p1
     long2, lat2 = p2
     brng = Geodesic.WGS84.Inverse(lat1, long1, lat2, long2)['azi1']
-    return brng
+    return (brng+360)%360
 
 
 def get_distance(p1, p2):
@@ -122,11 +122,13 @@ class taxi_path(object):
         """
         next_point = False
         output = []
-        if abs(get_bearing(aircraft_loc, self.centerlinepoints[id_path])) > 60 or Point(aircraft_loc).distance(Point(self.centerlinepoints[id_path]))*100000 < 1:
+        id_path=min(id_path, len(self.centerlinepoints)-1)
+        if Point(aircraft_loc).distance(Point(self.centerlinepoints[id_path]))*100000 < 1 or abs(aircraft_heading - get_bearing(aircraft_loc, self.centerlinepoints[id_path])) > 60:
+            #print(id_path, Point(aircraft_loc).distance(Point(self.centerlinepoints[id_path]))*100000, aircraft_loc, self.centerlinepoints[id_path], (get_bearing(aircraft_loc, self.centerlinepoints[id_path])+360)%360, aircraft_heading, abs(aircraft_heading - (get_bearing(aircraft_loc, self.centerlinepoints[id_path])+360)%360))
             # I move to the next centerline point
             next_point = True
             # I keep my next 4 points
-            my_points_state = self.centerlinepoints[id_path+1:min(id_path+4, len(self.centerlinepoints)-1)]
+            my_points_state = self.centerlinepoints[id_path+1:min(id_path+5, len(self.centerlinepoints)-1)]
         else:
             # I keep my next 4 points
             my_points_state = self.centerlinepoints[id_path:min(id_path+4, len(self.centerlinepoints)-1)]

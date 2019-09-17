@@ -81,19 +81,20 @@ class TaxiapControlTask(Task):
         #dist_r = math.exp(-sim.get_property_value(c.shortest_dist)) #1.0/math.sqrt((sim.get_property_value(c.shortest_dist)+1))
         #print(sim.get_property_value(c.simulation_sim_time_sec), "vitesse", sim.get_property_value(c.velocities_vc_fps), "distance", sim.get_property_value(c.shortest_dist), "reward", dist_r, "steer", sim.get_property_value(c.fcs_steer_cmd_norm), "a1, a2", sim.get_property_value(c.a1), sim.get_property_value(c.a2))
         # inverse of the proportional absolute value of the minimal angle between the initial and current heading ...
-        #shortest_dist_r = math.exp(-math.fabs(sim.get_property_value(c.shortest_dist)))
+        shortest_dist_r = math.exp(-math.fabs(sim.get_property_value(c.shortest_dist)))
         #delta_heading_r = math.exp(-math.fabs(sim.get_property_value(c.delta_heading)))
 
         #print(sim.get_property_value(c.delta_heading))
-        d1 = sim.get_property_value(c.d1)
-        if (d1 < 10 and d1 > 0):
+        '''
+        sd = sim.get_property_value(c.shortest_dist)
+        if (sd < 5 and sd > 0):
             return 1
         else:
             return 0
-
+        '''
         #reward = delta_heading_r
         
-        #return reward
+        return shortest_dist_r
 
 
     def is_terminal(self, state, sim):
@@ -113,7 +114,7 @@ class TaxiapControlTask(Task):
             sim.set_property_value(c.target_vg, 20.0*self.k2f)
 
         
-        sim.set_property_value(c.target_heading_deg, (sim.get_property_value(c.attitude_psi_deg) + a1) % 360)
+        #sim.set_property_value(c.target_heading_deg, (sim.get_property_value(c.attitude_psi_deg) + a1) % 360)
 
 
         # TOTEST
@@ -122,6 +123,7 @@ class TaxiapControlTask(Task):
         # . reward de la distance parcouru tant que distance a la ligne central < a 20 m
         # . reward sur le nombre de points passé (ie: id_path)
 
+        '''
         if sim.get_property_value(c.simulation_sim_time_sec) < 30:
             max_centerline_distance = 40
         elif sim.get_property_value(c.simulation_sim_time_sec) < 60:
@@ -132,7 +134,7 @@ class TaxiapControlTask(Task):
             max_centerline_distance = 5
         else:
             max_centerline_distance = 1
-
-        return sim.get_property_value(c.simulation_sim_time_sec)>=150 or math.fabs(sim.get_property_value(c.shortest_dist)) >= max_centerline_distance
+        '''
+        return sim.get_property_value(c.simulation_sim_time_sec)>=150 or math.fabs(sim.get_property_value(c.shortest_dist)) >= 10
 
 

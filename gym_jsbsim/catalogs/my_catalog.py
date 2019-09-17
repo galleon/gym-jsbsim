@@ -99,7 +99,7 @@ class MyCatalog(Property, Enum):
         
         sec = str(sim.get_property_value(JsbsimCatalog.simulation_sim_time_sec))
         if (False):
-            '''
+            
             try:
                 #s,d1,d2,d3,d4
                 print("[" + 
@@ -119,7 +119,7 @@ class MyCatalog(Property, Enum):
                 "],")
             except:
                 pass
-            
+            '''
 
         #sim.set_property_value(MyCatalog.nb_step, int(sim.get_property_value(MyCatalog.nb_step))+1)
 

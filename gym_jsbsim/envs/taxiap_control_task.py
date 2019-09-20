@@ -77,7 +77,7 @@ class TaxiapControlTask(Task):
         self.avg_dist += math.fabs(sim.get_property_value(c.shortest_dist))
         self.nb_step += 1
 
-        #print(sim.get_property_value(c.shortest_dist), sim.get_property_value(c.velocities_vc_fps), sim.get_property_value(c.fcs_steer_cmd_norm))
+        print(sim.get_property_value(c.shortest_dist), sim.get_property_value(c.velocities_vc_fps), sim.get_property_value(c.fcs_steer_cmd_norm))
         
         
         return shortest_dist_r

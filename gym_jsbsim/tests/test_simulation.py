@@ -18,7 +18,7 @@ class TestSimulation(unittest.TestCase):
                         c.attitude_psi_deg, c.attitude_theta_deg, c.attitude_phi_deg,
                         c.velocities_p_rad_sec, c.velocities_q_rad_sec, c.velocities_r_rad_sec]
 
-    error_max = 0.001
+    error_max = 0.002
 
     tmax = 3600  # in seconds
 

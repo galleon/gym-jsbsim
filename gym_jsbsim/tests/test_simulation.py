@@ -13,13 +13,14 @@ class TestSimulation(unittest.TestCase):
     """
 
     # the properties to check at the end of the two simulations
-    state_properties = [c.position_h_sl_ft,c.position_lat_geod_deg,c.position_long_gc_deg,
-                        c.velocities_u_fps,c.velocities_v_fps,c.velocities_w_fps,
-                        c.velocities_p_rad_sec, c.velocities_q_rad_sec,c.velocities_r_rad_sec]
+    state_properties = [c.position_h_sl_ft, c.position_lat_geod_deg, c.position_long_gc_deg,
+                        c.velocities_u_fps, c.velocities_v_fps, c.velocities_w_fps,
+                        c.attitude_psi_deg, c.attitude_theta_deg, c.attitude_phi_deg,
+                        c.velocities_p_rad_sec, c.velocities_q_rad_sec, c.velocities_r_rad_sec]
 
     error_max = 0.001
 
-    tmax = 3600 # in seconds
+    tmax = 3600  # in seconds
 
     def setUp(self):
         self.env = gym_jsbsim.make('GymJsbsim-HeadingControlTask-v0')
@@ -61,12 +62,12 @@ class TestSimulation(unittest.TestCase):
             if p1 == p2:
                 error = 0
             else:
-                error = math.fabs(p2 - p1)/max(math.fabs(p1),math.fabs(p2))
-            self.assertLess(error,self.error_max,'The two simulations have diverged')
+                error = math.fabs(p2 - p1)/max(math.fabs(p1), math.fabs(p2))
+            self.assertLess(error, self.error_max, 'The two simulations have diverged')
 
 
     def test_get_state_set_state_constant_action(self):
-        constant_action = [1,1,1,1]
+        constant_action = [1, 1, 1, 1]
 
         self.env.reset()
 
@@ -105,7 +106,7 @@ class TestSimulation(unittest.TestCase):
 
 
     def test_get_state_set_state_oscillating_altitude(self):
-        #taking actions only on the elevator command
+        # taking actions only on the elevator command
         self.env.task.define_action([c.fcs_elevator_cmd_norm])
         self.env.reset()
 
@@ -125,7 +126,7 @@ class TestSimulation(unittest.TestCase):
                 state = self.env.get_full_state()
                 get_state = True
 
-            #compute action
+            # compute action
             last_delta = delta
             delta = self.env.sim.get_property_value(c.delta_altitude)
             action = [-(kp * delta + kd * (delta - last_delta))]
@@ -151,7 +152,7 @@ class TestSimulation(unittest.TestCase):
             if p1 == p2:
                 error = 0
             else:
-                error = math.fabs(p2 - p1)/max(math.fabs(p1),math.fabs(p2))
-            self.assertLess(error,self.error_max,'The two simulations have diverged')
+                error = math.fabs(p2 - p1)/max(math.fabs(p1), math.fabs(p2))
+            self.assertLess(error, self.error_max, 'The two simulations have diverged')
 
 

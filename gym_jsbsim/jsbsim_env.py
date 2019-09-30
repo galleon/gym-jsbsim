@@ -162,7 +162,7 @@ class JSBSimEnv(gym.Env):
 
         :param mode: str, the mode to render with
         """
-        output = self.task.get_props_output()
+        output = self.task.get_output()
 
         if mode == 'human':
             pass

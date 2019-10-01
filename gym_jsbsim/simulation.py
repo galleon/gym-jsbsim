@@ -174,10 +174,10 @@ class Simulation:
             if prop.update:
                 prop.update(self)
 
-    def get_state(self):
+    def get_sim_state(self):
         return {prop: self.get_property_value(prop) for prop in Catalog.values()}
 
-    def set_state(self,state):
+    def state_to_ic(self, state):
         init_conditions = {}
 
         state_to_ic = {Catalog.position_lat_gc_deg: Catalog.ic_lat_gc_deg,

@@ -41,19 +41,19 @@ class TestSimulation(unittest.TestCase):
         while t <= self.tmax and self.env.sim.get_property_value(c.position_h_sl_ft) >= 200:
             if t >= 5 and get_state is False:
                 # get_state after 5 seconds of simulation
-                state = self.env.get_full_state()
+                state = self.env.get_state()
                 get_state = True
             if get_state:
                 count_actions +=1
             self.env.step()
             t = self.env.get_sim_time()
-        end_state_1 = self.env.get_full_state()
+        end_state_1 = self.env.get_state()
 
         # second flight
-        self.env.set_full_state(state)
+        self.env.set_state(state)
         for _ in range(count_actions):
             self.env.step()
-        end_state_2 = self.env.get_full_state()
+        end_state_2 = self.env.get_state()
 
         # compute error between two end states
         for prop in self.state_properties:
@@ -80,19 +80,19 @@ class TestSimulation(unittest.TestCase):
         while t <= self.tmax and self.env.sim.get_property_value(c.position_h_sl_ft) >= 200:
             if t >= 5 and get_state is False:
                 # get_state after 5 seconds of simulation
-                state = self.env.get_full_state()
+                state = self.env.get_state()
                 get_state = True
             if get_state:
                 count_actions += 1
             self.env.step(constant_action)
             t = self.env.get_sim_time()
-        end_state_1 = self.env.get_full_state()
+        end_state_1 = self.env.get_state()
 
         # second flight
-        self.env.set_full_state(state)
+        self.env.set_state(state)
         for _ in range(count_actions):
             self.env.step(constant_action)
-        end_state_2 = self.env.get_full_state()
+        end_state_2 = self.env.get_state()
 
         # compute error between two end states
         for prop in self.state_properties:
@@ -123,7 +123,7 @@ class TestSimulation(unittest.TestCase):
         while t <= self.tmax and self.env.sim.get_property_value(c.position_h_sl_ft) >= 200:
             if t >= 5 and get_state is False:
                 # get_state after 5 seconds of simulation
-                state = self.env.get_full_state()
+                state = self.env.get_state()
                 get_state = True
 
             # compute action
@@ -137,13 +137,13 @@ class TestSimulation(unittest.TestCase):
             self.env.step(action)
             t = self.env.get_sim_time()
 
-        end_state_1 = self.env.get_full_state()
+        end_state_1 = self.env.get_state()
 
         # second flight
-        self.env.set_full_state(state)
+        self.env.set_state(state)
         for action in actions:
             self.env.step(action)
-        end_state_2 = self.env.get_full_state()
+        end_state_2 = self.env.get_state()
 
         # compute error between two end states
         for prop in self.state_properties:

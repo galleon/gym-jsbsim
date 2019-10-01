@@ -231,7 +231,7 @@ class JSBSimEnv(gym.Env):
         return self.sim.get_sim_time()
 
     def get_state(self):
-        return self.sim.get_state()
+        return self.sim.get_sim_state()
 
     def _get_clipped_state(self):
         clipped_state = np.clip(self.state,

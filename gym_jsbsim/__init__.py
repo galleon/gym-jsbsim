@@ -19,7 +19,7 @@ with OpenAI Gym so that they can be instantiated with a gym.make(id)
 """
 
 if 'JSBSIM_ROOT_DIR' not in os.environ:
-    os.environ['JSBSIM_ROOT_DIR'] = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'jsbsim')
+    os.environ['JSBSIM_ROOT_DIR'] = os.path.join(os.path.dirname(__file__), 'jsbsim')
 
 for task_name in TASKS:
     register(

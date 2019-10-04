@@ -243,6 +243,4 @@ class JSBSimEnv(gym.Env):
         return clipped_state
 
     def set_state(self, state):
-        init_conditions = self.sim.state_to_ic(state)
-        self.task.define_init_conditions(init_conditions)
-        self.reset()
+        self.sim.set_sim_state(state)

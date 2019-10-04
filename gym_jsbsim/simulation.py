@@ -46,13 +46,14 @@ class Simulation:
 
         self.agent_interaction_steps = agent_interaction_steps
 
+        self.initialise(init_conditions)
+
+    def initialise(self, init_conditions):
         self.set_initial_conditions(init_conditions)
         success = self.jsbsim_exec.run_ic()
         self.propulsion_init_running(-1)
-
         if not success:
             raise RuntimeError('JSBSim failed to init simulation conditions.')
-
 
     def propulsion_init_running(self,i):
         n = self.jsbsim_exec.propulsion_get_num_engines()
@@ -203,3 +204,8 @@ class Simulation:
                 elif 'RW' in prop.access:
                     init_conditions[prop] = value
         return init_conditions
+
+    def set_sim_state(self, state):
+        init_conditions = self.state_to_ic(state)
+        self.jsbsim_exec.reset_to_initial_conditions(0)
+        self.initialise(init_conditions)

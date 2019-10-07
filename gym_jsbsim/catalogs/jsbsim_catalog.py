@@ -229,4 +229,4 @@ class JsbsimCatalog(Property, Enum):
     simulation_do_simple_trim = Property('simulation/do_simple_trim', '', access='W')
 
     # Auto Pilot
-    ap_vg_hold = Property('ap/vg-hold', 'Auto Pilot ON OFF', access='W')
+    ap_vg_hold = Property('ap/vg-hold', 'Auto Pilot ON OFF')

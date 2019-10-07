@@ -334,17 +334,12 @@ void FGPropulsion::InitRunning(int n)
       throw(string("Tried to initialize a non-existent engine!"));
     }
 
-    in.ThrottleCmd[n] = in.ThrottlePos[n] = 1; // Set the throttle command and position
-    in.MixtureCmd[n] = in.MixturePos[n] = 1;   // Set the mixture command and position
-
     GetEngine(n)->InitRunning();
     GetSteadyState();
 
   } else if (n < 0) { // -1 refers to "All Engines"
 
     for (unsigned int i=0; i<GetNumEngines(); i++) {
-      in.ThrottleCmd[i] = in.ThrottlePos[i] = 1; // Set the throttle command and position
-      in.MixtureCmd[i] = in.MixturePos[i] = 1;   // Set the mixture command and position
       GetEngine(i)->InitRunning();
     }
 

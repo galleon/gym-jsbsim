@@ -144,7 +144,7 @@ class MyCatalog(Property, Enum):
     d6 = Property('d6', 'd6', 0, 1000, access = 'R')
     d7 = Property('d7', 'd7', 0, 1000, access = 'R')
     d8 = Property('d8', 'd8', 0, 1000, access = 'R')
-    a1 = Property('a1', 'a1', -180, 180, access = 'R'
+    a1 = Property('a1', 'a1', -180, 180, access = 'R')
     a2 = Property('a2', 'a2', -180, 180, access = 'R')
     a3 = Property('a3', 'a3', -180, 180, access = 'R')
     a4 = Property('a4', 'a4', -180, 180, access = 'R')

@@ -1,6 +1,3 @@
-""" Defines custom properties not implemented in JSBSim """
-
-
 from enum import Enum
 from gym.spaces import Box, Discrete
 from gym_jsbsim.catalogs.property import Property
@@ -21,6 +18,8 @@ taxiPath = taxi_path()
 
 class MyCatalog(Property, Enum):
     '''
+
+    A class to define and store new properties not implemented in JSBSim
 
     '''
 
@@ -63,6 +62,10 @@ class MyCatalog(Property, Enum):
 
 
     def update_detect_extreme_state(sim):
+        '''
+        Check whether the simulation is going through excessive values before it returns NaN values.
+        Store the result in detect_extreme_state property.
+        '''
         extreme_velocity = sim.get_property_value(JsbsimCatalog.velocities_eci_velocity_mag_fps) >= 1e10
         extreme_rotation = norm(sim.get_property_values([JsbsimCatalog.velocities_p_rad_sec,JsbsimCatalog.velocities_q_rad_sec,JsbsimCatalog.velocities_r_rad_sec])) >= 1000
         extreme_altitude = sim.get_property_value(JsbsimCatalog.position_h_sl_ft) >= 1e10

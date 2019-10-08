@@ -5,6 +5,12 @@ from gym_jsbsim.catalogs.property import Property
 
 
 class JsbsimCatalog(Property, Enum):
+    '''
+
+    A class to store and customize jsbsim properties
+
+    '''
+
     # position and attitude
 
     position_h_sl_ft = Property('position/h-sl-ft', 'altitude above mean sea level [ft]', -1400, 85000)

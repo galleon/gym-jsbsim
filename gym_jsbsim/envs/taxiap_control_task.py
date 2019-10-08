@@ -2,6 +2,7 @@ from gym_jsbsim.task import Task
 from gym_jsbsim.catalogs.catalog import Catalog as c
 import random
 import math
+from collections import deque
 
 """
     A task in which the agent must follow taxiway centerline trajectory.
@@ -10,6 +11,7 @@ import math
 
 class TaxiapControlTask(Task):
     state_var = [c.velocities_vc_fps, c.shortest_dist, c.d1, c.d2, c.d3, c.d4, c.a1, c.a2, c.a3, c.a4]
+    #state_var = [c.velocities_vc_fps, c.shortest_dist, c.d1, c.d2, c.d3, c.d4, c.d5, c.d6, c.d7, c.d8, c.a1, c.a2, c.a3, c.a4, c.a5, c.a6, c.a7, c.a8]
     
     #state_var = [c.velocities_vc_fps, c.delta_heading]#c.shortest_dist, c.a1, c.d1]
 
@@ -24,6 +26,8 @@ class TaxiapControlTask(Task):
 
     avg_dist = 0
     nb_step = 0
+    r=1
+    steer_history = deque(maxlen=6)
 
     init_conditions = { # 'ic/h-sl-ft', 'initial altitude MSL [ft]'
                         c.ic_h_sl_ft: INITIAL_ALTITUDE_FT,
@@ -77,10 +81,20 @@ class TaxiapControlTask(Task):
         self.avg_dist += math.fabs(sim.get_property_value(c.shortest_dist))
         self.nb_step += 1
 
+        '''
+        self.steer_history.append(sim.get_property_value(c.fcs_steer_cmd_norm))
+        # Compute sum of steer_cmd
+        sum_steer_cmd = 0
+        for i in range(1, len(self.steer_history)):
+            sum_steer_cmd += abs(self.steer_history[i-1]-self.steer_history[i])
+        
+        steer_cmd_reward = math.exp(-math.fabs(sum_steer_cmd))
+        '''
+
         print(sim.get_property_value(c.shortest_dist), sim.get_property_value(c.velocities_vc_fps), sim.get_property_value(c.fcs_steer_cmd_norm))
         
         
-        return shortest_dist_r
+        return shortest_dist_r*shortest_dist_r
 
 
     def is_terminal(self, state, sim):
@@ -93,11 +107,14 @@ class TaxiapControlTask(Task):
         LAWS 1 (static): velocity < 7 knots in turn and < 20 knots in straight line
         '''
         # TURN
-        a1 = sim.get_property_value(c.a1)
+        #if (sim.get_property_value(c.id_path)%10>=1 and sim.get_property_value(c.id_path)%10<2):
+        #    self.r = random.uniform(1.0, 1.5)
+
+        a1 = sim.get_property_value(c.a2)
         if abs(a1) > 15:
-            sim.set_property_value(c.target_vg, 7.0*self.k2f)
+            sim.set_property_value(c.target_vg, 7.0*self.k2f*self.r)
         else: # STRAIGHTLINE
-            sim.set_property_value(c.target_vg, 20.0*self.k2f)
+            sim.set_property_value(c.target_vg, 20.0*self.k2f*self.r)
 
         
         #sim.set_property_value(c.target_heading_deg, (sim.get_property_value(c.attitude_psi_deg) + a1) % 360)
@@ -122,8 +139,8 @@ class TaxiapControlTask(Task):
             max_centerline_distance = 1
         '''
 
-        terminal = sim.get_property_value(c.simulation_sim_time_sec)>=150 or math.fabs(sim.get_property_value(c.shortest_dist)) >= 10
-        if terminal:
+        terminal = sim.get_property_value(c.simulation_sim_time_sec)>=450 or math.fabs(sim.get_property_value(c.shortest_dist)) >= 10
+        if terminal and False:
             print('Simulation ended at t='+str(sim.get_property_value(c.simulation_sim_time_sec)))
             print('Avg dist to central line: '+str(self.avg_dist / self.nb_step))
         return terminal

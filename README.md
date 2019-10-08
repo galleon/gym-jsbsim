@@ -1,3 +1,6 @@
+
+[![Build Status](https://travis-ci.org/galleon/gym-jsbsim.svg?branch=new)](https://travis-ci.org/galleon/gym-jsbsim)
+
 # Gym-Jsbsim
 
 Gym-JSBSim provides reinforcement learning environments for the control of fixed-wing aircraft using the JSBSim flight dynamics model. Gym-JSBSim requires a Unix-like OS and Python 3.6.

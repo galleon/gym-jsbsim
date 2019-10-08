@@ -114,7 +114,7 @@ class taxi_path(object):
 
         return output
 
-    def update_path2(self, aircraft_loc, aircraft_heading, id_path):
+    def update_path2(self, aircraft_loc, aircraft_heading, id_path, nb_point):
         """
         :param ref_pts: aircraft (longitude,latitude)
         :param ac_heading:
@@ -132,10 +132,10 @@ class taxi_path(object):
             # I move to the next centerline point
             next_point = True
             # I keep my next 4 points
-            my_points_state = self.centerlinepoints[id_path+1:min(id_path+5, len(self.centerlinepoints)-1)]
+            my_points_state = self.centerlinepoints[id_path+1:min(id_path+nb_point+1, len(self.centerlinepoints)-1)]
         else:
             # I keep my next 4 points
-            my_points_state = self.centerlinepoints[id_path:min(id_path+4, len(self.centerlinepoints)-1)]
+            my_points_state = self.centerlinepoints[id_path:min(id_path+nb_point, len(self.centerlinepoints)-1)]
         # I compute heading and distance of my next 4 points
         for p in my_points_state:
             output.append([p, Point(aircraft_loc).distance(Point(p))*100000, get_bearing(aircraft_loc, p)])

@@ -1,3 +1,4 @@
+import os
 from gym.envs.registration import registry, register, make, spec
 from gym_jsbsim.envs import TASKS
 from gym_jsbsim.catalogs import Catalog
@@ -16,6 +17,9 @@ with OpenAI Gym so that they can be instantiated with a gym.make(id)
        env = gym.make('GymJsbsim-{task}-v0')
 
 """
+
+if 'JSBSIM_ROOT_DIR' not in os.environ:
+    os.environ['JSBSIM_ROOT_DIR'] = os.path.join(os.path.dirname(__file__), 'jsbsim')
 
 for task_name in TASKS:
     register(

@@ -162,7 +162,7 @@ class JSBSimEnv(gym.Env):
 
         :param mode: str, the mode to render with
         """
-        output = self.task.get_props_output()
+        output = self.task.get_output()
 
         if mode == 'human':
             pass
@@ -230,8 +230,8 @@ class JSBSimEnv(gym.Env):
 
         return self.sim.get_sim_time()
 
-    def get_full_state(self):
-        return self.sim.get_state()
+    def get_state(self):
+        return self.sim.get_sim_state()
 
     def _get_clipped_state(self):
         clipped_state = np.clip(self.state,
@@ -242,7 +242,5 @@ class JSBSimEnv(gym.Env):
 
         return clipped_state
 
-    def set_full_state(self, state):
-        init_conditions = self.sim.set_state(state)
-        self.task.define_init_conditions(init_conditions)
-        self.reset()
+    def set_state(self, state):
+        self.sim.set_sim_state(state)

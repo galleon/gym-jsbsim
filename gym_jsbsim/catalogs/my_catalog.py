@@ -13,7 +13,7 @@ from numpy.linalg import norm
 
 my_path = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 coordinates_path = os.path.join(my_path, "docs/points.json")
-taxiPath = taxi_path(path_to_points=coordinates_path, number_of_points_to_use=5)
+taxiPath = taxi_path()
 
 #taxi_freq_state = 30
 

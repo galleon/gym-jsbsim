@@ -1,4 +1,3 @@
-
 language: python
  matrix:
   include:
@@ -10,7 +9,7 @@ language: python
       language: shell       # 'language: python' is an error on Travis CI macOS
 # command to install dependencies
 install:
-  - pip install .
+  - pip3 install .
 # command to run tests
 script:
-  - python -m unittest
+  - python3 -m unittest

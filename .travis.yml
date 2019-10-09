@@ -1,13 +1,15 @@
 language: python
-python:
-  - "3.7"
+ matrix:
+  include:
+    - name: "Python 3.7 on Linux"
+      python: 3.7           # this works for Linux but is ignored on macOS or Windows
+    - name: "Python 3.7 on macOS"
+      os: osx
+      osx_image: xcode10.2    # Python 3.7 running on macOS 10.14.4
+      language: shell       # 'language: python' is an error on Travis CI macOS
 # command to install dependencies
 install:
-  - pip install matplotlib
-  - pip install geopandas
-  - pip install geographiclib
-  - pip install shapely
-  - pip install .
+  - pip3 install .
 # command to run tests
 script:
-  - python -m unittest
+  - python3 -m unittest

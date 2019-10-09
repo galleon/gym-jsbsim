@@ -28,5 +28,5 @@ setup(
                                                ],
                            language='c++')],
     package_data={'gym_jsbsim': ['docs/*','jsbsim/aircraft/*/*.xml','jsbsim/systems/*.xml','jsbsim/engine/*.xml']},
-    install_requires=['cython>=0.25','gym>=0.12.5'],
-    setup_requires=['cython>=0.25','gym>=0.12.5'])
+    install_requires=['cython>=0.25','gym>=0.12.5','shapely','geographiclib'],
+    setup_requires=['cython>=0.25','gym>=0.12.5','shapely','geographiclib'])

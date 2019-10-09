@@ -1,6 +1,3 @@
-""" Defines custom properties not implemented in JSBSim """
-
-
 from enum import Enum
 from gym.spaces import Box, Discrete
 from gym_jsbsim.catalogs.property import Property
@@ -13,7 +10,7 @@ from numpy.linalg import norm
 
 my_path = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 coordinates_path = os.path.join(my_path, "docs/points.json")
-taxiPath = taxi_path(path_to_points=coordinates_path, number_of_points_to_use=5)
+taxiPath = taxi_path()
 
 #taxi_freq_state = 30
 
@@ -21,6 +18,8 @@ taxiPath = taxi_path(path_to_points=coordinates_path, number_of_points_to_use=5)
 
 class MyCatalog(Property, Enum):
     '''
+
+    A class to define and store new properties not implemented in JSBSim
 
     '''
 
@@ -63,6 +62,10 @@ class MyCatalog(Property, Enum):
 
 
     def update_detect_extreme_state(sim):
+        '''
+        Check whether the simulation is going through excessive values before it returns NaN values.
+        Store the result in detect_extreme_state property.
+        '''
         extreme_velocity = sim.get_property_value(JsbsimCatalog.velocities_eci_velocity_mag_fps) >= 1e10
         extreme_rotation = norm(sim.get_property_values([JsbsimCatalog.velocities_p_rad_sec,JsbsimCatalog.velocities_q_rad_sec,JsbsimCatalog.velocities_r_rad_sec])) >= 1000
         extreme_altitude = sim.get_property_value(JsbsimCatalog.position_h_sl_ft) >= 1e10
@@ -144,7 +147,7 @@ class MyCatalog(Property, Enum):
     d6 = Property('d6', 'd6', 0, 1000, access = 'R')
     d7 = Property('d7', 'd7', 0, 1000, access = 'R')
     d8 = Property('d8', 'd8', 0, 1000, access = 'R')
-    a1 = Property('a1', 'a1', -180, 180, access = 'R'
+    a1 = Property('a1', 'a1', -180, 180, access = 'R')
     a2 = Property('a2', 'a2', -180, 180, access = 'R')
     a3 = Property('a3', 'a3', -180, 180, access = 'R')
     a4 = Property('a4', 'a4', -180, 180, access = 'R')

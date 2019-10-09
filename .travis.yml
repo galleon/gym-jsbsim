@@ -1,5 +1,5 @@
 language: python
- matrix:
+matrix:
   include:
     - name: "Python 3.7 on Linux"
       python: 3.7           # this works for Linux but is ignored on macOS or Windows

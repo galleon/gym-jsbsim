@@ -14,8 +14,8 @@ class TaxiapControlTask(Task):
     action_var = [c.fcs_steer_cmd_norm]
 
     k2f = 1.68781 # Knot to feet
-    INIT_AC_LON = 1.37211666700005708
-    INIT_AC_LAT = 43.6189638890000424
+    INIT_AC_LON = 1.369889125000043  # 1.37211666700005708 attol
+    INIT_AC_LAT = 43.625578879000045 # 43.6189638890000424 attol
     INIT_AC_HEADING = 323
     INITIAL_ALTITUDE_FT = 8.42
     INITIAL_VELOCITY_U = 7.0 * k2f # 20 knots/sec
@@ -58,6 +58,7 @@ class TaxiapControlTask(Task):
         self.avg_dist += math.fabs(sim.get_property_value(c.shortest_dist))
         self.nb_step += 1
 
+
         #print(sim.get_property_value(c.shortest_dist), sim.get_property_value(c.velocities_vc_fps), sim.get_property_value(c.fcs_steer_cmd_norm))
         
         return shortest_dist_r*shortest_dist_r
@@ -80,7 +81,8 @@ class TaxiapControlTask(Task):
         else: # STRAIGHTLINE
             sim.set_property_value(c.target_vg, 20.0*self.k2f*self.r)
 
-        terminal = sim.get_property_value(c.simulation_sim_time_sec)>=450 or math.fabs(sim.get_property_value(c.shortest_dist)) >= 10
+
+        terminal = sim.get_property_value(c.simulation_sim_time_sec)>=150 #or math.fabs(sim.get_property_value(c.shortest_dist)) >= 10
 
         # Some debug prints with average distance to the centerline 
         # if terminal:

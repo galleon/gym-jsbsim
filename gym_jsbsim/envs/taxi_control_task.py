@@ -20,8 +20,8 @@ class TaxiControlTask(Task):
     ]
 
     k2f = 1.68781
-    INIT_AC_LON = 1.37211666700005708
-    INIT_AC_LAT = 43.6189638890000424
+    INIT_AC_LON = 1.369889125000043  # 1.37211666700005708 attol
+    INIT_AC_LAT = 43.625578879000045 # 43.6189638890000424 attol
     INIT_AC_HEADING = 323
     INITIAL_ALTITUDE_FT = 8.42
     INITIAL_VELOCITY_U = 7.0 * k2f #33.76 #20 knots/sec
@@ -66,10 +66,15 @@ class TaxiControlTask(Task):
         self.avg_dist += math.fabs(sim.get_property_value(c.shortest_dist))
         self.nb_step += 1
         # average velocity with simulation time ponderation ... normalised
-        self.perf_time += math.fabs(sim.get_property_value(c.velocities_vc_fps)) 
-        self.perf_tim_avg_norm = ((self.perf_time / self.nb_step) / (21.0*self.k2f)) * (sim.get_property_value(c.simulation_sim_time_sec)/450)
         
-        reward = 0.6*dist_r + 0.4*self.perf_tim_avg_norm
+        self.perf_time += math.fabs(sim.get_property_value(c.velocities_vc_fps))
+        av_vel = self.perf_time / self.nb_step
+        dist_total = av_vel * sim.get_property_value(c.simulation_sim_time_sec)
+
+        dist_total_norm =  dist_total / (21.0*self.k2f * sim.get_property_value(c.simulation_sim_time_sec))
+
+        
+        reward = 0.6*dist_r + 0.4*dist_total_norm
 
         #print(sim.get_property_value(c.shortest_dist), sim.get_property_value(c.velocities_vc_fps), sim.get_property_value(c.fcs_steer_cmd_norm))
         
@@ -78,7 +83,7 @@ class TaxiControlTask(Task):
 
     def is_terminal(self, state, sim):
         
-        terminal = sim.get_property_value(c.simulation_sim_time_sec)>=450 or math.fabs(sim.get_property_value(c.shortest_dist)) >= 10 or math.fabs(sim.get_property_value(c.velocities_vc_fps)) > 21*self.k2f or math.fabs(sim.get_property_value(c.velocities_vc_fps)) < 7*self.k2f          
+        terminal = sim.get_property_value(c.simulation_sim_time_sec)>=450 or math.fabs(sim.get_property_value(c.shortest_dist)) >= 20 or math.fabs(sim.get_property_value(c.velocities_vc_fps)) > 21*self.k2f or math.fabs(sim.get_property_value(c.velocities_vc_fps)) < 7*self.k2f          
         
         # if terminal:
         #     print('Simulation ended at t='+str(sim.get_property_value(c.simulation_sim_time_sec)))

@@ -14,12 +14,23 @@ Our work is initially based on the Gor-Ren repository (https://github.com/Gor-Re
  * Allow to define discrete GYM attributes
 
 
-## Instalation
+## Installation
 
+First, you have to download the gym-jsbsim package with the latest JSBSim release by running: 
 ```
-git clone -b new https://github.com/galleon/gym-jsbsim.git
-cd gy-jsbsim
+git clone --branch new https://github.com/galleon/gym-jsbsim.git
+cd gym-jsbsim/gym_jsbsim
+git clone https://github.com/JSBSim-Team/jsbsim.git
+cd ..
+```
+Then, you can install it directly on your Linux machine with:
+```
 pip install .
+```
+Or you can choose to install it in a Docker container by typing the following command:
+```
+docker build -t docker_gym_jsbsim
+docker run -v "$PWD":/home/gym-jsbsim -it docker_gym_jsbsim
 ```
 
 ## Environments

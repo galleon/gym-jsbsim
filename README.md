@@ -1,13 +1,24 @@
 # JSBSim Aircraft Simulator for Open AI Gym Environment
 
-## Are we able to learn an aircraft to fly (or roll)
+## Are we able to learn an aircraft to fly (or roll) ?
 
 This project aims at creating realistic open AI GYM environements using the open source Flight Dynamic Model JSBSim.
+Our work is initially based on the Gor-Ren repository (https://github.com/Gor-Ren/gym-jsbsim) on which we made many modifications:
+
+ * remove link to flight-gear to focus only on JSBSim and GYM environment making.
+ * a complete link to JSBSim with an acces to the full list of attributes.
+ * a process to add extra features (like delta_heading for exemple) and the capabilities to call a dedicated function to update this attribute every time steps
+ * a feature to allow a ```set_state()``` and a ```get_state()``` to go back to a previous JSBSim state (very usefull if you want to use MCTS, ICT, IW and planning /scheduling approaches)
+ * an autopilot for ground procedure (A320) based on 2 PIDs to manage throttles and brake to make the aircraft roll at a specific velocity
 
 
 ## Instalation
 
-
+```
+git clone -b new https://github.com/galleon/gym-jsbsim.git
+cd gy-jsbsim
+pip install .
+```
 
 ## Environments
 
@@ -15,13 +26,22 @@ So far, is available:
 
  * [x] Heading Task: *GymJsbsim-HeadingControlTask-v0*: The aircraft should maintain its initial heading and altitude. during the simulation, the aircraft should turn to reach a new heading every 150 secondes with an incremental difficulty.
  * [x] Taxi task: *GymJsbsim-TaxiControlTask-v0*: The aircraft should follow a predifined trajectory on the runaway. 
- * [x] Taxi with AutoPilot task: *GymJsbsim-TaxiapControlTask-v0*: The aircraft should follow a predifined trajectory on the runaway
+ * [x] Taxi with AutoPilot task: *GymJsbsim-TaxiapControlTask-v0*: The aircraft should follow a predifined trajectory on the runaway. The aircraft velocity is manage by an autopilot.
  * [x] Approach Task: *GymJsbsim-ApproachControlTask-v0*: The aircraft should take off and reach a selected altitude.
  
 ## Heading Task
 
 ```
+import gym
+import gym_jsbsim
+
 env = gym.make("GymJsbsim-HeadingControlTask-v0")   
+env.reset()
+done = False
+
+while not done:
+   action = env.action_space.sample()
+   state, reward, done, _ = env.step(action)
 ```
 
 In this task, the aircraft should perform a stable steady flight following its initial heading and altitude. Every 150 secondes, a new target heading is set. At each time the target heading is more and more complecated to reach, starting with a delta of 10° to finish with a delta of 90°, alterning left and right turn:
@@ -74,7 +94,16 @@ The reward is compute as a weighted function between:
 ## Taxi Task
 
 ```
-env = gym.make("GymJsbsim-TaxiControlTask-v0")   
+import gym
+import gym_jsbsim
+
+env = gym.make("GymJsbsim-TaxiControlTask-v0")      
+env.reset()
+done = False
+
+while not done:
+   action = env.action_space.sample()
+   state, reward, done, _ = env.step(action)
 ```
 
 In this environnement, the aircraft should behave on ground and following a specific path, trying to be closest as possible to the runaway centerline.
@@ -118,7 +147,16 @@ The scenario is over if the aircraft overtake the centerline from 10 meters or m
 ## Taxi Auto Pilot Task
 
 ```
-env = gym.make("GymJsbsim-TaxiapControlTask-v0")   
+import gym
+import gym_jsbsim
+
+env = gym.make("GymJsbsim-TaxiapControlTask-v0")      
+env.reset()
+done = False
+
+while not done:
+   action = env.action_space.sample()
+   state, reward, done, _ = env.step(action)
 ```
 
 This is the same Taxi environement with an autopilot to manage the aircraft velocity.   

@@ -9,7 +9,7 @@ matrix:
       language: shell       # 'language: python' is an error on Travis CI macOS
 # command to install dependencies
 install:
-  - pip3 install .
+  - pip3 install --no-cache-dir .
 # command to run tests
 script:
   - python3 -m unittest

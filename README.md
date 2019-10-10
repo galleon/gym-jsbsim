@@ -10,6 +10,8 @@ Our work is initially based on the Gor-Ren repository (https://github.com/Gor-Re
  * a process to add extra features (like delta_heading for exemple) and the capabilities to call a dedicated function to update this attribute every time steps
  * a feature to allow a ```set_state()``` and a ```get_state()``` to go back to a previous JSBSim state (very usefull if you want to use MCTS, ICT, IW and planning /scheduling approaches)
  * an autopilot for ground procedure (A320) based on 2 PIDs to manage throttles and brake to make the aircraft roll at a specific velocity
+ * a complete taxi environement with access to runaway path attributes (like distances and angles to next points) to train an aircraft to roll autonomously
+ * Allow to define discrete GYM attributes
 
 
 ## Instalation
@@ -24,10 +26,10 @@ pip install .
 
 So far, is available:
 
- * [x] Heading Task: *GymJsbsim-HeadingControlTask-v0*: The aircraft should maintain its initial heading and altitude. during the simulation, the aircraft should turn to reach a new heading every 150 secondes with an incremental difficulty.
+ * [x] Heading Task: *GymJsbsim-HeadingControlTask-v0*: The aircraft should maintain its initial heading and altitude. During the simulation, the aircraft should turn to reach a new heading every 150 secondes with an incremental difficulty.
  * [x] Taxi task: *GymJsbsim-TaxiControlTask-v0*: The aircraft should follow a predifined trajectory on the runaway. 
  * [x] Taxi with AutoPilot task: *GymJsbsim-TaxiapControlTask-v0*: The aircraft should follow a predifined trajectory on the runaway. The aircraft velocity is manage by an autopilot.
- * [x] Approach Task: *GymJsbsim-ApproachControlTask-v0*: The aircraft should take off and reach a selected altitude.
+ * [x] Approach Task: *GymJsbsim-ApproachControlTask-v0*: The aircraft should decrese its altitude (it is still a draft environement and not realitic in regards to appraoch procedure).
  
 ## Heading Task
 

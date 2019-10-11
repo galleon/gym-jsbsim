@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/galleon/gym-jsbsim.svg?branch=new)](https://travis-ci.org/galleon/gym-jsbsim)
+
 # JSBSim Aircraft Simulator for Open AI Gym Environment
 
 ## Are we able to learn an aircraft to fly (or taxi) ?

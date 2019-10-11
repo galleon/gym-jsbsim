@@ -12,16 +12,11 @@ matrix:
       python: 3.7           # this works for Linux but is ignored on macOS or Windows
       install:
         - pip3 install .
-    - name: "Python 3.7 on macOS"
-      os: osx
-      osx_image: xcode11    # Python 3.7 running on macOS 10.14.4
-      language: shell       # 'language: python' is an error on Travis CI macOS
-      services:
-        - docker
-      install:
-        - docker build -t docker_gym_jsbsim
-        - docker run -v "$PWD":/home/gym-jsbsim -it docker_gym_jsbsim
-  
+    #- name: "Python 3.7 on macOS"
+      #os: osx
+      #osx_image: xcode11    # Python 3.7 running on macOS 10.14.4
+      #language: shell       # 'language: python' is an error on Travis CI macOS
+    
 # command to run tests
 script:
   - python3 -m unittest

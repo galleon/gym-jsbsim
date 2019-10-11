@@ -1,22 +1,24 @@
 language: python
 
 before_install:
-  - git clone --branch new https://github.com/galleon/gym-jsbsim.git
-  - cd gym-jsbsim/gym_jsbsim
+  - cd gym_jsbsim
   - git clone https://github.com/JSBSim-Team/jsbsim.git
+  - sed -i -E  '/in.(Mixture|Throttle)Cmd\[[in]\] = in.(Mixture|Throttle)Pos\[[in]\] = 1;/d' jsbsim/src/models/FGPropulsion.cpp
+  - sed -i 's/<expat_config.h>/"expat_config.h"/' jsbsim/src/simgear/xml/xmlparse.c jsbsim/src/simgear/xml/xmlrole.c jsbsim/src/simgear/xml/xmltok.c
   - cd ..
 
 matrix:
   include:
     - name: "Python 3.7 on Linux"
       python: 3.7           # this works for Linux but is ignored on macOS or Windows
-      install:
-        - pip3 install .
-    #- name: "Python 3.7 on macOS"
-      #os: osx
-      #osx_image: xcode11    # Python 3.7 running on macOS 10.14.4
-      #language: shell       # 'language: python' is an error on Travis CI macOS
-    
+    - name: "Python 3.7 on macOS"
+      os: osx
+      osx_image: xcode11    # Python 3.7 running on macOS 10.14.4
+      language: shell       # 'language: python' is an error on Travis CI macOS
+
+install:
+  - pip3 install .
+
 # command to run tests
 script:
   - python3 -m unittest

@@ -1,6 +1,6 @@
 # JSBSim Aircraft Simulator for Open AI Gym Environment
 
-## Are we able to learn an aircraft to fly (or roll) ?
+## Are we able to learn an aircraft to fly (or taxi) ?
 
 This project aims at creating realistic open AI GYM environements using the open source Flight Dynamic Model JSBSim.
 Our work is initially based on the Gor-Ren repository (https://github.com/Gor-Ren/gym-jsbsim) on which we made many modifications:
@@ -9,8 +9,8 @@ Our work is initially based on the Gor-Ren repository (https://github.com/Gor-Re
  * a complete link to JSBSim with an acces to the full list of attributes.
  * a process to add extra features (like delta_heading for exemple) and the capabilities to call a dedicated function to update this attribute every time steps
  * a feature to allow a ```set_state()``` and a ```get_state()``` to go back to a previous JSBSim state (very usefull if you want to use MCTS, ICT, IW and planning /scheduling approaches)
- * an autopilot for ground procedure (A320) based on 2 PIDs to manage throttles and brake to make the aircraft roll at a specific velocity
- * a complete taxi environement with access to runaway path attributes (like distances and angles to next points) to train an aircraft to roll autonomously
+ * an autopilot for ground procedure (A320) based on 2 PIDs to manage throttles and brake to make the aircraft taxi at a specific velocity
+ * a complete taxi environement with access to runaway path attributes (like distances and angles to next points) to train an aircraft to taxi autonomously
  * Allow to define discrete GYM attributes
 
 
@@ -85,7 +85,7 @@ state_var = [c.delta_altitude, # the delta altitude between the aircraft and tar
              c.delta_heading, # the delta heading between the aircraft and target heading
              c.velocities_v_down_fps, # the vertical velocity of the aircraft
              c.velocities_vc_fps, # the air velocity of the aircraft
-             c.velocities_p_rad_sec, # roll axis velocity
+             c.velocities_p_rad_sec, # taxi axis velocity
              c.velocities_q_rad_sec, # pitch axis velocity
              c.velocities_r_rad_sec] # yaw axis velocity
 ```

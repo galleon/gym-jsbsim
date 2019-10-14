@@ -3,7 +3,6 @@ language: python
 before_install:
   - cd gym_jsbsim
   - git clone https://github.com/JSBSim-Team/jsbsim.git
-  - sed -i -E  '/in.(Mixture|Throttle)Cmd\[[in]\] = in.(Mixture|Throttle)Pos\[[in]\] = 1;/d' jsbsim/src/models/FGPropulsion.cpp
   - cd ..
 
 matrix:
@@ -14,8 +13,6 @@ matrix:
       os: osx
       osx_image: xcode11    # Python 3.7 running on macOS 10.14.4
       language: shell       # 'language: python' is an error on Travis CI macOS
-      before_install:
-        - sed -i '' 's/<expat_config.h>/"expat_config.h"/' gym_jsbsim/jsbsim/src/simgear/xml/xmlparse.c gym_jsbsim/jsbsim/src/simgear/xml/xmlrole.c gym_jsbsim/jsbsim/src/simgear/xml/xmltok.c
 
 install:
   - pip3 install .

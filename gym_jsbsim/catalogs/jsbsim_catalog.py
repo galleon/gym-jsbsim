@@ -100,7 +100,8 @@ class JsbsimCatalog(Property, Enum):
         :param prop: property to update
         """
         value = sim.get_property_value(prop)
-        for i in range(1, sim.jsbsim_exec.propulsion_get_num_engines()):
+        n = sim.jsbsim_exec.get_propulsion().get_num_engines()
+        for i in range(1, n):
             sim.jsbsim_exec.set_property_value(prop.name_jsbsim + "[" + str(i) + "]", value)
 
     def update_equal_throttle_pos(sim):

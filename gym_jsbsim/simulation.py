@@ -51,9 +51,22 @@ class Simulation:
     def initialise(self, init_conditions):
         self.set_initial_conditions(init_conditions)
         success = self.jsbsim_exec.run_ic()
-        self.jsbsim_exec.propulsion_init_running(-1)
+        self.propulsion_init_running(-1)
         if not success:
             raise RuntimeError('JSBSim failed to init simulation conditions.')
+
+    def propulsion_init_running(self, i):
+        propulsion = self.jsbsim_exec.get_propulsion()
+        n = propulsion.get_num_engines()
+        if i>=0:
+            if i >= n:
+                raise IndexError("Tried to initialize a non-existent engine!")
+            propulsion.get_engine(i).init_running()
+            propulsion.get_steady_state()
+        else:
+            for j in range(n):
+                propulsion.get_engine(j).init_running()
+            propulsion.get_steady_state()
 
     def set_initial_conditions(self, init_conditions=None):
         """

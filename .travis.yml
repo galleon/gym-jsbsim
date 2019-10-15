@@ -25,3 +25,11 @@ install:
 # command to run tests
 script:
   - python3 -m unittest
+
+deploy:
+  provider: pypi
+  username: __token__
+  password: 
+    secure: pypi-AgEIcHlwaS5vcmcCJDRiMDkxY2UzLTY1ODQtNGQ1Ni05NjhmLTM2NGNhMDlkNWJkZAACJXsicGVybWlzc2lvbnMiOiAidXNlciIsICJ2ZXJzaW9uIjogMX0AAAYgErj9tV8NxVaK72fN9EjPOl4ypkRP0KAJ3GW8jMRrkFU
+  distributions: bdist_wheel
+  skip_existing: true

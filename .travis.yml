@@ -15,8 +15,8 @@ matrix:
       language: shell       # 'language: python' is an error on Travis CI macOS
 
 install:
-  - pip3 install cython
-  - python3 setup.py bdist_wheel -d build
+  - python3 setup.py bdist_wheel
+  - pip3 install gym_jsbsim --no-index -f dist
 
 # command to run tests
 script:

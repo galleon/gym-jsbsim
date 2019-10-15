@@ -20,7 +20,7 @@ matrix:
           update: true
 
 install:
-  - pip3 install .
+  - pip3 install -v .
 
 # command to run tests
 script:

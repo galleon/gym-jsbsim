@@ -40,7 +40,7 @@ docker run -v "$PWD":/home/gym-jsbsim -it docker_gym_jsbsim
 
 So far, is available:
 
- * [x] Heading Task: *GymJsbsim-HeadingControlTask-v0*: The aircraft should maintain its initial heading and altitude. During the simulation, the aircraft should turn to reach a new heading every 150 secondes with an incremental difficulty.
+ * [x] Heading Task: *GymJsbsim-HeadingControlTask-v0*: The aircraft should maintain its initial heading and altitude. During the simulation, the aircraft should turn to reach a new heading every 150 seconds with an incremental difficulty.
  * [x] Taxi task: *GymJsbsim-TaxiControlTask-v0*: The aircraft should follow a predifined trajectory on the runaway. 
  * [x] Taxi with AutoPilot task: *GymJsbsim-TaxiapControlTask-v0*: The aircraft should follow a predifined trajectory on the runaway. The aircraft velocity is manage by an autopilot.
  * [x] Approach Task: *GymJsbsim-ApproachControlTask-v0*: The aircraft should decrese its altitude (it is still a draft environement and not realitic in regards to appraoch procedure).
@@ -60,7 +60,7 @@ while not done:
    state, reward, done, _ = env.step(action)
 ```
 
-In this task, the aircraft should perform a stable steady flight following its initial heading and altitude. Every 150 secondes, a new target heading is set. At each time the target heading is more and more complecated to reach, starting with a delta of 10° to finish with a delta of 90°, alterning left and right turn:
+In this task, the aircraft should perform a stable steady flight following its initial heading and altitude. Every 150 seconds, a new target heading is set. At each time the target heading is more and more complecated to reach, starting with a delta of 10° to finish with a delta of 90°, alterning left and right turn:
 
 So, the scenario is as follow:
 
@@ -78,8 +78,8 @@ So, the scenario is as follow:
 
 Terminal conditions are the following:
  * If the aircraft is up or under 300 feets from its target altitude, the scenario is over.
- * If the target heading is not reach with an accuracy of 10° during the 150 secondes, the scenario is over.
- * The full scenario will not exeed 1500 secondes.
+ * If the target heading is not reach with an accuracy of 10° during the 150 seconds, the scenario is over.
+ * The full scenario will not exeed 1500 seconds.
 
 The input state set is a vector of 7 parameters:
 

@@ -17,7 +17,7 @@ matrix:
 install:
   - pip3 install cython
   - python3 setup.py bdist_wheel -v
-  - pip3 install gym_jsbsim --no-index -f dist
+  - pip3 install gym_jsbsim -f dist
 
 # command to run tests
 script:

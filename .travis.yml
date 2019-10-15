@@ -11,10 +11,14 @@ matrix:
     - name: "Python 3.7 on Windows"
       os: windows
       language: shell
-      install: choco install mingw
-      
+      before_install:
+        - choco install python
+        - python -m pip install --upgrade pip
+      env: PATH=/c/Python37:/c/Python37/Scripts:$PATH
+
 install:
-  - pip3 install . || pip install .
+  - pip3 install --upgrade pip  # all three OSes agree about 'pip3'
+  - pip3 install .
 
 # command to run tests
 script:

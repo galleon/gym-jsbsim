@@ -13,6 +13,9 @@ matrix:
       os: osx
       osx_image: xcode11    # Python 3.7 running on macOS 10.14.4
       language: shell       # 'language: python' is an error on Travis CI macOS
+    - name: "Python 3.7 on Windows"
+      os: windows
+      language: shell
 
 install:
   - pip3 install .
@@ -31,3 +34,6 @@ deploy:
     secure: pypi-AgEIcHlwaS5vcmcCJDRiMDkxY2UzLTY1ODQtNGQ1Ni05NjhmLTM2NGNhMDlkNWJkZAACJXsicGVybWlzc2lvbnMiOiAidXNlciIsICJ2ZXJzaW9uIjogMX0AAAYgErj9tV8NxVaK72fN9EjPOl4ypkRP0KAJ3GW8jMRrkFU
   distributions: bdist_wheel
   skip_existing: true
+  branches:
+    only:
+      - new

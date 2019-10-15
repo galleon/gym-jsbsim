@@ -2,7 +2,7 @@ language: python
 
 before_install:
   - cd gym_jsbsim
-  - git clone https://github.com/JSBSim-Team/jsbsim.git
+# - git clone https://github.com/JSBSim-Team/jsbsim.git
   - cd ..
 
 matrix:

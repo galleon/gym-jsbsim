@@ -29,10 +29,10 @@ class custom_build_ext(build_ext):
 
 setup(
     name='gym_jsbsim',
-    version='1.0.0',
+    version='0.1.0',
     url='https://github.com/galleon/gym-jsbsim/tree/new/gym_jsbsim',
-    author='John Doe',
-    author_email='john.doe@gmail.com',
+    author='Guillaume Alleon',
+    author_email='guillaume.alleon@gmail.com',
     license='LGPL 2.1',
     description='Gym JSBSim environment',
     long_description=long_description,

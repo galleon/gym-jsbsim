@@ -20,7 +20,7 @@ matrix:
           update: true
 
 install:
-  - python3 setup.py bdist_wheel wheel -d build
+  - python3 setup.py bdist_wheel -d build
 
 # command to run tests
 script:

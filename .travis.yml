@@ -15,14 +15,15 @@ matrix:
       language: shell       # 'language: python' is an error on Travis CI macOS
 
 install:
-  - pip3 install cython
-  - python3 setup.py bdist_wheel -v
-  - pip3 install gym_jsbsim -f dist
+  - pip3 install .
 
 # command to run tests
 script:
   - python3 -m unittest
 
+after_success:
+  - python setup.py bdist_wheel
+  
 deploy:
   provider: pypi
   username: __token__

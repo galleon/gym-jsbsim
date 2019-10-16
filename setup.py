@@ -42,8 +42,7 @@ setup(
                            include_dirs=['gym_jsbsim/jsbsim/src'],
                            libraries=libraries,
                            extra_compile_args=['-DJSBSIM_VERSION=\"1.0.0.dev1\"',
-                                               '-DHAVE_EXPAT_CONFIG_H',
-                                               '-std=c++11'
+                                               '-DHAVE_EXPAT_CONFIG_H'
                                                ],
                            language='c++')],
     package_data={'gym_jsbsim': ['docs/*','jsbsim/aircraft/*/*.xml','jsbsim/systems/*.xml','jsbsim/engine/*.xml']},

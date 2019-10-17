@@ -27,7 +27,7 @@ script:
   - python3 -m unittest || python -m unittest # python3 does not exist on Windows
 
 after_success:
-  - python3 setup.py bdist_wheel || python setupy.py bdist_wheel
+  - python3 setup.py bdist_wheel || python setup.py bdist_wheel
 
 deploy:
   provider: pypi

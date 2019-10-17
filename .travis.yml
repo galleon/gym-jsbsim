@@ -1,36 +1,32 @@
 language: python
-
 matrix:
   include:
-    - name: "Python 3.7 on Linux"
-      python: 3.7           # this works for Linux but is ignored on macOS or Windows
-    - name: "Python 3.7 on macOS"
-      os: osx
-      osx_image: xcode11    # Python 3.7 running on macOS 10.14.4
-      language: shell       # 'language: python' is an error on Travis CI macOS
-    - name: "Python 3.7 on Windows"
-      os: windows
-      language: shell
-      before_install:
-        - choco install python --version=3.7.4
-        - python -m pip install --upgrade pip
-        - pip install https://download.lfd.uci.edu/pythonlibs/g5apjq5m/Shapely-1.6.4.post2-cp37-cp37m-win_amd64.whl wheel
-        - sed -i 's/<expat.h>/"expat.h"/' gym_jsbsim/jsbsim/src/simgear/xml/easyxml.cxx
-        - sed -i 's/std::min/(std::min)/' gym_jsbsim/jsbsim/src/simgear/misc/strutils.cxx
-      env: PATH=/c/Python37:/c/Python37/Scripts:$PATH
-
+  - name: Python 3.7 on Linux
+    python: 3.7
+  - name: Python 3.7 on macOS
+    os: osx
+    osx_image: xcode11
+    language: shell
+  - name: Python 3.7 on Windows
+    os: windows
+    language: shell
+    before_install:
+    - choco install python --version=3.7.4
+    - python -m pip install --upgrade pip
+    - pip install https://download.lfd.uci.edu/pythonlibs/g5apjq5m/Shapely-1.6.4.post2-cp37-cp37m-win_amd64.whl
+      wheel
+    - sed -i 's/<expat.h>/"expat.h"/' gym_jsbsim/jsbsim/src/simgear/xml/easyxml.cxx
+    - sed -i 's/std::min/(std::min)/' gym_jsbsim/jsbsim/src/simgear/misc/strutils.cxx
+    env: PATH=/c/Python37:/c/Python37/Scripts:$PATH
 install:
-  - pip3 install .
-
-# command to run tests
+- pip3 install .
 script:
-  - python3 -m unittest || python -m unittest # python3 does not exist on Windows
-
+- python3 -m unittest || python -m unittest
 deploy:
   provider: pypi
   username: galleon
   password:
-    secure: "tKVYK5SsN/0PZtu/gy8oa2YN4P3YlIVdaW00Kot5KRhFL5MZQjY4tVNM8x0xDtACAw3a42o37C2k6njAyqjLquaSmvfxWQ4G4ItRbpOEnnqyjWrEu/2qDBiHJV36fHVObycv64B9c3d3hz4m+00wc1tVhl7BM3xfMRqQWWD4m1xJ5VqX/agr35DbNf43SEQja3OZYceSir+EBBEonyKG7ZmCxhmyRkv25RVn9FenO16sC35yeQ2hnmv3Z0o4VjN2kG/AVlfzJKaeAwJOuwQ3m5AHV6WW3Giek2W0eC3Y6K+STvMnyN6h99LBpD4Bmjjxq1kn5+ZQ14uNlHNYEQTk4HpkI6yzap9JpHEmjNivtnWTCY3CFAy36ChVMaYK/DYUDRuE65E2688bsyVaz9o4G+c7RlZiOf2LsxOdfSkPyJCW9iJ8MHTbx6Sodn6pTxxMMtotFsWdOaqMV6MfpHkXXnVmjX7cw2Q62qhNa7HA0miFO2rVIyN5NbqF4tB1v0APklZm8lGhLmSjw5YtUOq9BZtiWG9cv2AJBoh11D7MFdZ+RgAkVbbp1lbhaM4YViPrAWEemJnWdpJ7/NmfPWMPzVF00gJ4hzOb0aZCJB2NO/ozKvLoGIBFEUH12lErMV6nwt8XuSiyoWuHPqJN14ERx73UJrs9Iz9nQxe9ycktyHQ="
+    secure: Dj25UHJRIagIOUSyofGQhJpYSUH6MuFoPt80jAuseDBUwgsTYUCldFybl8ZitbZ93NHS4SSKUoitz59VCerrhpjATSQzcSPHsbS2FIu6kBu7c8tHUvfy4c+KTuE0ui/hY8ylTcdz9hnO1gezwR2/OwsPhrhhnDGkHMWusmCazk9FdYDk0Bf2Upcbxl76aV7WbNMbhrFyRN/F69EK4Y3CQGfAARC6u5K2JiaWM7T8UP66axt/YUqIfCei8rjUgwI9z470fOolxbqygUXA0MUHawMNDz73VMhZvhis0EZDn+B5/wDDObEDZ6ZwkcgziIxlIJlyhL02UIXn1eQxM1K2RQw0oObxfPI1mfap58ormsfwYlYZENI4WMCZppRdHMQG852WsqJh21MHmKGLVrnNcJ5Py9lJtG+G/oqg8rbdWx+M2TFS5a9oPZ6FiTOvQNxtWPomDeisBrab6tBcPWeKAfikI9xZp0FOxMPydMKv58TT7dF40M2/qnXkmJTl9tRjLbPe+/C2svGSzDZUfgA0npL6IvFJ2n0rAkZiwnp8ieIleaVYcsEh75te+T/VaZ0FUfuChC3mGdYzQT05xrQvFnBCrhRueFnZjqf5VI/oDgCzOo5STIRzXRFGZ1Hd5DESP1sjvxbBDQd1uyyRd8xEUvWPQMjYDyGt4oL4ozmDx6g=
   distributions: bdist_wheel
   skip_existing: true
   on:

@@ -36,6 +36,5 @@ deploy:
     secure: "tKVYK5SsN/0PZtu/gy8oa2YN4P3YlIVdaW00Kot5KRhFL5MZQjY4tVNM8x0xDtACAw3a42o37C2k6njAyqjLquaSmvfxWQ4G4ItRbpOEnnqyjWrEu/2qDBiHJV36fHVObycv64B9c3d3hz4m+00wc1tVhl7BM3xfMRqQWWD4m1xJ5VqX/agr35DbNf43SEQja3OZYceSir+EBBEonyKG7ZmCxhmyRkv25RVn9FenO16sC35yeQ2hnmv3Z0o4VjN2kG/AVlfzJKaeAwJOuwQ3m5AHV6WW3Giek2W0eC3Y6K+STvMnyN6h99LBpD4Bmjjxq1kn5+ZQ14uNlHNYEQTk4HpkI6yzap9JpHEmjNivtnWTCY3CFAy36ChVMaYK/DYUDRuE65E2688bsyVaz9o4G+c7RlZiOf2LsxOdfSkPyJCW9iJ8MHTbx6Sodn6pTxxMMtotFsWdOaqMV6MfpHkXXnVmjX7cw2Q62qhNa7HA0miFO2rVIyN5NbqF4tB1v0APklZm8lGhLmSjw5YtUOq9BZtiWG9cv2AJBoh11D7MFdZ+RgAkVbbp1lbhaM4YViPrAWEemJnWdpJ7/NmfPWMPzVF00gJ4hzOb0aZCJB2NO/ozKvLoGIBFEUH12lErMV6nwt8XuSiyoWuHPqJN14ERx73UJrs9Iz9nQxe9ycktyHQ="
   distributions: bdist_wheel
   skip_existing: true
-  branches:
-    only:
-      - new
+  on:
+    branch: new

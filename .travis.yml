@@ -23,6 +23,7 @@ install:
 script:
 - python3 -m unittest || python -m unittest
 deploy:
+  edge: true
   provider: pypi
   username: galleon
   password:
@@ -31,5 +32,4 @@ deploy:
   skip_existing: true
   skip_cleanup: true
   on:
-    python: 3.7
     branch: new

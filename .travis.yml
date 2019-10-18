@@ -28,8 +28,8 @@ script:
 - python -m unittest
 before_deploy:
   if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-      shopt -s expand_aliases
-      alias python=python3
+      shopt -s expand_aliases &&
+      alias python=python3 &&
       alias pip=pip3;
   fi
 deploy:

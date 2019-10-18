@@ -8,6 +8,7 @@ matrix:
     osx_image: xcode11
     language: shell
     before_install:
+    - shopt -s expand_aliases
     - alias python=python3
     - alias pip=pip3
   - name: Python 3.7 on Windows

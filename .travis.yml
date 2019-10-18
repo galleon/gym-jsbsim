@@ -7,10 +7,6 @@ matrix:
     os: osx
     osx_image: xcode11
     language: shell
-    before_install:
-    - shopt -s expand_aliases
-    - alias python=python3
-    - alias pip=pip3
   - name: Python 3.7 on Windows
     os: windows
     language: shell
@@ -23,17 +19,15 @@ matrix:
     - sed -i 's/std::min/(std::min)/' gym_jsbsim/jsbsim/src/simgear/misc/strutils.cxx
     env: PATH=/c/Python37:/c/Python37/Scripts:$PATH
 install:
-- pip install .
+- pip3 install .
 script:
-- python -m unittest
-before_deploy:
-  if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-      shopt -s expand_aliases &&
-      alias python=python3 &&
-      alias pip=pip3;
-  fi
+- python -m unittest || python3 -m unittest
+
+after_success:
+  # Build the manylinux1 wheel binary packages
+  - docker run --rm -v $PWD:/io quay.io/pypa/manylinux2010_x86_64 /io/build-wheels.sh
+
 deploy:
-  edge: true
   provider: pypi
   username: galleon
   password:

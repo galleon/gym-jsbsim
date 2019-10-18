@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 from setuptools.command.build_ext import build_ext
 from distutils.extension import Extension
 from distutils.util import get_platform
-import sys
+from distutils.ccompiler import get_default_compiler
 
 with open('README.md') as f:
     long_description = f.read()
@@ -13,7 +13,7 @@ if get_platform() == 'mingw':
     libraries = ['ws2_32']
 
 extra_compile_args = ['-DHAVE_EXPAT_CONFIG_H']
-if sys.platform == 'win32':
+if get_default_compiler() == 'msvc':
     extra_compile_args.append('-DJSBSIM_VERSION=\\"1.0.0.dev1\\"')
 else:
     extra_compile_args.append('-DJSBSIM_VERSION=\"1.0.0.dev1\"')
@@ -53,4 +53,4 @@ setup(
                            language='c++')],
     package_data={'gym_jsbsim': ['docs/*','jsbsim/aircraft/*/*.xml','jsbsim/systems/*.xml','jsbsim/engine/*.xml']},
     install_requires=['cython>=0.25','gym>=0.12.5','shapely','geographiclib'],
-    setup_requires=['cython>=0.25','gym>=0.12.5','shapely','geographiclib'])
+    setup_requires=['cython>=0.25'])

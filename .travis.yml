@@ -7,6 +7,9 @@ matrix:
     os: osx
     osx_image: xcode11
     language: shell
+    before_install:
+    - alias python=python3
+    - alias pip=pip3
   - name: Python 3.7 on Windows
     os: windows
     language: shell
@@ -19,9 +22,9 @@ matrix:
     - sed -i 's/std::min/(std::min)/' gym_jsbsim/jsbsim/src/simgear/misc/strutils.cxx
     env: PATH=/c/Python37:/c/Python37/Scripts:$PATH
 install:
-- pip3 install .
+- pip install .
 script:
-- python3 -m unittest || python -m unittest
+- python -m unittest
 deploy:
   edge: true
   provider: pypi

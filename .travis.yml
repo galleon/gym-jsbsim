@@ -1,13 +1,11 @@
 language: python
-
-before_install:
-  - sed -i 's/<expat.h>/"expat.h"/' gym_jsbsim/jsbsim/src/simgear/xml/easyxml.cxx
-  - sed -i 's/std::min/(std::min)/' gym_jsbsim/jsbsim/src/simgear/misc/strutils.cxx
-  
 matrix:
   include:
   - name: Python 3.7 on Linux
     python: 3.7
+    before_install:
+      - sed -i 's/<expat.h>/"expat.h"/' gym_jsbsim/jsbsim/src/simgear/xml/easyxml.cxx
+      - sed -i 's/std::min/(std::min)/' gym_jsbsim/jsbsim/src/simgear/misc/strutils.cxx
   - name: Python 3.7 on macOS
     os: osx
     osx_image: xcode11
@@ -19,6 +17,8 @@ matrix:
     - choco install python --version=3.7.4
     - python -m pip install --upgrade pip
     - pip install https://download.lfd.uci.edu/pythonlibs/g5apjq5m/Shapely-1.6.4.post2-cp37-cp37m-win_amd64.whl
+    - sed -i 's/<expat.h>/"expat.h"/' gym_jsbsim/jsbsim/src/simgear/xml/easyxml.cxx
+    - sed -i 's/std::min/(std::min)/' gym_jsbsim/jsbsim/src/simgear/misc/strutils.cxx
     env: PATH=/c/Python37:/c/Python37/Scripts:$PATH
 install:
 - pip3 install .
@@ -28,7 +28,7 @@ script:
 after_success:
   # Build the manylinux1 wheel binary packages
   - pip3 install wheel twine
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then chmod +x build_wheels.sh && docker run --rm -v $PWD:/io quay.io/pypa/manylinux2010_x86_64 /io/build_wheels.sh; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then chmod +x build_wheels.sh && docker run --rm -v $PWD:/io quay.io/pypa/manylinux2010_x86_64 /io/build_wheels.sh && ls dist/; fi
 
 deploy:
   provider: script

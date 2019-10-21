@@ -3,7 +3,7 @@ set -e -x
 
 for PYBIN in /opt/python/*3[67]*/bin; do
     "${PYBIN}/pip" install cython
-    "${PYBIN}/python" ./setup.py bdist_wheel
+    "${PYBIN}/python" /io/setup.py bdist_wheel
 done
 
 # Bundle external shared libraries into the wheels

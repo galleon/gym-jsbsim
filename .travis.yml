@@ -29,7 +29,7 @@ after_success:
 
 deploy:
   provider: script
-  script: ./deploy.sh
+  script: sh ./deploy.sh
   skip_existing: true
   skip_cleanup: true
   on:

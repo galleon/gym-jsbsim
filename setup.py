@@ -44,7 +44,7 @@ class custom_build_ext(build_ext):
 
 setup(
     name='gym_jsbsim',
-    version='0.1.0',
+    version='0.1.1',
     url='https://github.com/galleon/gym-jsbsim/tree/new/gym_jsbsim',
     author='Guillaume Alleon',
     author_email='guillaume.alleon@gmail.com',

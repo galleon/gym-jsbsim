@@ -5,7 +5,6 @@ matrix:
     python: 3.7
     before_install:
     - sed -i 's/<expat.h>/"expat.h"/' gym_jsbsim/jsbsim/src/simgear/xml/easyxml.cxx
-    - sed -i 's/std::min/(std::min)/' gym_jsbsim/jsbsim/src/simgear/misc/strutils.cxx
   - name: Python 3.7 on macOS
     os: osx
     osx_image: xcode11

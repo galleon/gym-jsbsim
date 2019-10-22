@@ -4,12 +4,8 @@ from gym_jsbsim.catalogs.property import Property
 from gym_jsbsim.catalogs.jsbsim_catalog import JsbsimCatalog
 from gym_jsbsim.envs.taxi_utils2 import *
 from gym_jsbsim.catalogs import utils
-import time
-import os.path
 from numpy.linalg import norm
 
-my_path = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
-coordinates_path = os.path.join(my_path, "docs/points.json")
 taxiPath = taxi_path()
 
 #taxi_freq_state = 30

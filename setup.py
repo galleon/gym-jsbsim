@@ -4,6 +4,14 @@ from setuptools.command.build_ext import build_ext
 from distutils.extension import Extension
 from distutils.util import get_platform
 from distutils.ccompiler import get_default_compiler
+import os
+
+# move aircraft from docs to jsbsim directory
+from_path = 'gym_jsbsim/docs/aircraft'
+to_path = 'gym_jsbsim/jsbsim/aircraft'
+for air in os.listdir(from_path):
+    for f in os.listdir(os.path.join(from_path, air)):
+        os.replace(os.path.join(from_path, air, f), os.path.join(to_path, air, f))
 
 with open('README.md') as f:
     long_description = f.read()
@@ -51,6 +59,6 @@ setup(
                            libraries=libraries,
                            extra_compile_args=extra_compile_args,
                            language='c++')],
-    package_data={'gym_jsbsim': ['docs/*','jsbsim/aircraft/*/*.xml','jsbsim/systems/*.xml','jsbsim/engine/*.xml']},
+    package_data={'gym_jsbsim': ['jsbsim/aircraft/*/*.xml','jsbsim/systems/*.xml','jsbsim/engine/*.xml']},
     install_requires=['cython>=0.25','gym>=0.12.5','shapely','geographiclib'],
     setup_requires=['cython>=0.25'])

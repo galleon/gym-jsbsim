@@ -4,7 +4,7 @@ cd /io
 
 for PYBIN in /opt/python/*3[67]*/bin; do
     "${PYBIN}/pip" install cython
-    "${PYBIN}/python" setup.py bdist_wheel
+    "${PYBIN}/python" setup.py bdist_wheel --build-number=$TRAVIS_BUILD_NUMBER
 done
 
 # Bundle external shared libraries into the wheels

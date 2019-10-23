@@ -5,6 +5,7 @@ from distutils.extension import Extension
 from distutils.util import get_platform
 from distutils.ccompiler import get_default_compiler
 import os
+import platform
 
 # move aircraft from docs to jsbsim directory
 from_path = 'gym_jsbsim/docs/aircraft'
@@ -17,12 +18,16 @@ with open('README.md') as f:
     long_description = f.read()
 
 libraries = []
+extra_compile_args = ['-DHAVE_EXPAT_CONFIG_H']
+shapely_args = ''
+
 if get_platform() == 'mingw':
     libraries = ['ws2_32']
 
-extra_compile_args = ['-DHAVE_EXPAT_CONFIG_H']
 if get_default_compiler() == 'msvc':
     extra_compile_args.append('-DJSBSIM_VERSION=\\"1.0.0.dev1\\"')
+    py_version = ''.join(platform.python_version_tuple()[:2])
+    shapely_args = f'@https://download.lfd.uci.edu/pythonlibs/g5apjq5m/Shapely-1.6.4.post2-cp{py_version}-cp{py_version}m-win_amd64.whl'
 else:
     extra_compile_args.append('-DJSBSIM_VERSION=\"1.0.0.dev1\"')
 
@@ -60,5 +65,5 @@ setup(
                            extra_compile_args=extra_compile_args,
                            language='c++')],
     package_data={'gym_jsbsim': ['jsbsim/aircraft/*/*.xml','jsbsim/systems/*.xml','jsbsim/engine/*.xml']},
-    install_requires=['cython>=0.25','gym>=0.12.5','shapely','geographiclib'],
+    install_requires=['cython>=0.25','gym>=0.12.5','shapely'+shapely_args,'geographiclib'],
     setup_requires=['cython>=0.25'])

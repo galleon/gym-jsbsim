@@ -1,12 +1,14 @@
 language: python
 
 before_install:
-  - if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then
-  -   sed -i 's/<expat.h>/"expat.h"/' gym_jsbsim/jsbsim/src/simgear/xml/easyxml.cxx;
-  -   if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
-  -     sed -i 's/std::min/(std::min)/' gym_jsbsim/jsbsim/src/simgear/misc/strutils.cxx;
-  -   fi;
-  - fi
+  - |
+    if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then
+      sed -i 's/<expat.h>/"expat.h"/' gym_jsbsim/jsbsim/src/simgear/xml/easyxml.cxx
+      if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
+        sed -i 's/std::min/(std::min)/' gym_jsbsim/jsbsim/src/simgear/misc/strutils.cxx
+      fi
+    fi
+    
 matrix:
   include:
   - name: Python 3.7 on Linux

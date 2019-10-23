@@ -1,10 +1,18 @@
 language: python
+
+before_install:
+  - if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then
+      sed -i 's/<expat.h>/"expat.h"/' gym_jsbsim/jsbsim/src/simgear/xml/easyxml.cxx;
+      if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
+        sed -i 's/std::min/(std::min)/' gym_jsbsim/jsbsim/src/simgear/misc/strutils.cxx;
+      fi;
+    fi
 matrix:
   include:
   - name: Python 3.7 on Linux
     python: 3.7
-    before_install:
-    - sed -i 's/<expat.h>/"expat.h"/' gym_jsbsim/jsbsim/src/simgear/xml/easyxml.cxx
+  - name: Python 3.6 on Linux
+    python: 3.6
   - name: Python 3.7 on macOS
     os: osx
     osx_image: xcode11
@@ -15,9 +23,14 @@ matrix:
     before_install:
     - choco install python --version=3.7.4
     - python -m pip install --upgrade pip
-    - sed -i 's/<expat.h>/"expat.h"/' gym_jsbsim/jsbsim/src/simgear/xml/easyxml.cxx
-    - sed -i 's/std::min/(std::min)/' gym_jsbsim/jsbsim/src/simgear/misc/strutils.cxx
     env: PATH=/c/Python37:/c/Python37/Scripts:$PATH
+  - name: Python 3.7 on Windows
+      os: windows
+      language: shell
+      before_install:
+        - choco install python --version=3.6.5
+        - python -m pip install --upgrade pip
+      env: PATH=/c/Python36:/c/Python36/Scripts:$PATH
 install:
 - pip3 install .
 script:
@@ -25,7 +38,7 @@ script:
 after_success:
 - pip3 install wheel twine
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then chmod +x build_wheels.sh && docker run
-  --rm -v $PWD:/io quay.io/pypa/manylinux2010_x86_64 /io/build_wheels.sh && ls dist/;
+  --rm -e TRAVIS_PYTHON_VERSION=$TRAVIS_PYTHON_VERSION -v $PWD:/io quay.io/pypa/manylinux2010_x86_64 /io/build_wheels.sh && ls dist/;
   fi
 deploy:
   provider: script

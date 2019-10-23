@@ -2,7 +2,7 @@
 set -e -x
 cd /io
 
-for PYBIN in /opt/python/*3[67]*/bin; do
+for PYBIN in /opt/python/*${TRAVIS_PYTHON_VERSION//.}*/bin; do
     "${PYBIN}/pip" install cython
     "${PYBIN}/python" setup.py bdist_wheel
 done

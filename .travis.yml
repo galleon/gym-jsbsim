@@ -9,6 +9,14 @@ matrix:
     python: 3.7
     before_install:
     - sed -i 's/<expat.h>/"expat.h"/' gym_jsbsim/jsbsim/src/simgear/xml/easyxml.cxx
+  - name: Python 3.6 on macOS
+    os: osx
+    osx_image: xcode11
+    language: shell
+    before_install:
+    - pyenv install 3.6.5
+    - pyenv global 3.6.5
+    - python3 -V
   - name: Python 3.7 on macOS
     os: osx
     osx_image: xcode11

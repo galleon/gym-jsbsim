@@ -32,12 +32,12 @@ script:
 - python3 -m unittest || python -m unittest
 after_success:
 - pip3 install wheel twine
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then chmod +x build_wheels.sh && docker run
-  --rm -e TRAVIS_PYTHON_VERSION=$TRAVIS_PYTHON_VERSION -v $PWD:/io quay.io/pypa/manylinux2010_x86_64 /io/build_wheels.sh && ls dist/;
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then chmod +x build_tools/build_wheels.sh && docker run
+  --rm -e TRAVIS_PYTHON_VERSION=$TRAVIS_PYTHON_VERSION -v $PWD:/io quay.io/pypa/manylinux2010_x86_64 /io/build_tools/build_wheels.sh && ls dist/;
   fi
 deploy:
   provider: script
-  script: sh ./deploy.sh
+  script: sh build_tools/deploy.sh
   skip_existing: true
   skip_cleanup: true
   on:

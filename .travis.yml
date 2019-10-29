@@ -3,12 +3,8 @@ matrix:
   include:
   - name: Python 3.6 on Linux
     python: 3.6
-    before_install:
-    - sed -i 's/<expat.h>/"expat.h"/' gym_jsbsim/jsbsim/src/simgear/xml/easyxml.cxx
   - name: Python 3.7 on Linux
     python: 3.7
-    before_install:
-    - sed -i 's/<expat.h>/"expat.h"/' gym_jsbsim/jsbsim/src/simgear/xml/easyxml.cxx
   - name: Python 3.6 on macOS
     os: osx
     language: shell
@@ -22,8 +18,6 @@ matrix:
     before_install:
     - choco install python --version=3.6.5
     - python -m pip install --upgrade pip
-    - sed -i 's/<expat.h>/"expat.h"/' gym_jsbsim/jsbsim/src/simgear/xml/easyxml.cxx
-    - sed -i 's/std::min/(std::min)/' gym_jsbsim/jsbsim/src/simgear/misc/strutils.cxx
     env: PATH=/c/Python36:/c/Python36/Scripts:$PATH
   - name: Python 3.7 on Windows
     os: windows
@@ -31,8 +25,6 @@ matrix:
     before_install:
     - choco install python --version=3.7.4
     - python -m pip install --upgrade pip
-    - sed -i 's/<expat.h>/"expat.h"/' gym_jsbsim/jsbsim/src/simgear/xml/easyxml.cxx
-    - sed -i 's/std::min/(std::min)/' gym_jsbsim/jsbsim/src/simgear/misc/strutils.cxx
     env: PATH=/c/Python37:/c/Python37/Scripts:$PATH
 install:
 - pip3 install .

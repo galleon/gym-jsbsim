@@ -2,6 +2,12 @@ import os
 from gym.envs.registration import registry, register, make, spec
 from gym_jsbsim.envs import TASKS
 from gym_jsbsim.catalogs import Catalog
+from pkg_resources import get_distribution, DistributionNotFound
+try:
+    __version__ = get_distribution(__name__).version
+except DistributionNotFound:
+    # package is not installed
+    pass
 
 """
 

@@ -244,3 +244,4 @@ class JSBSimEnv(gym.Env):
 
     def set_state(self, state):
         self.sim.set_sim_state(state)
+        self.state = self.get_observation()

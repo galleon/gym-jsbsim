@@ -25,7 +25,7 @@ The package is directly installable with pip typing the following command :
 pip install gym-jsbsim
 ```
 ### Windows
-First, you have to install the Shapely library (#39) with :
+First, you have to install the Shapely library (issue [#39](https://github.com/galleon/gym-jsbsim/issues/39)) with :
 * ##### Python 3.6 :
    ```
    pip install https://download.lfd.uci.edu/pythonlibs/g5apjq5m/Shapely-1.6.4.post2-cp36-cp36m-win_amd64.whl

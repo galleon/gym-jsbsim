@@ -32,7 +32,7 @@ install:
 - pip3 install .
 script:
 - python3 -m unittest || python -m unittest
-after_success:
+before_deploy:
 - pip3 install wheel twine
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then chmod +x build_tools/build_wheels.sh && docker run
   --rm -e TRAVIS_PYTHON_VERSION=$TRAVIS_PYTHON_VERSION -v $PWD:/io quay.io/pypa/manylinux2010_x86_64 /io/build_tools/build_wheels.sh && ls dist/;

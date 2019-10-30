@@ -19,19 +19,24 @@ Our work is initially based on the Gor-Ren repository (https://github.com/Gor-Re
 
 ## Installation
 
-First, you have to download the gym-jsbsim package with the latest JSBSim release by running: 
+### Mac OS / Linux
+The package is directly installable with pip typing the following command :
 ```
-git clone --recursive --branch new https://github.com/galleon/gym-jsbsim.git
-cd gym-jsbsim
+pip install gym-jsbsim
 ```
-Then, you can install it directly on your Linux machine with:
+### Windows
+First, you have to install the Shapely library (#39) with :
+* ##### Python 3.6 :
+   ```
+   pip install https://download.lfd.uci.edu/pythonlibs/g5apjq5m/Shapely-1.6.4.post2-cp36-cp36m-win_amd64.whl
+   ```
+* ##### Python 3.7 :
+   ```
+   pip install https://download.lfd.uci.edu/pythonlibs/g5apjq5m/Shapely-1.6.4.post2-cp37-cp37m-win_amd64.whl
+   ```
+Then, you can install the package with the pip install command :
 ```
-pip install .
-```
-Or you can choose to install it in a Docker container by typing the following command:
-```
-docker build -t docker_gym_jsbsim
-docker run -v "$PWD":/home/gym-jsbsim -it docker_gym_jsbsim
+pip install gym-jsbsim
 ```
 
 ## Environments

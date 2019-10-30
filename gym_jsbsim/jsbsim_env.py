@@ -138,7 +138,7 @@ class JSBSimEnv(gym.Env):
 
         return is_not_contained or self.task.is_terminal(self.state, self.sim)
 
-    def render(self, mode='human'):
+    def render(self, mode='human', **kwargs):
         """Renders the environment.
 
         The set of supported modes varies per environment. (And some
@@ -162,7 +162,8 @@ class JSBSimEnv(gym.Env):
 
         :param mode: str, the mode to render with
         """
-        output = self.task.get_output()
+        self.task.render(self.sim, mode=mode, **kwargs)
+        """output = self.task.get_output()
 
         if mode == 'human':
             pass
@@ -170,6 +171,7 @@ class JSBSimEnv(gym.Env):
             pass
         else:
             pass
+        """
 
     def seed(self, seed=None):
         """

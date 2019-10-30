@@ -3,6 +3,7 @@ import re
 from os import environ
 import jsbsim
 from gym_jsbsim.catalogs.catalog import Catalog
+from gym_jsbsim.catalogs.property import Property, CustomProperty
 
 
 class Simulation:
@@ -150,11 +151,18 @@ class Simulation:
 
         :return : float
         """
-
-        if prop.access == 'R':
-            if prop.update:
-                prop.update(self)
-        return self.jsbsim_exec.get_property_value(prop.name_jsbsim)
+        if isinstance(prop, Property):
+            if prop.access == 'R':
+                if prop.update:
+                    prop.update(self)
+            return self.jsbsim_exec.get_property_value(prop.name_jsbsim)
+        elif isinstance(prop, CustomProperty):
+            if 'R' in prop.access and prop.read:
+                return prop.read(self)
+            else:
+                raise RuntimeError(f'{prop} is not readable')
+        else:
+            raise ValueError(f"prop type unhandled: {type(prop)} ({prop})")
 
     def set_property_value(self, prop, value):
         """
@@ -165,18 +173,25 @@ class Simulation:
         :param value: float
 
         """
-
         # set value in property bounds
-        if value < prop.min:
-            value = prop.min
-        elif value > prop.max:
-            value = prop.max
+        if isinstance(prop, Property):
+            if value < prop.min:
+                value = prop.min
+            elif value > prop.max:
+                value = prop.max
 
-        self.jsbsim_exec.set_property_value(prop.name_jsbsim, value)
+            self.jsbsim_exec.set_property_value(prop.name_jsbsim, value)
 
-        if 'W' in prop.access:
-            if prop.update:
-                prop.update(self)
+            if 'W' in prop.access:
+                if prop.update:
+                    prop.update(self)
+        elif isinstance(prop, CustomProperty):
+            if 'W' in prop.access and prop.write:
+                return prop.write(self, value)
+            else:
+                raise RuntimeError(f'{prop} is not readable')
+        else:
+            raise ValueError(f"prop type unhandled: {type(prop)} ({prop})")
 
     def get_sim_state(self):
         return {prop: self.get_property_value(prop) for prop in Catalog.values()}

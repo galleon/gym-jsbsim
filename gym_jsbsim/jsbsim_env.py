@@ -220,27 +220,21 @@ class JSBSimEnv(gym.Env):
 
         """
         obs_list = self.sim.get_property_values(self.task.get_observation_var())
-        obs_tuple = ()
-        for obs in obs_list:
-            obs_tuple += (np.array([obs]),)
-        return obs_tuple
+        return tuple([np.array([obs]) for obs in obs_list])
 
     def get_sim_time(self):
         """ Gets the simulation time from sim, a float. """
-
         return self.sim.get_sim_time()
 
     def get_state(self):
         return self.sim.get_sim_state()
 
     def _get_clipped_state(self):
-        clipped_state = np.clip(self.state,
-                                [o.low for o in self.observation_space],
-                                [o.high for o in self.observation_space])
-        # Shape the state as a tuple of arrays
-        clipped_state = tuple(np.array([val]) for val in clipped_state.squeeze())
-
-        return clipped_state
+        clipped = [
+            np.clip(self.state[i], o.low, o.high) if self.task.state_var[i].clipped else self.state[i]
+            for i, o in enumerate(self.observation_space)
+        ]
+        return tuple(clipped)
 
     def set_state(self, state):
         self.sim.set_sim_state(state)

@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/galleon/gym-jsbsim.svg?branch=new)](https://travis-ci.org/galleon/gym-jsbsim)
+[![ Windows Build Status](http://badges.herokuapp.com/travis/galleon/gym-jsbsim?env=BADGE=windows&label=windows&branch=new)](https://travis-ci.org/galleon/gym-jsbsim) [![ Linux Build Status](http://badges.herokuapp.com/travis/galleon/gym-jsbsim?env=BADGE=linux&label=linux&branch=new)](https://travis-ci.org/galleon/gym-jsbsim) [![ MacOS Build Status](http://badges.herokuapp.com/travis/galleon/gym-jsbsim?env=BADGE=osx&label=OSX&branch=new)](https://travis-ci.org/galleon/gym-jsbsim)
 
 # JSBSim Aircraft Simulator for Open AI Gym Environment
 

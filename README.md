@@ -138,7 +138,7 @@ and extracted from this path a list of geodesic coordinates that the aircraft sh
 As state set for this environment, we compute every timestep, the distance (di) and angle (ai) to the next 4 path points according to location of the aircraft (ie: d1 to d4 and a1 to a4)
 
 <p align="center">
-  <img src=./gym_jsbsim/docs/l2f_taxistate.png>
+  <img src=https://github.com/galleon/gym-jsbsim/blob/new/gym_jsbsim/docs/l2f_taxistate.png?raw=true>
 </p>
 
 

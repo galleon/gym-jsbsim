@@ -130,7 +130,7 @@ In this environnement, the aircraft should behave on ground and following a spec
 For this environement, we have extract a path from the AMDB files of blagnac airport:
 
 <p align="center">
-  <img width="600" height="400" src=./gym_jsbsim/docs/l2f_taxi_path.png>
+  <img width="600" height="400" src=https://github.com/galleon/gym-jsbsim/blob/new/gym_jsbsim/docs/l2f_taxi_path.png?raw=true>
 </p>
 
 and extracted from this path a list of geodesic coordinates that the aircraft should follow.

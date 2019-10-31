@@ -1,6 +1,5 @@
 import numpy as np
-from shapely import ops
-from shapely.geometry import MultiPoint,Point,MultiLineString,LineString
+from shapely.geometry import Point, LineString
 from geographiclib.geodesic import Geodesic
 
 def get_bearing(p1, p2):

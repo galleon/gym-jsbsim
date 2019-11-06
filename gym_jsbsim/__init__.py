@@ -1,33 +1,35 @@
-import gym.envs.registration
-import enum
-from gym_jsbsim.base_flight_task import BaseFlightTask
-from gym_jsbsim.env_control_task import HeadingControlTask, ChangeHeadingControlTask, TaxiControlTask, TakeoffControlTask
-
-from gym_jsbsim.aircraft import Aircraft, cessna172P
-from gym_jsbsim import utils
+import os
+from gym.envs.registration import registry, register, make, spec
+from gym_jsbsim.envs import TASKS
+from gym_jsbsim.catalogs import Catalog
+from pkg_resources import get_distribution, DistributionNotFound
+try:
+    __version__ = get_distribution(__name__).version
+except DistributionNotFound:
+    # package is not installed
+    pass
 
 """
-This script registers all combinations of task, aircraft settings
- etc. with OpenAI Gym so that they can be instantiated with a gym.make(id)
+
+This script registers JSBSimEnv
+
+with OpenAI Gym so that they can be instantiated with a gym.make(id)
+
  command.
 
-The gym_jsbsim.Envs enum stores all registered environments as members with
- their gym id string as value. This allows convenient autocompletion and value
- safety. To use do:
-       env = gym.make(gym_jsbsim.Envs.desired_environment.value)
+
+ To use do:
+
+       env = gym.make('GymJsbsim-{task}-v0')
+
 """
 
-for env_id, (task, plane, enable_flightgear) in utils.get_env_id_kwargs_map().items():
-    if enable_flightgear:
-        entry_point = 'gym_jsbsim.environment:JsbSimEnv'
-    else:
-        entry_point = 'gym_jsbsim.environment:NoFGJsbSimEnv'
-    kwargs = dict(task_type=task,
-                  aircraft=plane)
-    gym.envs.registration.register(id=env_id,
-                                   entry_point=entry_point,
-                                   kwargs=kwargs)
+if 'JSBSIM_ROOT_DIR' not in os.environ:
+    os.environ['JSBSIM_ROOT_DIR'] = os.path.join(os.path.dirname(__file__), 'jsbsim')
 
-# make an Enum storing every Gym-JSBSim environment ID for convenience and value safety
-Envs = enum.Enum.__call__('Envs', [(utils.AttributeFormatter.translate(env_id), env_id)
-                                   for env_id in utils.get_env_id_kwargs_map().keys()])
+for task_name in TASKS:
+    register(
+        id=f'GymJsbsim-{task_name}-v0',
+        entry_point='gym_jsbsim.jsbsim_env:JSBSimEnv',
+        kwargs=dict(task=TASKS[task_name])
+    )

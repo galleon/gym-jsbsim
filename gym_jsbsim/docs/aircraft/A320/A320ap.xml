@@ -1,0 +1,70 @@
+<autopilot name="A320 Autopilot">
+
+ <!-- INTERFACE PROPERTIES -->
+   <property> ap/vg-hold </property>
+   <property value="2"> ap/vg-pid-throttle-kp </property>
+   <property value="0.008"> ap/vg-pid-throttle-ki </property>
+   <property value="0"> ap/vg-pid-throttle-kd </property>
+   <property value="1"> ap/vg-brake-gain </property>
+   <property> tc/target-vg </property> 
+
+<!-- Ground velocity controller --> 
+ <channel name="AP ground velocity"> 
+
+   <switch name="ap/vg-on-off">
+     <default value="-1"/>
+     <test value="0">
+       ap/vg-hold == 1
+       gear/wow == 1
+     </test>
+   </switch>
+
+   <summer name="velocities/delta-vg">
+    <input> tc/target-vg </input>
+    <input> -velocities/vg-fps</input>
+   </summer>
+
+   <pid name="ap/vg-throttle-error-pid">
+     <input> velocities/delta-vg </input>
+        <kp> ap/vg-pid-throttle-kp </kp>
+        <ki> ap/vg-pid-throttle-ki </ki>     
+        <kd> ap/vg-pid-throttle-kd </kd>
+        <trigger> ap/vg-on-off </trigger>
+   </pid>
+
+   <pure_gain name="ap/vg-brake-error-gain">
+     <input> ap/vg-throttle-error-pid </input>
+     <gain> ap/vg-brake-gain </gain>
+   </pure_gain>
+
+   <switch name="ap/brake-cmd-norm">
+       <default value="fcs/left-brake-cmd-norm"/>
+       <test value="-ap/vg-brake-error-gain">
+         ap/vg-hold == 1
+         gear/wow == 1
+       </test>
+       <clipto>
+         <min> 0 </min>
+         <max> 1 </max>
+       </clipto>
+       <output> fcs/left-brake-cmd-norm </output>
+       <output> fcs/right-brake-cmd-norm </output>
+   </switch>
+
+   <switch name="ap/throttle-cmd-norm">
+       <default value="fcs/throttle-cmd-norm"/>
+       <test value="ap/vg-throttle-error-pid">
+         ap/vg-hold == 1
+         gear/wow == 1
+       </test>
+       <clipto>
+         <min> 0 </min>
+         <max> 1 </max>
+       </clipto>
+       <output> fcs/throttle-cmd-norm </output>
+       <output> fcs/throttle-cmd-norm[1] </output>
+   </switch>
+
+ </channel>
+</autopilot>
+   

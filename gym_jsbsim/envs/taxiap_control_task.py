@@ -43,7 +43,6 @@ class TaxiapControlTask(Task):
                         c.target_heading_deg: INIT_AC_HEADING,
                         c.fcs_throttle_cmd_norm: 0,
                         c.fcs_mixture_cmd_norm: 1,
-                        c.propulsion_set_running: -1, # Engine Running
                         c.gear_gear_pos_norm : 1, # Landing gear ON
                         c.gear_gear_cmd_norm: 1, # Landing gear ON
                         c.ap_vg_hold: 1, # AP ON

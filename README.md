@@ -214,5 +214,7 @@ python test_agent.py
 ## Links
 
 Open AI GYM: https://github.com/openai/gym
+
 JSBSim: https://github.com/JSBSim-Team/jsbsim
+
 Gor-Ren Gym-Jsbsim repo: https://github.com/Gor-Ren/gym-jsbsim

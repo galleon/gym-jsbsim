@@ -47,7 +47,6 @@ deploy:
   skip_existing: true
   skip_cleanup: true
   on:
-    branch: new
     tags: true
 env:
   global:

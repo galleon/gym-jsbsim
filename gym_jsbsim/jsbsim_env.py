@@ -229,7 +229,8 @@ class JSBSimEnv(gym.Env):
         return self.sim.get_sim_time()
 
     def get_state(self):
-        return self.sim.get_sim_state()
+        raise NotImplementedError("To be implemented")
+        #return self.sim.get_sim_state()
 
     def _get_clipped_state(self):
         clipped = [
@@ -239,5 +240,6 @@ class JSBSimEnv(gym.Env):
         return tuple(clipped)
 
     def set_state(self, state):
-        self.sim.set_sim_state(state)
-        self.state = self.get_observation()
+        raise NotImplementedError("To be implemented")
+        #self.sim.set_sim_state(state)
+        #self.state = self.get_observation()

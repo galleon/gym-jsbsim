@@ -43,7 +43,7 @@ pip install gym-jsbsim
 ### Sources
 If you want to build from the source, clone the repository using the following command as we have submodules:
 ```
-git clone --recurse-submodules https://github.com/galleon/gym-jsbsim.git .
+git clone --recurse-submodules https://github.com/galleon/gym-jsbsim.git
 ```
 
 ## Environments

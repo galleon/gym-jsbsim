@@ -1,7 +1,7 @@
 import os
 
 try:
-    from .version import __version__, __jsbsim_version__ # noqa: F401
+    from .version import __version__, __jsbsim_version__  # noqa: F401
 except ImportError:
     pass
 
@@ -24,12 +24,12 @@ with OpenAI Gym so that they can be instantiated with a gym.make(id)
 
 """
 
-if 'JSBSIM_ROOT_DIR' not in os.environ:
-    os.environ['JSBSIM_ROOT_DIR'] = os.path.join(os.path.dirname(__file__), 'jsbsim-'+ __jsbsim_version__)
+if "JSBSIM_ROOT_DIR" not in os.environ:
+    os.environ["JSBSIM_ROOT_DIR"] = os.path.join(os.path.dirname(__file__), "jsbsim-" + __jsbsim_version__)
 
 for task_name in TASKS:
     register(
-        id=f'GymJsbsim-{task_name}-v0',
-        entry_point='gym_jsbsim.jsbsim_env:JSBSimEnv',
-        kwargs=dict(task=TASKS[task_name])
+        id=f"GymJsbsim-{task_name}-v0",
+        entry_point="gym_jsbsim.jsbsim_env:JSBSimEnv",
+        kwargs=dict(task=TASKS[task_name]),
     )

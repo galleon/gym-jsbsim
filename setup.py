@@ -57,8 +57,8 @@ urllib.request.urlretrieve(
 sub_dirs = ["aircraft", "engine", "systems"]
 archive = ZipFile("v{}.zip".format(jsbsim_version))
 for file in archive.namelist():
-    print("file: {}".format(file))
-    if file.split(os.path.sep)[1] in sub_dirs:
+    l = file.split(os.path.sep)
+    if len(l) > 1 and l[1] in sub_dirs:
         archive.extract(file, to_path)
 
 # move aircraft from docs to jsbsim directory

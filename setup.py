@@ -1,9 +1,8 @@
 from setuptools import setup, find_packages
 from distutils.util import get_platform
-from packaging import version
+from distutils.version import StrictVersion as parse_version
 from zipfile import ZipFile
 import subprocess
-import shutil
 import os
 
 def _get_version_hash():
@@ -21,12 +20,12 @@ if version[:1] == 'v':
     version = version[1:]
 
 jsbsim_dependency = ''
-if version.parse(version) > version.parse("0.5.0"):
+if parse_version(version) > parse_version("0.5.0"):
     jsbsim_dependency = "1.1.0"
 
 # download a/c data
 cwd = os.path.dirname(os.path.abspath(__file__))
-to_path = 'gym_jsbsim/jsbsim/'
+to_path = 'gym_jsbsim/'
 
 try:
     command = "curl -LO https://github.com/JSBSim-Team/jsbsim/archive/v{}.zip".format(jsbsim_dependency)
@@ -34,15 +33,18 @@ try:
 except Exception:
     pass
 
-with ZipFile("v{}".format(jsbsim_dependency), 'r') as zo:
-    for sub_dir in ["aircraft", "engine", "systems"]:
-        zo.extract(sub_dir, to_path)
+sub_dirs = ["aircraft", "engine", "systems"]
+archive = ZipFile("v{}".format(jsbsim_dependency))
+for file in archive.list():
+    if file.split(os.path.sep)[1] in sub_dirs:
+        zo.extract(file, to_path)
 
 # move aircraft from docs to jsbsim directory
 from_path = 'gym_jsbsim/docs/aircraft'
+to_path = 'gym_jsbsim/jsbsim-{}/aircraft'.format(jsbsim_dependecy)
 for aircraft in os.listdir(from_path):
     for f in os.listdir(os.path.join(from_path, aircraft)):
-        os.replace(os.path.join(from_path, aircraft, f), os.path.join(to_path, 'aircraft', aircraft, f))
+        os.replace(os.path.join(from_path, aircraft, f), os.path.join(to_path, aircraft, f))
 
 with open('README.md') as f:
     long_description = f.read()
@@ -69,7 +71,7 @@ if __name__ == '__main__':
         python_requires='>3.6',
         setup_requires=['pytest-runner'],
         tests_require=['pytest'],
-        packages=find_packages(exclude=('docs', 'tests', 'notebooks'),
+        packages=find_packages(exclude=('docs', 'tests', 'notebooks')),
         package_data={
             'gym_jsbsim': ['jsbsim/aircraft/*/*.xml','jsbsim/systems/*.xml','jsbsim/engine/*.xml']
         },

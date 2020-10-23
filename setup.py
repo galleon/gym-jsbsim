@@ -2,6 +2,7 @@ from setuptools import setup, find_packages
 from distutils.util import get_platform
 from distutils.version import StrictVersion as parse_version
 from zipfile import ZipFile
+import shutil
 import subprocess
 import os
 
@@ -16,44 +17,47 @@ def _get_version_hash():
 
 version = _get_version_hash()
 
-print(version)
-version="0.5.1"
-
 if version[:1] == 'v':
     version = version[1:]
 
-jsbsim_dependency = ''
+jsbsim_version = ''
 if parse_version(version) > parse_version("0.5.0"):
-    jsbsim_dependency = "1.1.0"
+    jsbsim_version = "1.1.0"
+
+cwd = os.path.dirname(os.path.abspath(__file__))
+
+def write_version_file():
+    with open(os.path.join(cwd, 'gym_jsbsim', 'version.py'), 'w')  as file:
+        file.write("__version__ = '{}'\n".format(version))
+        file.write("__jsbsim_version__ = '{}'\n".format(jsbsim_version))
 
 # download a/c data
-cwd = os.path.dirname(os.path.abspath(__file__))
 to_path = 'gym_jsbsim/'
 
 try:
-    command = "curl -LO https://github.com/JSBSim-Team/jsbsim/archive/v{}.zip".format(jsbsim_dependency)
+    command = "curl -LO https://github.com/JSBSim-Team/jsbsim/archive/v{}.zip".format(jsbsim_version)
     subprocess.call([command], shell=True)
 except Exception:
     pass
 
 sub_dirs = ["aircraft", "engine", "systems"]
-archive = ZipFile("v{}.zip".format(jsbsim_dependency))
+archive = ZipFile("v{}.zip".format(jsbsim_version))
 for file in archive.namelist():
     if file.split(os.path.sep)[1] in sub_dirs:
         archive.extract(file, to_path)
 
 # move aircraft from docs to jsbsim directory
 from_path = 'gym_jsbsim/docs/aircraft'
-to_path = 'gym_jsbsim/jsbsim-{}/aircraft'.format(jsbsim_dependency)
+to_path = 'gym_jsbsim/jsbsim-{}/aircraft'.format(jsbsim_version)
 for aircraft in os.listdir(from_path):
     for f in os.listdir(os.path.join(from_path, aircraft)):
-        os.replace(os.path.join(from_path, aircraft, f), os.path.join(to_path, aircraft, f))
+        shutil.copyfile(os.path.join(from_path, aircraft, f), os.path.join(to_path, aircraft, f))
 
 with open('README.md') as f:
     long_description = f.read()
 
 requirements = [
-        'jsbsim>=' + jsbsim_dependency,
+        'jsbsim>=' + jsbsim_version,
         'folium>=0.10.1',
         'geographiclib>=1.50',
         'gym>=0.15.7',
@@ -61,6 +65,7 @@ requirements = [
 ]
 
 if __name__ == '__main__':
+    write_version_file()
     setup(
         name='gym_jsbsim',
         version=version,

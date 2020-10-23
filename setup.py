@@ -2,6 +2,7 @@ from setuptools import setup, find_packages
 from distutils.util import get_platform
 from distutils.version import StrictVersion as parse_version
 from zipfile import ZipFile
+import urllib.request
 import shutil
 import subprocess
 import os
@@ -36,11 +37,13 @@ def write_version_file():
 # download a/c data
 to_path = 'gym_jsbsim/'
 
-try:
-    command = "curl -LO https://github.com/JSBSim-Team/jsbsim/archive/v{}.zip".format(jsbsim_version)
-    subprocess.call([command], shell=True)
-except Exception:
-    pass
+urllib.request.urlretrieve('https://github.com/JSBSim-Team/jsbsim/archive/v{}.zip'.format(jsbsim_version), 'v{}.zip'.format(jsbsim_version))
+
+#try:
+#    command = "curl -LO https://github.com/JSBSim-Team/jsbsim/archive/v{}.zip".format(jsbsim_version)
+#    subprocess.call([command], shell=True)
+#except Exception:
+#    pass
 
 sub_dirs = ["aircraft", "engine", "systems"]
 archive = ZipFile("v{}.zip".format(jsbsim_version))

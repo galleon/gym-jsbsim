@@ -24,6 +24,8 @@ jsbsim_version = ''
 if parse_version(version) > parse_version("0.5.0"):
     jsbsim_version = "1.1.0"
 
+print("Building wheels {}-{}".format(version, jsbsim_version))
+
 cwd = os.path.dirname(os.path.abspath(__file__))
 
 def write_version_file():

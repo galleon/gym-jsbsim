@@ -16,6 +16,9 @@ def _get_version_hash():
 
 version = _get_version_hash()
 
+print(version)
+version="0.5.1"
+
 if version[:1] == 'v':
     version = version[1:]
 
@@ -34,14 +37,14 @@ except Exception:
     pass
 
 sub_dirs = ["aircraft", "engine", "systems"]
-archive = ZipFile("v{}".format(jsbsim_dependency))
-for file in archive.list():
+archive = ZipFile("v{}.zip".format(jsbsim_dependency))
+for file in archive.namelist():
     if file.split(os.path.sep)[1] in sub_dirs:
-        zo.extract(file, to_path)
+        archive.extract(file, to_path)
 
 # move aircraft from docs to jsbsim directory
 from_path = 'gym_jsbsim/docs/aircraft'
-to_path = 'gym_jsbsim/jsbsim-{}/aircraft'.format(jsbsim_dependecy)
+to_path = 'gym_jsbsim/jsbsim-{}/aircraft'.format(jsbsim_dependency)
 for aircraft in os.listdir(from_path):
     for f in os.listdir(os.path.join(from_path, aircraft)):
         os.replace(os.path.join(from_path, aircraft, f), os.path.join(to_path, aircraft, f))

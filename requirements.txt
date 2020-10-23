@@ -1,0 +1,5 @@
+jsbsim>=1.1.0
+folium>=0.10.1
+geographiclib>=1.50
+gym>=0.15.7
+shapely>=1.7.1

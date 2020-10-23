@@ -18,8 +18,7 @@ class TestSimulation(unittest.TestCase):
                         c.attitude_psi_deg, c.attitude_theta_deg, c.attitude_phi_deg,
                         c.velocities_p_rad_sec, c.velocities_q_rad_sec, c.velocities_r_rad_sec]
 
-    #error_max = 0.0005
-    error_max = 0.005
+    error_max = 0.0005
 
     tmax = 3600  # in seconds
 
@@ -102,7 +101,7 @@ class TestSimulation(unittest.TestCase):
                 error = 0
             else:
                 error = math.fabs(p2 - p1) / max(math.fabs(p1), math.fabs(p2))
-            self.assertLess(error, self.error_max, 'The two simulations have diverged')
+            self.assertLess(error, 10*self.error_max, 'The two simulations have diverged')
 
     def test_get_state_set_state_oscillating_altitude(self):
         # taking actions only on the elevator command

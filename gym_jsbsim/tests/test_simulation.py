@@ -112,7 +112,6 @@ class TestSimulation(unittest.TestCase):
                 error = 0
             else:
                 error = math.fabs(p2 - p1) / max(math.fabs(p1), math.fabs(p2))
-                print("Prop {} has the following error: {}".format(prop, error))
             self.assertLess(error, 10 * self.error_max, "The two simulations have diverged")
 
     def test_get_state_set_state_oscillating_altitude(self):

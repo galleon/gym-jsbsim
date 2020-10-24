@@ -63,7 +63,7 @@ for file in archive.namelist():
 
 # move aircraft from docs to jsbsim directory
 from_path = os.path.join("gym_jsbsim", "docs", "aircraft")
-to_path = os.path.join("gym_jsbsim", "jsbsim-{}".format(jsbsim_version, "aircraft")
+to_path = os.path.join("gym_jsbsim", "jsbsim-{}".format(jsbsim_version), "aircraft")
 for aircraft in os.listdir(from_path):
     for f in os.listdir(os.path.join(from_path, aircraft)):
         shutil.copyfile(

@@ -58,7 +58,9 @@ sub_dirs = ["aircraft", "engine", "systems"]
 archive = ZipFile("v{}.zip".format(jsbsim_version))
 for file in archive.namelist():
     l = file.split(os.path.sep)
+    print(l)
     if len(l) > 2 and l[1] in sub_dirs:
+        print(file)
         archive.extract(file, to_path)
 
 # move aircraft from docs to jsbsim directory

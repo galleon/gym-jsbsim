@@ -21,7 +21,7 @@ class Simulation:
 
         :param aircraft_name: name of aircraft to be loaded.
 
-            JSBSim looks for file '\model_name\model_name.xml' from root dir.
+            JSBSim looks for file '\aircraft_name\aircraft_name.xml' from root dir.
 
         :param init_conditions: dict mapping properties to their initial values.
 

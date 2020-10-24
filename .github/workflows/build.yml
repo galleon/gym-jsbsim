@@ -11,7 +11,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.6, 3.7, 3.8]
-      fail-fast: false
+      fail-fast: true
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
@@ -32,7 +32,28 @@ jobs:
         run: python setup.py bdist
       - name: Test with pytest
         run: |
-          pytest
+          pytest -s
+      - name: Upload for release
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.os }}_files
+          path: dist/*
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download files
+        uses: actions/download-artifact@v2
+      - name: Prepare files
+        run: |
+          mkdir dist
+          find . -type f -print
+          find . -type f -name *.whl -exec cp {} dist/ \;
+          find . -type f -name *.tar.gz -exec cp {} dist/ \;
+      - name: Set up Python
+        uses: actions/setuo-python@v1
+        with:
+          python-version: '3.6'
       - name: Publish
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_UNAME }}

@@ -54,10 +54,9 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: '3.6'
-      - name: Publish
-        env:
-          TWINE_USERNAME: ${{ secrets.PYPI_UNAME }}
-          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
-        run: |
-          pip install -U twine
-          twine --verbose upload dist/*
+      - name: Publish distribution 📦 to PyPI
+        if: startsWith(github.event.ref, 'refs/tags')
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          password: ${{ secrets.PYPI_TOKEN }}
+          packages_dir: dist/

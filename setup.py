@@ -95,9 +95,9 @@ if __name__ == "__main__":
         packages=find_packages(exclude=("docs", "tests", "notebooks")),
         package_data={
             "gym_jsbsim": [
-                "jsbsim/aircraft/*/*.xml",
-                "jsbsim/systems/*.xml",
-                "jsbsim/engine/*.xml",
+                "jsbsim-{}/aircraft/*/*.xml".format(jsbsim_version),
+                "jsbsim-{}/systems/*.xml".format(jsbsim_version),
+                "jsbsim-{}/engine/*.xml".format(jsbsim_version),
             ]
         },
         install_requires=requirements,

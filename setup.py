@@ -25,9 +25,10 @@ version = _get_version_hash()
 if version[:1] == "v":
     version = version[1:]
 
-jsbsim_version = ""
-if parse_version(version) > parse_version("0.5.0"):
-    jsbsim_version = "1.1.0"
+try:
+    from jsbsim import __version__ as jsbsim_version # noqa: F401
+except ImportError:
+    pass
 
 print("Building wheels {}-{}".format(version, jsbsim_version))
 
@@ -47,12 +48,6 @@ urllib.request.urlretrieve(
     "https://github.com/JSBSim-Team/jsbsim/archive/v{}.zip".format(jsbsim_version),
     "v{}.zip".format(jsbsim_version),
 )
-
-# try:
-#    command = "curl -LO https://github.com/JSBSim-Team/jsbsim/archive/v{}.zip".format(jsbsim_version)
-#    subprocess.call([command], shell=True)
-# except Exception:
-#    pass
 
 sub_dirs = ["aircraft", "engine", "systems"]
 archive = ZipFile("v{}.zip".format(jsbsim_version))
